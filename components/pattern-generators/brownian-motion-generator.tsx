@@ -103,6 +103,12 @@ export default function BrownianMotionGenerator({
 
       void main() {
         vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+        
+        // Aspect ratio correction to prevent stretching
+        float aspect = u_resolution.x / u_resolution.y;
+        vec2 aspectCorrectedUV = uv;
+        aspectCorrectedUV.x *= aspect;
+        
         vec3 color = vec3(0.05); // Dark background
         
         // Draw particles with trails (controlled by particle count)
@@ -112,19 +118,24 @@ export default function BrownianMotionGenerator({
           
           float particleId = float(i);
           
-          // Current position
+          // Current position with aspect correction
           vec2 currentPos = getParticlePos(particleId);
-          float currentDist = length(uv - currentPos);
+          currentPos.x *= aspect;
+          float currentDist = length(aspectCorrectedUV - currentPos);
+          
+          // Adjust particle size based on aspect ratio for consistent circular appearance
+          float particleSize = 0.015 / sqrt(aspect);
+          float glowSize = 0.025 / sqrt(aspect);
           
           // Draw current particle (bright yellow, controlled by brightness)
-          if(currentDist < 0.015) {
-            float intensity = 1.0 / (1.0 + currentDist * 400.0);
+          if(currentDist < particleSize) {
+            float intensity = 1.0 / (1.0 + currentDist * 400.0 * aspect);
             // Brightness controlled by uniform
             color += vec3(intensity * u_brightness, intensity * u_brightness * 0.75, intensity * u_brightness * 0.15);
             
             // Add extra glow around particle
-            if(currentDist < 0.025) {
-              float glowIntensity = 1.0 / (1.0 + currentDist * 150.0);
+            if(currentDist < glowSize) {
+              float glowIntensity = 1.0 / (1.0 + currentDist * 150.0 * aspect);
               color += vec3(glowIntensity * u_brightness * 0.4, glowIntensity * u_brightness * 0.3, glowIntensity * u_brightness * 0.05);
             }
           }
@@ -134,7 +145,7 @@ export default function BrownianMotionGenerator({
           for(int t = 1; t < 15; t++) {
             if(t >= maxTrailLength) break;
             
-            float trailTime = u_time - float(t) * 0.15;
+            float trailTime = u_time - float(t) * 0.1; // Closer trail spacing for better visibility
             
             // Recalculate position at past time
             vec2 seed = vec2(particleId * 12.9898, particleId * 78.233);
@@ -155,18 +166,25 @@ export default function BrownianMotionGenerator({
             ) * u_jitterAmount;
             
             vec2 trailPos = fract(startPos + trailOffset);
-            float trailDist = length(uv - trailPos);
+            trailPos.x *= aspect;
+            float trailDist = length(aspectCorrectedUV - trailPos);
             
-            if(trailDist < 0.008) {
+            // Make trail points larger and more visible
+            float trailSize = 0.012 / sqrt(aspect);
+            
+            if(trailDist < trailSize) {
               float alpha = 1.0 - float(t) / u_trailLength;
-              float intensity = 1.0 / (1.0 + trailDist * 1000.0) * alpha;
-              color += vec3(intensity * 0.2, intensity * 0.2, intensity * 0.2);
+              float intensity = 1.0 / (1.0 + trailDist * 600.0 * aspect) * alpha;
+              // Make trails much more visible and slightly yellow-tinted
+              color += vec3(intensity * 0.8, intensity * 0.75, intensity * 0.4);
             }
           }
         }
         
-        // Subtle grid overlay
-        vec2 grid = abs(fract(uv * 40.0) - 0.5);
+        // Subtle grid overlay with aspect correction
+        vec2 gridUV = uv;
+        gridUV.x *= aspect;
+        vec2 grid = abs(fract(gridUV * 40.0) - 0.5);
         float gridLine = min(grid.x, grid.y);
         if(gridLine < 0.01) {
           color += vec3(0.008);
