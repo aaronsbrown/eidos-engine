@@ -19,7 +19,7 @@ export default function PixelatedNoiseGenerator({
   onControlChange 
 }: PatternGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const noiseRef = useRef<SimplexNoise>(new SimplexNoise())
   const timeRef = useRef<number>(0)
 
@@ -63,8 +63,6 @@ export default function PixelatedNoiseGenerator({
           const normalized = (noiseValue + 1) * 0.5
 
           // Create color based on noise value and selected color scheme
-          let r, g, b
-
           const getColor = (scheme: string, value: number, intensity: number) => {
             switch (scheme) {
               case 'retro':
@@ -119,10 +117,7 @@ export default function PixelatedNoiseGenerator({
             }
           }
 
-          const [red, green, blue] = getColor(controls.colorScheme, normalized, controls.colorIntensity)
-          r = red
-          g = green
-          b = blue
+          const [r, g, b] = getColor(controls.colorScheme, normalized, controls.colorIntensity)
 
           ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
 

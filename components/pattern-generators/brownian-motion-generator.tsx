@@ -18,7 +18,7 @@ export default function BrownianMotionGenerator({
   onControlChange 
 }: PatternGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const glRef = useRef<WebGLRenderingContext | null>(null)
   const programRef = useRef<WebGLProgram | null>(null)
   const timeRef = useRef<number>(0)
@@ -37,12 +37,13 @@ export default function BrownianMotionGenerator({
     if (!canvas) return
 
     // Initialize WebGL
-    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-    if (!gl) {
+    const glContext = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+    if (!glContext) {
       console.error("WebGL not supported")
       return
     }
 
+    const gl = glContext as WebGLRenderingContext
     glRef.current = gl
     canvas.width = width
     canvas.height = height
