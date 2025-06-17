@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
 
 export default function PatternGeneratorShowcase() {
@@ -22,7 +23,7 @@ export default function PatternGeneratorShowcase() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 relative">
+    <div className="min-h-screen bg-background text-foreground relative">
       {/* Technical Grid Background */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-30"
@@ -43,7 +44,8 @@ export default function PatternGeneratorShowcase() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="text-xs font-mono text-gray-500 border border-gray-300 px-2 py-1 bg-white">
+            <ThemeToggle />
+            <div className="text-xs font-mono text-muted-foreground border border-border px-2 py-1 bg-background">
               [{String(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).padStart(2, '0')}/{String(patternGenerators.length).padStart(2, '0')}]
             </div>
             <Button 
