@@ -9,9 +9,43 @@ export default function PatternGeneratorShowcase() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
   const [dimensions, setDimensions] = useState({ width: 534, height: 300 })
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
+
+  // Initialize default control values for patterns that have controls
+  const initializeControlValues = (patternId: string) => {
+    const pattern = patternGenerators.find(p => p.id === patternId)
+    if (!pattern?.controls) return {}
+    
+    const defaults: Record<string, number | string | boolean> = {}
+    pattern.controls.forEach(control => {
+      defaults[control.id] = control.defaultValue
+    })
+    return defaults
+  }
+
+  // Get current control values for the selected pattern
+  const getCurrentControlValues = () => {
+    if (!controlValues[selectedPatternId]) {
+      const defaults = initializeControlValues(selectedPatternId)
+      setControlValues(prev => ({ ...prev, [selectedPatternId]: defaults }))
+      return defaults
+    }
+    return controlValues[selectedPatternId]
+  }
+
+  // Handle control changes
+  const handleControlChange = (controlId: string, value: number | string | boolean) => {
+    setControlValues(prev => ({
+      ...prev,
+      [selectedPatternId]: {
+        ...prev[selectedPatternId],
+        [controlId]: value
+      }
+    }))
+  }
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
@@ -61,30 +95,59 @@ export default function PatternGeneratorShowcase() {
       </header>
 
       <div className="flex relative">
-        {/* Left Sidebar - Pattern Selection Only */}
-        <aside className="w-64 border-r border-border p-6 bg-background/50 backdrop-blur-sm">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-2 h-2 bg-yellow-400"></div>
-            <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
+        {/* Left Sidebar - Pattern Selection & Specifications */}
+        <aside className="w-64 border-r border-border p-6 bg-background/50 backdrop-blur-sm space-y-6">
+          {/* Pattern Selection */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
+            </div>
+            <div className="space-y-1">
+              {patternGenerators.map((pattern, index) => (
+                <button
+                  key={pattern.id}
+                  onClick={() => setSelectedPatternId(pattern.id)}
+                  className={`w-full text-left p-3 border transition-all font-mono text-xs ${
+                    selectedPatternId === pattern.id
+                      ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
+                      : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="uppercase tracking-wider">{pattern.name}</span>
+                    <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                  </div>
+                  <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="space-y-1">
-            {patternGenerators.map((pattern, index) => (
-              <button
-                key={pattern.id}
-                onClick={() => setSelectedPatternId(pattern.id)}
-                className={`w-full text-left p-3 border transition-all font-mono text-xs ${
-                  selectedPatternId === pattern.id
-                    ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
-                    : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="uppercase tracking-wider">{pattern.name}</span>
-                  <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
-                </div>
-                <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
-              </button>
-            ))}
+
+          {/* Pattern Specifications */}
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
+            </div>
+            <div className="border border-border p-3 bg-background space-y-2">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">TYPE:</span>
+                <span className="text-foreground uppercase">{selectedPattern.id}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">SIZE:</span>
+                <span className="text-foreground">{dimensions.width} × {dimensions.height}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">FPS:</span>
+                <span className="text-foreground">60</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">STATUS:</span>
+                <span className="text-green-600 dark:text-green-400">ACTIVE</span>
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -138,6 +201,9 @@ export default function PatternGeneratorShowcase() {
                   width={dimensions.width} 
                   height={dimensions.height}
                   className="w-full h-full"
+                  controls={selectedPattern.controls}
+                  controlValues={getCurrentControlValues()}
+                  onControlChange={handleControlChange}
                 />
               </div>
             </div>
@@ -187,7 +253,7 @@ export default function PatternGeneratorShowcase() {
           </div>
         </main>
 
-        {/* Right Sidebar - Parameters & Controls */}
+        {/* Right Sidebar - Viewport & Simulation Parameters */}
         <aside className="w-80 border-l border-border p-6 space-y-6 bg-background/50 backdrop-blur-sm">
           {/* Viewport Controls */}
           <div>
@@ -223,44 +289,67 @@ export default function PatternGeneratorShowcase() {
             </div>
           </div>
 
-          {/* Pattern Parameters */}
+          {/* Simulation Parameters */}
           <div className="border-t border-border pt-6">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
-              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Controls</h3>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">
+                {selectedPattern.controls ? "Simulation Parameters" : "Pattern Controls"}
+              </h3>
             </div>
-            <div className="space-y-4">
+            {selectedPattern.controls ? (
+              <div className="grid grid-cols-2 gap-4">
+                {selectedPattern.controls.map((control) => {
+                  const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+                  
+                  if (control.type === 'range') {
+                    return (
+                      <div key={control.id} className={control.id === 'jitterAmount' || control.id === 'colorScheme' ? 'col-span-2' : ''}>
+                        <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                        <input
+                          type="range"
+                          min={control.min}
+                          max={control.max}
+                          step={control.step}
+                          value={currentValue as number}
+                          onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
+                          className="w-full accent-yellow-400"
+                        />
+                        <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
+                          {control.step && control.step < 1 
+                            ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
+                            : currentValue
+                          }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
+                        </div>
+                      </div>
+                    )
+                  } else if (control.type === 'select') {
+                    return (
+                      <div key={control.id} className="col-span-2">
+                        <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                        <select
+                          value={currentValue as string}
+                          onChange={(e) => handleControlChange(control.id, e.target.value)}
+                          className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
+                        >
+                          {control.options?.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )
+                  }
+                  return null
+                })}
+              </div>
+            ) : (
               <div className="border border-border p-3 bg-background">
-                <div className="text-xs font-mono text-muted-foreground mb-3 uppercase">Reserved for Future Controls</div>
-                <div className="text-xs text-muted-foreground/60">Pattern-specific parameters will appear here when implemented</div>
+                <div className="text-xs font-mono text-muted-foreground mb-3 uppercase">No Controls Available</div>
+                <div className="text-xs text-muted-foreground/60">This pattern does not have interactive controls</div>
               </div>
-            </div>
-          </div>
-
-          {/* Pattern Specifications */}
-          <div className="border-t border-border pt-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
-              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
-            </div>
-            <div className="border border-border p-3 bg-background space-y-2">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-muted-foreground">TYPE:</span>
-                <span className="text-foreground uppercase">{selectedPattern.id}</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-muted-foreground">SIZE:</span>
-                <span className="text-foreground">{dimensions.width} × {dimensions.height}</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-muted-foreground">FPS:</span>
-                <span className="text-foreground">60</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-muted-foreground">STATUS:</span>
-                <span className="text-green-600 dark:text-green-400">ACTIVE</span>
-              </div>
-            </div>
+            )}
           </div>
         </aside>
       </div>

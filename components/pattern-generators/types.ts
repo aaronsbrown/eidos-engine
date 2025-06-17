@@ -16,6 +16,7 @@ export interface PatternGeneratorProps {
   height: number
   className?: string
   controls?: PatternControl[]
+  controlValues?: Record<string, number | string | boolean>
   onControlChange?: (controlId: string, value: number | string | boolean) => void
 }
 

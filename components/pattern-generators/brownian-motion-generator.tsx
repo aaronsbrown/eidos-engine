@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useMemo } from "react"
 import type { PatternGeneratorProps } from "./types"
 
 interface BrownianControls {
@@ -15,7 +15,7 @@ export default function BrownianMotionGenerator({
   width, 
   height, 
   className = "",
-  onControlChange 
+  controlValues
 }: PatternGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
@@ -23,14 +23,14 @@ export default function BrownianMotionGenerator({
   const programRef = useRef<WebGLProgram | null>(null)
   const timeRef = useRef<number>(0)
   
-  // Control state
-  const [controls, setControls] = useState<BrownianControls>({
-    particleCount: 12,
-    speed: 1.0,
-    brightness: 2.0,
-    trailLength: 8,
-    jitterAmount: 0.05
-  })
+  // Use passed control values or defaults
+  const controls: BrownianControls = useMemo(() => ({
+    particleCount: (controlValues?.particleCount as number) ?? 12,
+    speed: (controlValues?.speed as number) ?? 1.0,
+    brightness: (controlValues?.brightness as number) ?? 2.0,
+    trailLength: (controlValues?.trailLength as number) ?? 8,
+    jitterAmount: (controlValues?.jitterAmount as number) ?? 0.05
+  }), [controlValues])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -272,18 +272,12 @@ export default function BrownianMotionGenerator({
     }
   }, [width, height, controls])
 
-  const handleControlChange = (key: keyof BrownianControls, value: number) => {
-    setControls(prev => ({ ...prev, [key]: value }))
-    if (onControlChange) {
-      onControlChange(key, value)
-    }
-  }
 
   return (
     <div className={className}>
       {/* Canvas Container */}
       <div
-        className="overflow-hidden relative border border-gray-300"
+        className="overflow-hidden relative"
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <canvas ref={canvasRef} className="w-full h-full" />
@@ -294,91 +288,6 @@ export default function BrownianMotionGenerator({
         </div>
         <div className="absolute bottom-2 right-2 text-xs font-mono text-gray-400 bg-black/20 px-2 py-1">
           WebGL_2.0
-        </div>
-      </div>
-
-      {/* Control Panel */}
-      <div className="mt-4 p-4 border border-gray-300 bg-white space-y-4">
-        <div className="flex items-center space-x-2 mb-4">
-          <div className="w-2 h-2 bg-yellow-400"></div>
-          <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Simulation Parameters</h3>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {/* Particle Count */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Particle Count</label>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              step="1"
-              value={controls.particleCount}
-              onChange={(e) => handleControlChange('particleCount', parseInt(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.particleCount}</div>
-          </div>
-
-          {/* Speed */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Speed</label>
-            <input
-              type="range"
-              min="0.1"
-              max="3.0"
-              step="0.1"
-              value={controls.speed}
-              onChange={(e) => handleControlChange('speed', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.speed.toFixed(1)}×</div>
-          </div>
-
-          {/* Brightness */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Brightness</label>
-            <input
-              type="range"
-              min="0.5"
-              max="5.0"
-              step="0.1"
-              value={controls.brightness}
-              onChange={(e) => handleControlChange('brightness', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.brightness.toFixed(1)}×</div>
-          </div>
-
-          {/* Trail Length */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Trail Length</label>
-            <input
-              type="range"
-              min="2"
-              max="15"
-              step="1"
-              value={controls.trailLength}
-              onChange={(e) => handleControlChange('trailLength', parseInt(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.trailLength}</div>
-          </div>
-
-          {/* Jitter Amount */}
-          <div className="col-span-2">
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Brownian Jitter</label>
-            <input
-              type="range"
-              min="0.01"
-              max="0.2"
-              step="0.01"
-              value={controls.jitterAmount}
-              onChange={(e) => handleControlChange('jitterAmount', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.jitterAmount.toFixed(2)}</div>
-          </div>
         </div>
       </div>
     </div>

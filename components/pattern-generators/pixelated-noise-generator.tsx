@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useMemo } from "react"
 import type { PatternGeneratorProps } from "./types"
 import { SimplexNoise } from "@/lib/simplex-noise"
 
@@ -16,21 +16,21 @@ export default function PixelatedNoiseGenerator({
   width, 
   height, 
   className = "",
-  onControlChange 
+  controlValues
 }: PatternGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
   const noiseRef = useRef<SimplexNoise>(new SimplexNoise())
   const timeRef = useRef<number>(0)
 
-  // Control state
-  const [controls, setControls] = useState<PixelatedNoiseControls>({
-    pixelSize: 8,
-    noiseScale: 0.1,
-    animationSpeed: 0.02,
-    colorIntensity: 1.0,
-    colorScheme: 'retro'
-  })
+  // Use passed control values or defaults
+  const controls: PixelatedNoiseControls = useMemo(() => ({
+    pixelSize: (controlValues?.pixelSize as number) ?? 8,
+    noiseScale: (controlValues?.noiseScale as number) ?? 0.1,
+    animationSpeed: (controlValues?.animationSpeed as number) ?? 0.02,
+    colorIntensity: (controlValues?.colorIntensity as number) ?? 1.0,
+    colorScheme: (controlValues?.colorScheme as 'retro' | 'monochrome' | 'cyan' | 'amber') ?? 'retro'
+  }), [controlValues])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -140,18 +140,12 @@ export default function PixelatedNoiseGenerator({
     }
   }, [width, height, controls])
 
-  const handleControlChange = (key: keyof PixelatedNoiseControls, value: number | string) => {
-    setControls(prev => ({ ...prev, [key]: value }))
-    if (onControlChange) {
-      onControlChange(key, value)
-    }
-  }
 
   return (
     <div className={className}>
       {/* Canvas Container */}
       <div
-        className="overflow-hidden relative border border-gray-300"
+        className="overflow-hidden relative"
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: "pixelated" }} />
@@ -179,91 +173,6 @@ export default function PixelatedNoiseGenerator({
             `,
           }}
         />
-      </div>
-
-      {/* Control Panel */}
-      <div className="mt-4 p-4 border border-gray-300 bg-white space-y-4">
-        <div className="flex items-center space-x-2 mb-4">
-          <div className="w-2 h-2 bg-yellow-400"></div>
-          <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Noise Parameters</h3>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {/* Pixel Size */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Pixel Size</label>
-            <input
-              type="range"
-              min="2"
-              max="32"
-              step="1"
-              value={controls.pixelSize}
-              onChange={(e) => handleControlChange('pixelSize', parseInt(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.pixelSize}px</div>
-          </div>
-
-          {/* Noise Scale */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Noise Scale</label>
-            <input
-              type="range"
-              min="0.01"
-              max="0.5"
-              step="0.01"
-              value={controls.noiseScale}
-              onChange={(e) => handleControlChange('noiseScale', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.noiseScale.toFixed(2)}</div>
-          </div>
-
-          {/* Animation Speed */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Animation Speed</label>
-            <input
-              type="range"
-              min="0.001"
-              max="0.1"
-              step="0.001"
-              value={controls.animationSpeed}
-              onChange={(e) => handleControlChange('animationSpeed', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.animationSpeed.toFixed(3)}</div>
-          </div>
-
-          {/* Color Intensity */}
-          <div>
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Color Intensity</label>
-            <input
-              type="range"
-              min="0.1"
-              max="2.0"
-              step="0.1"
-              value={controls.colorIntensity}
-              onChange={(e) => handleControlChange('colorIntensity', parseFloat(e.target.value))}
-              className="w-full accent-yellow-400"
-            />
-            <div className="text-xs font-mono text-gray-500 mt-1 text-right">{controls.colorIntensity.toFixed(1)}×</div>
-          </div>
-
-          {/* Color Scheme */}
-          <div className="col-span-2">
-            <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Color Scheme</label>
-            <select
-              value={controls.colorScheme}
-              onChange={(e) => handleControlChange('colorScheme', e.target.value)}
-              className="w-full border border-gray-300 p-2 text-xs font-mono bg-white"
-            >
-              <option value="retro">RETRO_PALETTE</option>
-              <option value="monochrome">MONOCHROME</option>
-              <option value="cyan">CYAN_MATRIX</option>
-              <option value="amber">AMBER_TERMINAL</option>
-            </select>
-          </div>
-        </div>
       </div>
     </div>
   )
