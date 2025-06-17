@@ -7,7 +7,7 @@ import { patternGenerators } from "@/components/pattern-generators"
 
 export default function PatternGeneratorShowcase() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
+  const [dimensions, setDimensions] = useState({ width: 534, height: 300 })
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
@@ -18,7 +18,7 @@ export default function PatternGeneratorShowcase() {
     if (!isFullscreen) {
       setDimensions({ width: window.innerWidth - 40, height: window.innerHeight - 120 })
     } else {
-      setDimensions({ width: 800, height: 600 })
+      setDimensions({ width: 534, height: 300 })
     }
   }
 
@@ -61,115 +61,53 @@ export default function PatternGeneratorShowcase() {
       </header>
 
       <div className="flex relative">
-        {/* Pattern Selection Sidebar */}
-        <aside className="w-80 border-r border-gray-300 p-6 space-y-6 bg-white/50 backdrop-blur-sm">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
-              <h2 className="text-sm font-mono uppercase tracking-wider text-gray-700">Pattern Selection</h2>
-            </div>
-            <div className="space-y-1">
-              {patternGenerators.map((pattern, index) => (
-                <button
-                  key={pattern.id}
-                  onClick={() => setSelectedPatternId(pattern.id)}
-                  className={`w-full text-left p-3 border transition-all font-mono text-xs ${
-                    selectedPatternId === pattern.id
-                      ? "bg-yellow-100 border-yellow-400 text-gray-900"
-                      : "bg-white border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="uppercase tracking-wider">{pattern.name}</span>
-                    <span className="text-gray-400">{(index + 1).toString().padStart(2, '0')}</span>
-                  </div>
-                  <div className="text-gray-500 mt-1">{pattern.id}</div>
-                </button>
-              ))}
-            </div>
+        {/* Left Sidebar - Pattern Selection Only */}
+        <aside className="w-64 border-r border-border p-6 bg-background/50 backdrop-blur-sm">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-2 h-2 bg-yellow-400"></div>
+            <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
           </div>
-
-          {/* Dimension Controls */}
-          <div className="border-t border-gray-300 pt-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
-              <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Parameters</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="border border-gray-300 p-3 bg-white">
-                <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Width</label>
-                <input
-                  type="range"
-                  min="200"
-                  max="1200"
-                  value={dimensions.width}
-                  onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
-                  className="w-full accent-yellow-400"
-                />
-                <div className="text-xs font-mono text-gray-500 mt-1 text-right">{dimensions.width}px</div>
-              </div>
-              <div className="border border-gray-300 p-3 bg-white">
-                <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Height</label>
-                <input
-                  type="range"
-                  min="200"
-                  max="800"
-                  value={dimensions.height}
-                  onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
-                  className="w-full accent-yellow-400"
-                />
-                <div className="text-xs font-mono text-gray-500 mt-1 text-right">{dimensions.height}px</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pattern Info */}
-          <div className="border-t border-gray-300 pt-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
-              <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Specifications</h3>
-            </div>
-            <div className="border border-gray-300 p-3 bg-white space-y-2">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-gray-600">TYPE:</span>
-                <span className="text-gray-900 uppercase">{selectedPattern.id}</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-gray-600">SIZE:</span>
-                <span className="text-gray-900">{dimensions.width} × {dimensions.height}</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-gray-600">FPS:</span>
-                <span className="text-gray-900">60</span>
-              </div>
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-gray-600">STATUS:</span>
-                <span className="text-green-600">ACTIVE</span>
-              </div>
-            </div>
+          <div className="space-y-1">
+            {patternGenerators.map((pattern, index) => (
+              <button
+                key={pattern.id}
+                onClick={() => setSelectedPatternId(pattern.id)}
+                className={`w-full text-left p-3 border transition-all font-mono text-xs ${
+                  selectedPatternId === pattern.id
+                    ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
+                    : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="uppercase tracking-wider">{pattern.name}</span>
+                  <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                </div>
+                <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
+              </button>
+            ))}
           </div>
         </aside>
 
-        {/* Main Pattern Display */}
+        {/* Center - Pattern Display */}
         <main className="flex-1 p-6 relative">
           {/* Technical annotation boxes */}
-          <div className="absolute top-4 left-4 text-xs font-mono text-gray-500 space-y-1">
-            <div className="border border-gray-300 bg-white px-2 py-1">VIEWPORT_01</div>
+          <div className="absolute top-4 left-4 text-xs font-mono text-muted-foreground space-y-1">
+            <div className="border border-border bg-background px-2 py-1">VIEWPORT_01</div>
           </div>
-          <div className="absolute top-4 right-4 text-xs font-mono text-gray-500 space-y-1">
-            <div className="border border-gray-300 bg-white px-2 py-1">REAL_TIME</div>
+          <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
+            <div className="border border-border bg-background px-2 py-1">REAL_TIME</div>
           </div>
 
           <div className="flex flex-col items-center justify-center min-h-full">
             {/* Pattern Title with technical styling */}
             <div className="mb-8 text-center">
-              <h2 className="text-2xl font-mono uppercase tracking-widest text-gray-900 mb-2">
+              <h2 className="text-2xl font-mono uppercase tracking-widest text-foreground mb-2">
                 {selectedPattern.name}
               </h2>
-              <div className="flex items-center justify-center space-x-4 text-xs font-mono text-gray-500">
-                <span className="border border-gray-300 bg-white px-2 py-1">GENERATIVE_PATTERN</span>
-                <span className="border border-gray-300 bg-white px-2 py-1">60FPS_ANIMATION</span>
-                <span className="border border-gray-300 bg-white px-2 py-1">CANVAS_RENDER</span>
+              <div className="flex items-center justify-center space-x-4 text-xs font-mono text-muted-foreground">
+                <span className="border border-border bg-background px-2 py-1">GENERATIVE_PATTERN</span>
+                <span className="border border-border bg-background px-2 py-1">60FPS_ANIMATION</span>
+                <span className="border border-border bg-background px-2 py-1">CANVAS_RENDER</span>
               </div>
             </div>
 
@@ -182,15 +120,15 @@ export default function PatternGeneratorShowcase() {
               <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
               
               {/* Dimension labels */}
-              <div className="absolute -top-6 left-0 text-xs font-mono text-gray-500">
+              <div className="absolute -top-6 left-0 text-xs font-mono text-muted-foreground">
                 {dimensions.width}px
               </div>
-              <div className="absolute -left-12 top-0 text-xs font-mono text-gray-500 -rotate-90 origin-center">
+              <div className="absolute -left-12 top-0 text-xs font-mono text-muted-foreground -rotate-90 origin-center">
                 {dimensions.height}px
               </div>
 
               <div 
-                className="border-2 border-gray-400 bg-white shadow-lg"
+                className="border-2 border-border bg-background shadow-lg"
                 style={{ 
                   width: dimensions.width, 
                   height: dimensions.height 
@@ -214,12 +152,12 @@ export default function PatternGeneratorShowcase() {
                 }}
                 variant="outline"
                 size="sm"
-                className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+                className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
               >
                 ← PREV
               </Button>
               
-              <div className="text-xs font-mono text-gray-500 border border-gray-300 bg-white px-3 py-2">
+              <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
                 {(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).toString().padStart(2, '0')} / {patternGenerators.length.toString().padStart(2, '0')}
               </div>
               
@@ -231,7 +169,7 @@ export default function PatternGeneratorShowcase() {
                 }}
                 variant="outline"
                 size="sm"
-                className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+                className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
               >
                 NEXT →
               </Button>
@@ -239,15 +177,92 @@ export default function PatternGeneratorShowcase() {
           </div>
 
           {/* Bottom technical annotations */}
-          <div className="absolute bottom-4 left-4 text-xs font-mono text-gray-500">
-            <div className="border border-gray-300 bg-white px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
+          <div className="absolute bottom-4 left-4 text-xs font-mono text-muted-foreground">
+            <div className="border border-border bg-background px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
           </div>
-          <div className="absolute bottom-4 right-4 text-xs font-mono text-gray-500">
-            <div className="border border-gray-300 bg-white px-2 py-1">
+          <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground">
+            <div className="border border-border bg-background px-2 py-1">
               {new Date().toISOString().split('T')[0]}
             </div>
           </div>
         </main>
+
+        {/* Right Sidebar - Parameters & Controls */}
+        <aside className="w-80 border-l border-border p-6 space-y-6 bg-background/50 backdrop-blur-sm">
+          {/* Viewport Controls */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Viewport</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="border border-border p-3 bg-background">
+                <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">Width</label>
+                <input
+                  type="range"
+                  min="320"
+                  max="1280"
+                  value={dimensions.width}
+                  onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
+                  className="w-full accent-yellow-400"
+                />
+                <div className="text-xs font-mono text-muted-foreground mt-1 text-right">{dimensions.width}px</div>
+              </div>
+              <div className="border border-border p-3 bg-background">
+                <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">Height</label>
+                <input
+                  type="range"
+                  min="180"
+                  max="720"
+                  value={dimensions.height}
+                  onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
+                  className="w-full accent-yellow-400"
+                />
+                <div className="text-xs font-mono text-muted-foreground mt-1 text-right">{dimensions.height}px</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pattern Parameters */}
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Controls</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="border border-border p-3 bg-background">
+                <div className="text-xs font-mono text-muted-foreground mb-3 uppercase">Reserved for Future Controls</div>
+                <div className="text-xs text-muted-foreground/60">Pattern-specific parameters will appear here when implemented</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pattern Specifications */}
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
+            </div>
+            <div className="border border-border p-3 bg-background space-y-2">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">TYPE:</span>
+                <span className="text-foreground uppercase">{selectedPattern.id}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">SIZE:</span>
+                <span className="text-foreground">{dimensions.width} × {dimensions.height}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">FPS:</span>
+                <span className="text-foreground">60</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">STATUS:</span>
+                <span className="text-green-600 dark:text-green-400">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   )
