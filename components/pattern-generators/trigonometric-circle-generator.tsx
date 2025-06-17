@@ -264,7 +264,7 @@ export default function TrigonometricCircleGenerator({
       // Draw current position on circle
       ctx.fillStyle = "#facc15" // Yellow accent
       ctx.beginPath()
-      ctx.arc(circleX, circleY, 6, 0, 2 * Math.PI)
+      ctx.arc(circleX, circleY, 4, 0, 2 * Math.PI)
       ctx.fill()
 
       // Draw technical labels at bottom of waves to avoid collision
@@ -313,13 +313,6 @@ export default function TrigonometricCircleGenerator({
       >
         <canvas ref={canvasRef} className="w-full h-full" />
         
-        {/* Technical overlay */}
-        <div className="absolute top-2 left-2 text-xs font-mono text-yellow-400 bg-black/20 px-2 py-1">
-          TRIGONOMETRIC_CIRCLE
-        </div>
-        <div className="absolute bottom-2 right-2 text-xs font-mono text-gray-400 bg-black/20 px-2 py-1">
-          CANVAS_2D
-        </div>
       </div>
     </div>
   )

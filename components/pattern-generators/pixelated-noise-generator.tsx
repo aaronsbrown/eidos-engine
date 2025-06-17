@@ -150,13 +150,6 @@ export default function PixelatedNoiseGenerator({
       >
         <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: "pixelated" }} />
 
-        {/* Technical overlay */}
-        <div className="absolute top-2 left-2 text-xs font-mono text-yellow-400 bg-black/20 px-2 py-1">
-          PIXELATED_NOISE
-        </div>
-        <div className="absolute bottom-2 right-2 text-xs font-mono text-gray-400 bg-black/20 px-2 py-1">
-          CANVAS_2D
-        </div>
 
         {/* Add a subtle CRT-style overlay */}
         <div

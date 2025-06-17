@@ -300,13 +300,6 @@ export default function BrownianMotionGenerator({
       >
         <canvas ref={canvasRef} className="w-full h-full" />
         
-        {/* Technical overlay */}
-        <div className="absolute top-2 left-2 text-xs font-mono text-yellow-400 bg-black/20 px-2 py-1">
-          GLSL_BROWNIAN
-        </div>
-        <div className="absolute bottom-2 right-2 text-xs font-mono text-gray-400 bg-black/20 px-2 py-1">
-          WebGL_2.0
-        </div>
       </div>
     </div>
   )

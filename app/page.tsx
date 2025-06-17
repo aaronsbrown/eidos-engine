@@ -140,6 +140,12 @@ export default function PatternGeneratorShowcase() {
                 <span className="text-foreground">{dimensions.width} × {dimensions.height}</span>
               </div>
               <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">TECHNOLOGY:</span>
+                <span className="text-foreground uppercase">
+                  {selectedPattern.id === 'brownian-motion' ? 'WEBGL_2.0' : 'CANVAS_2D'}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">FPS:</span>
                 <span className="text-foreground">60</span>
               </div>
@@ -162,17 +168,6 @@ export default function PatternGeneratorShowcase() {
           </div>
 
           <div className="flex flex-col items-center justify-center min-h-full">
-            {/* Pattern Title with technical styling */}
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-mono uppercase tracking-widest text-foreground mb-2">
-                {selectedPattern.name}
-              </h2>
-              <div className="flex items-center justify-center space-x-4 text-xs font-mono text-muted-foreground">
-                <span className="border border-border bg-background px-2 py-1">GENERATIVE_PATTERN</span>
-                <span className="border border-border bg-background px-2 py-1">60FPS_ANIMATION</span>
-                <span className="border border-border bg-background px-2 py-1">CANVAS_RENDER</span>
-              </div>
-            </div>
 
             {/* Pattern Container with technical frame */}
             <div className="relative">
@@ -182,13 +177,6 @@ export default function PatternGeneratorShowcase() {
               <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-yellow-400"></div>
               <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
               
-              {/* Dimension labels */}
-              <div className="absolute -top-6 left-0 text-xs font-mono text-muted-foreground">
-                {dimensions.width}px
-              </div>
-              <div className="absolute -left-12 top-0 text-xs font-mono text-muted-foreground -rotate-90 origin-center">
-                {dimensions.height}px
-              </div>
 
               <div 
                 className="border-2 border-border bg-background shadow-lg"
