@@ -1,103 +1,252 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { patternGenerators } from "@/components/pattern-generators"
+
+export default function PatternGeneratorShowcase() {
+  const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
+  const PatternComponent = selectedPattern.component
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen)
+    if (!isFullscreen) {
+      setDimensions({ width: window.innerWidth - 40, height: window.innerHeight - 120 })
+    } else {
+      setDimensions({ width: 800, height: 600 })
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gray-50 text-gray-900 relative">
+      {/* Technical Grid Background */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Header */}
+      <header className="relative border-b border-gray-300 p-6 bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <div className="w-3 h-3 bg-yellow-400 border border-gray-400"></div>
+            <h1 className="text-xl font-mono tracking-wider uppercase">Pattern Generator System</h1>
+            <div className="text-xs font-mono text-gray-500 bg-white border border-gray-300 px-2 py-1">
+              v1.0.0
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-xs font-mono text-gray-500 border border-gray-300 px-2 py-1 bg-white">
+              [{String(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).padStart(2, '0')}/{String(patternGenerators.length).padStart(2, '0')}]
+            </div>
+            <Button 
+              onClick={toggleFullscreen}
+              variant="outline" 
+              size="sm"
+              className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+            >
+              {isFullscreen ? "EXIT_FULLSCREEN" : "FULLSCREEN"}
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </header>
+
+      <div className="flex relative">
+        {/* Pattern Selection Sidebar */}
+        <aside className="w-80 border-r border-gray-300 p-6 space-y-6 bg-white/50 backdrop-blur-sm">
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h2 className="text-sm font-mono uppercase tracking-wider text-gray-700">Pattern Selection</h2>
+            </div>
+            <div className="space-y-1">
+              {patternGenerators.map((pattern, index) => (
+                <button
+                  key={pattern.id}
+                  onClick={() => setSelectedPatternId(pattern.id)}
+                  className={`w-full text-left p-3 border transition-all font-mono text-xs ${
+                    selectedPatternId === pattern.id
+                      ? "bg-yellow-100 border-yellow-400 text-gray-900"
+                      : "bg-white border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="uppercase tracking-wider">{pattern.name}</span>
+                    <span className="text-gray-400">{(index + 1).toString().padStart(2, '0')}</span>
+                  </div>
+                  <div className="text-gray-500 mt-1">{pattern.id}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Dimension Controls */}
+          <div className="border-t border-gray-300 pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Parameters</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="border border-gray-300 p-3 bg-white">
+                <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Width</label>
+                <input
+                  type="range"
+                  min="200"
+                  max="1200"
+                  value={dimensions.width}
+                  onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
+                  className="w-full accent-yellow-400"
+                />
+                <div className="text-xs font-mono text-gray-500 mt-1 text-right">{dimensions.width}px</div>
+              </div>
+              <div className="border border-gray-300 p-3 bg-white">
+                <label className="block text-xs font-mono text-gray-600 mb-2 uppercase">Height</label>
+                <input
+                  type="range"
+                  min="200"
+                  max="800"
+                  value={dimensions.height}
+                  onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
+                  className="w-full accent-yellow-400"
+                />
+                <div className="text-xs font-mono text-gray-500 mt-1 text-right">{dimensions.height}px</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pattern Info */}
+          <div className="border-t border-gray-300 pt-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <h3 className="text-sm font-mono uppercase tracking-wider text-gray-700">Specifications</h3>
+            </div>
+            <div className="border border-gray-300 p-3 bg-white space-y-2">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-gray-600">TYPE:</span>
+                <span className="text-gray-900 uppercase">{selectedPattern.id}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-gray-600">SIZE:</span>
+                <span className="text-gray-900">{dimensions.width} × {dimensions.height}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-gray-600">FPS:</span>
+                <span className="text-gray-900">60</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-gray-600">STATUS:</span>
+                <span className="text-green-600">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Pattern Display */}
+        <main className="flex-1 p-6 relative">
+          {/* Technical annotation boxes */}
+          <div className="absolute top-4 left-4 text-xs font-mono text-gray-500 space-y-1">
+            <div className="border border-gray-300 bg-white px-2 py-1">VIEWPORT_01</div>
+          </div>
+          <div className="absolute top-4 right-4 text-xs font-mono text-gray-500 space-y-1">
+            <div className="border border-gray-300 bg-white px-2 py-1">REAL_TIME</div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center min-h-full">
+            {/* Pattern Title with technical styling */}
+            <div className="mb-8 text-center">
+              <h2 className="text-2xl font-mono uppercase tracking-widest text-gray-900 mb-2">
+                {selectedPattern.name}
+              </h2>
+              <div className="flex items-center justify-center space-x-4 text-xs font-mono text-gray-500">
+                <span className="border border-gray-300 bg-white px-2 py-1">GENERATIVE_PATTERN</span>
+                <span className="border border-gray-300 bg-white px-2 py-1">60FPS_ANIMATION</span>
+                <span className="border border-gray-300 bg-white px-2 py-1">CANVAS_RENDER</span>
+              </div>
+            </div>
+
+            {/* Pattern Container with technical frame */}
+            <div className="relative">
+              {/* Corner markers */}
+              <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-yellow-400"></div>
+              <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-yellow-400"></div>
+              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-yellow-400"></div>
+              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
+              
+              {/* Dimension labels */}
+              <div className="absolute -top-6 left-0 text-xs font-mono text-gray-500">
+                {dimensions.width}px
+              </div>
+              <div className="absolute -left-12 top-0 text-xs font-mono text-gray-500 -rotate-90 origin-center">
+                {dimensions.height}px
+              </div>
+
+              <div 
+                className="border-2 border-gray-400 bg-white shadow-lg"
+                style={{ 
+                  width: dimensions.width, 
+                  height: dimensions.height 
+                }}
+              >
+                <PatternComponent 
+                  width={dimensions.width} 
+                  height={dimensions.height}
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+
+            {/* Pattern Navigation with technical styling */}
+            <div className="flex items-center space-x-6 mt-12">
+              <Button
+                onClick={() => {
+                  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
+                  const prevIndex = currentIndex === 0 ? patternGenerators.length - 1 : currentIndex - 1
+                  setSelectedPatternId(patternGenerators[prevIndex].id)
+                }}
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+              >
+                ← PREV
+              </Button>
+              
+              <div className="text-xs font-mono text-gray-500 border border-gray-300 bg-white px-3 py-2">
+                {(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).toString().padStart(2, '0')} / {patternGenerators.length.toString().padStart(2, '0')}
+              </div>
+              
+              <Button
+                onClick={() => {
+                  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
+                  const nextIndex = currentIndex === patternGenerators.length - 1 ? 0 : currentIndex + 1
+                  setSelectedPatternId(patternGenerators[nextIndex].id)
+                }}
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+              >
+                NEXT →
+              </Button>
+            </div>
+          </div>
+
+          {/* Bottom technical annotations */}
+          <div className="absolute bottom-4 left-4 text-xs font-mono text-gray-500">
+            <div className="border border-gray-300 bg-white px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
+          </div>
+          <div className="absolute bottom-4 right-4 text-xs font-mono text-gray-500">
+            <div className="border border-gray-300 bg-white px-2 py-1">
+              {new Date().toISOString().split('T')[0]}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
-  );
+  )
 }
