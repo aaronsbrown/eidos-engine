@@ -3,6 +3,7 @@ import FrequencySpectrumGenerator from "./frequency-spectrum-generator"
 import NoiseFieldGenerator from "./noise-field-generator"
 import PixelatedNoiseGenerator from "./pixelated-noise-generator"
 import BrownianMotionGenerator from "./brownian-motion-generator"
+import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
@@ -128,7 +129,23 @@ export const patternGenerators: PatternGenerator[] = [
       },
     ],
   },
+  {
+    id: "trigonometric-circle",
+    name: "Trigonometric Circle",
+    component: TrigonometricCircleGenerator,
+    controls: [
+      {
+        id: "speed",
+        label: "Animation Speed",
+        type: "range",
+        min: 0.1,
+        max: 3.0,
+        step: 0.1,
+        defaultValue: 1.0,
+      },
+    ],
+  },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator }
+export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"

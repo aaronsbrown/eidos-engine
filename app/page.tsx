@@ -340,6 +340,20 @@ export default function PatternGeneratorShowcase() {
                         </select>
                       </div>
                     )
+                  } else if (control.type === 'checkbox') {
+                    return (
+                      <div key={control.id} className="col-span-2">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={currentValue as boolean}
+                            onChange={(e) => handleControlChange(control.id, e.target.checked)}
+                            className="w-4 h-4 accent-yellow-400"
+                          />
+                          <span className="text-xs font-mono text-muted-foreground uppercase">{control.label}</span>
+                        </label>
+                      </div>
+                    )
                   }
                   return null
                 })}
