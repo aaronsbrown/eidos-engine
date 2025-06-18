@@ -3,7 +3,7 @@ import type React from "react"
 export interface PatternControl {
   id: string
   label: string
-  type: 'range' | 'color' | 'checkbox' | 'select'
+  type: 'range' | 'color' | 'checkbox' | 'select' | 'button'
   min?: number
   max?: number
   step?: number
@@ -25,4 +25,5 @@ export interface PatternGenerator {
   name: string
   component: React.ComponentType<PatternGeneratorProps>
   controls?: PatternControl[]
+  technology: 'WEBGL_2.0' | 'CANVAS_2D'
 }

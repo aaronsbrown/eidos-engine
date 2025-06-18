@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
@@ -10,6 +10,8 @@ export default function PatternGeneratorShowcase() {
   const [dimensions, setDimensions] = useState({ width: 534, height: 300 })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
+  const [sidebarWidth, setSidebarWidth] = useState(380) // Default sidebar width
+  const [isResizing, setIsResizing] = useState(false)
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
@@ -46,6 +48,34 @@ export default function PatternGeneratorShowcase() {
       }
     }))
   }
+
+  // Handle sidebar resizing
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true)
+    e.preventDefault()
+  }
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return
+    const newWidth = window.innerWidth - e.clientX
+    setSidebarWidth(Math.max(300, Math.min(600, newWidth))) // Min 300px, max 600px
+  }, [isResizing])
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false)
+  }, [])
+
+  // Add mouse event listeners
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+    }
+  }, [isResizing, handleMouseMove, handleMouseUp])
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
@@ -142,7 +172,7 @@ export default function PatternGeneratorShowcase() {
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">TECHNOLOGY:</span>
                 <span className="text-foreground uppercase">
-                  {selectedPattern.id === 'brownian-motion' ? 'WEBGL_2.0' : 'CANVAS_2D'}
+                  {selectedPattern.technology}
                 </span>
               </div>
               <div className="flex justify-between text-xs font-mono">
@@ -167,7 +197,17 @@ export default function PatternGeneratorShowcase() {
             <div className="border border-border bg-background px-2 py-1">REAL_TIME</div>
           </div>
 
-          <div className="flex flex-col items-center justify-center min-h-full">
+          {/* Bottom technical annotations - positioned exactly like top ones */}
+          <div className="absolute bottom-4 left-4 text-xs font-mono text-muted-foreground">
+            <div className="border border-border bg-background px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
+          </div>
+          <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground">
+            <div className="border border-border bg-background px-2 py-1">
+              {new Date().toISOString().split('T')[0]}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center min-h-full pt-16">
 
             {/* Pattern Container with technical frame */}
             <div className="relative">
@@ -230,55 +270,57 @@ export default function PatternGeneratorShowcase() {
             </div>
           </div>
 
-          {/* Bottom technical annotations */}
-          <div className="absolute bottom-4 left-4 text-xs font-mono text-muted-foreground">
-            <div className="border border-border bg-background px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
-          </div>
-          <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground">
-            <div className="border border-border bg-background px-2 py-1">
-              {new Date().toISOString().split('T')[0]}
-            </div>
-          </div>
         </main>
 
+        {/* Resize Handle */}
+        <div 
+          className={`w-1 bg-border hover:bg-yellow-400 cursor-col-resize transition-colors ${isResizing ? 'bg-yellow-400' : ''}`}
+          onMouseDown={handleMouseDown}
+        />
+
         {/* Right Sidebar - Viewport & Simulation Parameters */}
-        <aside className="w-80 border-l border-border p-6 space-y-6 bg-background/50 backdrop-blur-sm">
-          {/* Viewport Controls */}
+        <aside 
+          className="border-l border-border p-6 space-y-4 bg-background/50 backdrop-blur-sm"
+          style={{ width: `${sidebarWidth}px` }}
+        >
+          {/* Viewport Controls - Compact */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="flex items-center space-x-2 mb-3">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Viewport</h3>
             </div>
-            <div className="space-y-4">
-              <div className="border border-border p-3 bg-background">
-                <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">Width</label>
-                <input
-                  type="range"
-                  min="320"
-                  max="1280"
-                  value={dimensions.width}
-                  onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
-                  className="w-full accent-yellow-400"
-                />
-                <div className="text-xs font-mono text-muted-foreground mt-1 text-right">{dimensions.width}px</div>
-              </div>
-              <div className="border border-border p-3 bg-background">
-                <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">Height</label>
-                <input
-                  type="range"
-                  min="180"
-                  max="720"
-                  value={dimensions.height}
-                  onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
-                  className="w-full accent-yellow-400"
-                />
-                <div className="text-xs font-mono text-muted-foreground mt-1 text-right">{dimensions.height}px</div>
+            <div className="border border-border p-2 bg-background space-y-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-muted-foreground mb-1 uppercase">Width</label>
+                  <input
+                    type="range"
+                    min="320"
+                    max="1280"
+                    value={dimensions.width}
+                    onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
+                    className="w-full accent-yellow-400"
+                  />
+                  <div className="text-xs font-mono text-muted-foreground text-right">{dimensions.width}px</div>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono text-muted-foreground mb-1 uppercase">Height</label>
+                  <input
+                    type="range"
+                    min="180"
+                    max="720"
+                    value={dimensions.height}
+                    onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
+                    className="w-full accent-yellow-400"
+                  />
+                  <div className="text-xs font-mono text-muted-foreground text-right">{dimensions.height}px</div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Simulation Parameters */}
-          <div className="border-t border-border pt-6">
+          <div className="border-t border-border pt-4">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">
@@ -286,64 +328,95 @@ export default function PatternGeneratorShowcase() {
               </h3>
             </div>
             {selectedPattern.controls ? (
-              <div className="grid grid-cols-2 gap-4">
-                {selectedPattern.controls.map((control) => {
-                  const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-                  
-                  if (control.type === 'range') {
-                    return (
-                      <div key={control.id} className={control.id === 'jitterAmount' || control.id === 'colorScheme' ? 'col-span-2' : ''}>
-                        <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                        <input
-                          type="range"
-                          min={control.min}
-                          max={control.max}
-                          step={control.step}
-                          value={currentValue as number}
-                          onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
-                          className="w-full accent-yellow-400"
-                        />
-                        <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
-                          {control.step && control.step < 1 
-                            ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
-                            : currentValue
-                          }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
+              <div className="space-y-4">
+                {/* Main controls grid (excluding buttons) */}
+                <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
+                  {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
+                    const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+                    
+                    if (control.type === 'range') {
+                      return (
+                        <div key={control.id} className="flex flex-col h-full">
+                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                          <div className="flex-1 flex flex-col justify-center">
+                            <input
+                              type="range"
+                              min={control.min}
+                              max={control.max}
+                              step={control.step}
+                              value={currentValue as number}
+                              onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
+                              className="w-full accent-yellow-400"
+                            />
+                          </div>
+                          <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
+                            {control.step && control.step < 1 
+                              ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
+                              : currentValue
+                            }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  } else if (control.type === 'select') {
-                    return (
-                      <div key={control.id} className="col-span-2">
-                        <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                        <select
-                          value={currentValue as string}
-                          onChange={(e) => handleControlChange(control.id, e.target.value)}
-                          className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
-                        >
-                          {control.options?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )
-                  } else if (control.type === 'checkbox') {
-                    return (
-                      <div key={control.id} className="col-span-2">
-                        <label className="flex items-center space-x-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={currentValue as boolean}
-                            onChange={(e) => handleControlChange(control.id, e.target.checked)}
-                            className="w-4 h-4 accent-yellow-400"
-                          />
-                          <span className="text-xs font-mono text-muted-foreground uppercase">{control.label}</span>
-                        </label>
-                      </div>
-                    )
-                  }
-                  return null
+                      )
+                    } else if (control.type === 'select') {
+                      return (
+                        <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
+                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                          <div className="flex-1 flex flex-col justify-center">
+                            <select
+                              value={currentValue as string}
+                              onChange={(e) => handleControlChange(control.id, e.target.value)}
+                              className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
+                            >
+                              {control.options?.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      )
+                    } else if (control.type === 'checkbox') {
+                      return (
+                        <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
+                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                          <div className="flex-1 flex items-center">
+                            <label className="flex items-center space-x-3 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={currentValue as boolean}
+                                onChange={(e) => handleControlChange(control.id, e.target.checked)}
+                                className="w-4 h-4 accent-yellow-400"
+                              />
+                              <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
+                            </label>
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  })}
+                </div>
+                
+                {/* Button controls in their own row */}
+                {selectedPattern.controls.filter(control => control.type === 'button').map((control) => {
+                  const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+                  return (
+                    <div key={control.id} className="pt-2">
+                      <Button
+                        onClick={() => {
+                          handleControlChange(control.id, !currentValue)
+                          // Auto-reset the button state after a brief moment
+                          setTimeout(() => handleControlChange(control.id, false), 100)
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="w-full font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20 uppercase"
+                      >
+                        {control.label}
+                      </Button>
+                    </div>
+                  )
                 })}
               </div>
             ) : (
@@ -354,6 +427,7 @@ export default function PatternGeneratorShowcase() {
             )}
           </div>
         </aside>
+
       </div>
     </div>
   )
