@@ -5,7 +5,17 @@
       "Bash(npm run dev:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(rg:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh issue create:*)",
+      "Bash(npm run build:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(gh issue:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
