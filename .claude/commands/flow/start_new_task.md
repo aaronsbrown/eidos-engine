@@ -1,0 +1,45 @@
+# Start New Task
+
+You are about to help the user start working on a new GitHub issue. Follow this workflow exactly:
+
+## Step 1: Fetch Open Issues
+Use the `gh` command to fetch all open issues from the repository:
+```bash
+gh issue list --state open --json number,title,body,labels
+```
+
+## Step 2: Present Issues to User
+Display the open issues in a clear, numbered format and ask the user which one they want to work on. Include:
+- Issue number
+- Title  
+- Brief description/body preview
+- Labels (if any)
+
+Ask: "Which issue would you like to work on? (Enter the issue number)"
+
+## Step 3: Create Feature Branch
+Once the user selects an issue:
+1. Create a descriptive branch name based on the issue (e.g., `feature/issue-123-add-controls`, `fix/issue-456-rendering-bug`)
+2. Create and switch to the new branch:
+```bash
+git checkout -b [branch-name]
+```
+
+## Step 4: Create Starter Plan
+Based on the selected issue:
+1. Use the TodoWrite tool to create a structured plan breaking down the work into specific, actionable tasks
+2. Consider the project's architecture and existing patterns (reference CLAUDE.md)
+3. Include tasks for:
+   - Code implementation
+   - Testing (if applicable)
+   - Documentation updates (anchor comments)
+   - Any other relevant steps
+
+## Step 5: Confirm Plan
+Present the plan to the user and ask: "Does this plan look good? Would you like me to proceed or make any adjustments?"
+
+Remember to follow all guidelines from CLAUDE.md, especially:
+- Use anchor comments (AIDEV-NOTE, etc.) 
+- Follow the established architecture
+- Maintain type safety
+- Consider performance implications
