@@ -302,7 +302,7 @@ export default function TrigonometricCircleGenerator({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [width, height, controls])
+  }, [width, height, controls, showTrails])
 
   return (
     <div className={className}>

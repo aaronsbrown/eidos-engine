@@ -1,6 +1,6 @@
 // AIDEV-NOTE: ThemeToggle component tests - rendering, toggleTheme function, theme state display
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeToggle } from './theme-toggle'
 
