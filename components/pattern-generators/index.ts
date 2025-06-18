@@ -486,13 +486,13 @@ export const patternGenerators: PatternGenerator[] = [
         min: 0.02,
         max: 0.5,
         step: 0.02,
-        defaultValue: 0.1,
+        defaultValue: 0.30,
       },
       {
         id: "initialCondition",
         label: "Initial Condition",
         type: "select",
-        defaultValue: "single",
+        defaultValue: "center",
         options: [
           { value: "single", label: "SINGLE_LEFT" },
           { value: "center", label: "SINGLE_CENTER" },
