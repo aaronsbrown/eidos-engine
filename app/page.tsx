@@ -142,7 +142,7 @@ export default function PatternGeneratorShowcase() {
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">TECHNOLOGY:</span>
                 <span className="text-foreground uppercase">
-                  {selectedPattern.id === 'brownian-motion' ? 'WEBGL_2.0' : 'CANVAS_2D'}
+                  {selectedPattern.technology}
                 </span>
               </div>
               <div className="flex justify-between text-xs font-mono">
@@ -340,6 +340,23 @@ export default function PatternGeneratorShowcase() {
                           />
                           <span className="text-xs font-mono text-muted-foreground uppercase">{control.label}</span>
                         </label>
+                      </div>
+                    )
+                  } else if (control.type === 'button') {
+                    return (
+                      <div key={control.id} className="col-span-2">
+                        <Button
+                          onClick={() => {
+                            handleControlChange(control.id, !currentValue)
+                            // Auto-reset the button state after a brief moment
+                            setTimeout(() => handleControlChange(control.id, false), 100)
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="w-full font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20 uppercase"
+                        >
+                          {control.label}
+                        </Button>
                       </div>
                     )
                   }

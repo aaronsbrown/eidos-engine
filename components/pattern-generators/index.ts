@@ -4,6 +4,7 @@ import NoiseFieldGenerator from "./noise-field-generator"
 import PixelatedNoiseGenerator from "./pixelated-noise-generator"
 import BrownianMotionGenerator from "./brownian-motion-generator"
 import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
+import ParticleSystemGenerator from "./particle-system-generator"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
@@ -11,6 +12,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "barcode",
     name: "Barcode Scanner",
     component: BarcodeGenerator,
+    technology: 'CANVAS_2D',
     controls: [
       {
         id: "scrollSpeed",
@@ -73,6 +75,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "frequency",
     name: "Frequency Spectrum",
     component: FrequencySpectrumGenerator,
+    technology: 'CANVAS_2D',
     controls: [
       {
         id: "barWidth",
@@ -135,6 +138,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "noise",
     name: "Noise Field",
     component: NoiseFieldGenerator,
+    technology: 'CANVAS_2D',
     controls: [
       {
         id: "noiseScale",
@@ -191,6 +195,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "pixelated-noise",
     name: "Pixelated Noise",
     component: PixelatedNoiseGenerator,
+    technology: 'CANVAS_2D',
     controls: [
       {
         id: "pixelSize",
@@ -246,6 +251,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "brownian-motion",
     name: "Brownian Motion",
     component: BrownianMotionGenerator,
+    technology: 'WEBGL_2.0',
     controls: [
       {
         id: "particleCount",
@@ -298,6 +304,7 @@ export const patternGenerators: PatternGenerator[] = [
     id: "trigonometric-circle",
     name: "Trigonometric Circle",
     component: TrigonometricCircleGenerator,
+    technology: 'CANVAS_2D',
     controls: [
       {
         id: "speed",
@@ -310,7 +317,130 @@ export const patternGenerators: PatternGenerator[] = [
       },
     ],
   },
+  {
+    id: "particle-system",
+    name: "Advanced Particle System",
+    component: ParticleSystemGenerator,
+    technology: 'WEBGL_2.0',
+    controls: [
+      {
+        id: "particleCount",
+        label: "Particle Count",
+        type: "range",
+        min: 1,
+        max: 100,
+        step: 1,
+        defaultValue: 50,
+      },
+      {
+        id: "lifeExpectancy",
+        label: "Life Expectancy",
+        type: "range",
+        min: 1.0,
+        max: 10.0,
+        step: 0.5,
+        defaultValue: 5.0,
+      },
+      {
+        id: "lifeVariation",
+        label: "Life Variation",
+        type: "range",
+        min: 0,
+        max: 100,
+        step: 5,
+        defaultValue: 50,
+      },
+      {
+        id: "particleSize",
+        label: "Particle Size",
+        type: "range",
+        min: 1,
+        max: 20,
+        step: 1,
+        defaultValue: 8,
+      },
+      {
+        id: "spawnRate",
+        label: "Spawn Rate",
+        type: "range",
+        min: 1,
+        max: 50,
+        step: 1,
+        defaultValue: 25,
+      },
+      {
+        id: "movementSpeed",
+        label: "Movement Speed",
+        type: "range",
+        min: 0.1,
+        max: 5.0,
+        step: 0.1,
+        defaultValue: 1.0,
+      },
+      {
+        id: "curlStrength",
+        label: "Curl Strength",
+        type: "range",
+        min: 0.0,
+        max: 2.0,
+        step: 0.1,
+        defaultValue: 1.0,
+      },
+      {
+        id: "gravity",
+        label: "Gravity",
+        type: "range",
+        min: -2.0,
+        max: 2.0,
+        step: 0.1,
+        defaultValue: 0.0,
+      },
+      {
+        id: "brightness",
+        label: "Brightness",
+        type: "range",
+        min: 0.5,
+        max: 8.0,
+        step: 0.5,
+        defaultValue: 3.0,
+      },
+      {
+        id: "enableTrails",
+        label: "Enable Trails",
+        type: "checkbox",
+        defaultValue: true,
+      },
+      {
+        id: "trailDecay",
+        label: "Trail Decay",
+        type: "range",
+        min: 0.8,
+        max: 0.99,
+        step: 0.01,
+        defaultValue: 0.95,
+      },
+      {
+        id: "colorPalette",
+        label: "Color Palette",
+        type: "select",
+        defaultValue: "classic",
+        options: [
+          { value: "classic", label: "CLASSIC_YELLOW" },
+          { value: "fire", label: "FIRE_GRADIENT" },
+          { value: "plasma", label: "PLASMA_SPECTRUM" },
+          { value: "ice", label: "ICE_CRYSTAL" },
+          { value: "electric", label: "ELECTRIC_CYAN" },
+        ],
+      },
+      {
+        id: "reset",
+        label: "Reset Simulation",
+        type: "button",
+        defaultValue: false,
+      },
+    ],
+  },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator }
+export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
