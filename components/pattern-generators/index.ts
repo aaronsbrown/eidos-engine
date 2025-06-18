@@ -5,6 +5,7 @@ import PixelatedNoiseGenerator from "./pixelated-noise-generator"
 import BrownianMotionGenerator from "./brownian-motion-generator"
 import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
+import CellularAutomatonGenerator from "./cellular-automaton-generator"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
@@ -451,7 +452,62 @@ export const patternGenerators: PatternGenerator[] = [
       },
     ],
   },
+  {
+    id: "cellular-automaton",
+    name: "Cellular Automaton",
+    component: CellularAutomatonGenerator,
+    technology: 'CANVAS_2D',
+    controls: [
+      {
+        id: "rulePrev",
+        label: "← PREV",
+        type: "button",
+        defaultValue: false,
+      },
+      {
+        id: "ruleNext", 
+        label: "NEXT →",
+        type: "button",
+        defaultValue: false,
+      },
+      {
+        id: "cellSize",
+        label: "Cell Size",
+        type: "range",
+        min: 1,
+        max: 8,
+        step: 1,
+        defaultValue: 2,
+      },
+      {
+        id: "animationSpeed",
+        label: "Generation Speed",
+        type: "range",
+        min: 0.02,
+        max: 0.5,
+        step: 0.02,
+        defaultValue: 0.1,
+      },
+      {
+        id: "initialCondition",
+        label: "Initial Condition",
+        type: "select",
+        defaultValue: "single",
+        options: [
+          { value: "single", label: "SINGLE_LEFT" },
+          { value: "center", label: "SINGLE_CENTER" },
+          { value: "random", label: "RANDOM_SEED" },
+        ],
+      },
+      {
+        id: "resetTrigger",
+        label: "Reset Automaton",
+        type: "button",
+        defaultValue: false,
+      },
+    ],
+  },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator }
+export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
