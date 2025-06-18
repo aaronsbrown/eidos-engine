@@ -329,6 +329,60 @@ export default function PatternGeneratorShowcase() {
             </div>
             {selectedPattern.controls ? (
               <div className="space-y-4">
+                {/* Navigation buttons first - only for cellular automaton */}
+                {selectedPattern.id === 'cellular-automaton' && (() => {
+                  const buttonControls = selectedPattern.controls.filter(control => control.type === 'button')
+                  const prevButton = buttonControls.find(c => c.id === 'rulePrev')
+                  const nextButton = buttonControls.find(c => c.id === 'ruleNext')
+                  const currentRule = getCurrentControlValues()['rule'] ?? 30
+                  
+                  return (
+                    (prevButton || nextButton) && (
+                      <div className="space-y-3">
+                        {/* Rule Number Header */}
+                        <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                          Rule Number
+                        </div>
+                        
+                        <div className="flex items-center space-x-6">
+                          {prevButton && (
+                            <Button
+                              onClick={() => {
+                                handleControlChange(prevButton.id, true)
+                                setTimeout(() => handleControlChange(prevButton.id, false), 100)
+                              }}
+                              variant="outline"
+                              size="sm"
+                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+                            >
+                              {prevButton.label}
+                            </Button>
+                          )}
+                          
+                          {/* Rule counter display */}
+                          <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
+                            {currentRule.toString().padStart(3, '0')} / 255
+                          </div>
+                          
+                          {nextButton && (
+                            <Button
+                              onClick={() => {
+                                handleControlChange(nextButton.id, true)
+                                setTimeout(() => handleControlChange(nextButton.id, false), 100)
+                              }}
+                              variant="outline"
+                              size="sm"
+                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+                            >
+                              {nextButton.label}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  )
+                })()}
+
                 {/* Main controls grid (excluding buttons) */}
                 <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
                   {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
@@ -398,8 +452,16 @@ export default function PatternGeneratorShowcase() {
                   })}
                 </div>
                 
-                {/* Button controls in their own row */}
-                {selectedPattern.controls.filter(control => control.type === 'button').map((control) => {
+                {/* Button controls at bottom */}
+                {selectedPattern.controls.filter(control => {
+                  if (control.type !== 'button') return false
+                  // For cellular automaton, exclude navigation buttons (they're rendered at top)
+                  if (selectedPattern.id === 'cellular-automaton') {
+                    return control.id !== 'rulePrev' && control.id !== 'ruleNext'
+                  }
+                  // For other patterns, include all button controls
+                  return true
+                }).map((control) => {
                   const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
                   return (
                     <div key={control.id} className="pt-2">
