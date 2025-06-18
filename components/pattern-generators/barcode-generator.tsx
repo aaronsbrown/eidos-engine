@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useMemo, useState } from "react"
 import type { PatternGeneratorProps } from "./types"
 
 interface BarcodeBar {
@@ -8,11 +8,30 @@ interface BarcodeBar {
   isBlack: boolean
 }
 
-export default function BarcodeGenerator({ width, height, className = "" }: PatternGeneratorProps) {
+interface BarcodeControls {
+  scrollSpeed: number
+  barDensity: number
+  scannerSpeed: number
+  scannerOpacity: number
+  colorScheme: 'classic' | 'inverted' | 'blue' | 'green' | 'amber'
+  showScanner: boolean
+}
+
+export default function BarcodeGenerator({ width, height, className = "", controlValues }: PatternGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
   const barsRef = useRef<BarcodeBar[]>([])
   const offsetRef = useRef<number>(0)
+  const [scannerPosition, setScannerPosition] = useState<number>(0)
+
+  const controls: BarcodeControls = useMemo(() => ({
+    scrollSpeed: (controlValues?.scrollSpeed as number) ?? 2,
+    barDensity: (controlValues?.barDensity as number) ?? 0.6,
+    scannerSpeed: (controlValues?.scannerSpeed as number) ?? 2,
+    scannerOpacity: (controlValues?.scannerOpacity as number) ?? 0.6,
+    colorScheme: (controlValues?.colorScheme as 'classic' | 'inverted' | 'blue' | 'green' | 'amber') ?? 'classic',
+    showScanner: (controlValues?.showScanner as boolean) ?? true
+  }), [controlValues])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -32,7 +51,7 @@ export default function BarcodeGenerator({ width, height, className = "" }: Patt
       // Generate enough bars to fill 2x the width for seamless scrolling
       while (totalWidth < width * 2) {
         const barWidth = Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 2 : 1
-        const isBlack = Math.random() > 0.4
+        const isBlack = Math.random() > (1 - controls.barDensity)
         bars.push({ width: barWidth, isBlack })
         totalWidth += barWidth
       }
@@ -40,16 +59,34 @@ export default function BarcodeGenerator({ width, height, className = "" }: Patt
       return bars
     }
 
-    if (barsRef.current.length === 0) {
-      barsRef.current = generateBars()
+    // Regenerate bars when density changes
+    barsRef.current = generateBars()
+
+    const getColors = (scheme: string) => {
+      switch (scheme) {
+        case 'classic':
+          return { background: 'white', foreground: 'black' }
+        case 'inverted':
+          return { background: 'black', foreground: 'white' }
+        case 'blue':
+          return { background: '#dbeafe', foreground: '#1e40af' }
+        case 'green':
+          return { background: '#dcfce7', foreground: '#166534' }
+        case 'amber':
+          return { background: '#fef3c7', foreground: '#92400e' }
+        default:
+          return { background: 'white', foreground: 'black' }
+      }
     }
 
     const animate = () => {
-      ctx.fillStyle = "white"
+      const colors = getColors(controls.colorScheme)
+      
+      ctx.fillStyle = colors.background
       ctx.fillRect(0, 0, width, height)
 
       // Update scroll offset
-      offsetRef.current += 2 // Speed of scrolling
+      offsetRef.current += controls.scrollSpeed
       
       // Calculate total width of bars for wrap-around
       const totalBarsWidth = barsRef.current.reduce((sum, bar) => sum + bar.width, 0)
@@ -65,7 +102,7 @@ export default function BarcodeGenerator({ width, height, className = "" }: Patt
         const bar = barsRef.current[barIndex]
         
         if (x + bar.width > 0) {
-          ctx.fillStyle = bar.isBlack ? "black" : "white"
+          ctx.fillStyle = bar.isBlack ? colors.foreground : colors.background
           ctx.fillRect(x, 0, bar.width, height)
         }
         
@@ -88,7 +125,23 @@ export default function BarcodeGenerator({ width, height, className = "" }: Patt
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [width, height])
+  }, [width, height, controls])
+
+  // Update scanner position
+  useEffect(() => {
+    if (!controls.showScanner) return
+
+    const updateScanner = () => {
+      setScannerPosition(prev => {
+        const newPosition = prev + controls.scannerSpeed
+        return newPosition > width + 20 ? -20 : newPosition
+      })
+    }
+
+    const scannerInterval = setInterval(updateScanner, 16) // ~60fps
+    
+    return () => clearInterval(scannerInterval)
+  }, [controls.scannerSpeed, controls.showScanner, width])
 
   return (
     <div
@@ -97,33 +150,17 @@ export default function BarcodeGenerator({ width, height, className = "" }: Patt
     >
       <canvas ref={canvasRef} className="w-full h-full" />
       
-      {/* Subtle scanning line effect */}
-      <div
-        className="absolute top-0 w-1 h-full bg-red-500 opacity-60 animate-pulse"
-        style={{
-          animation: "scan 2s linear infinite",
-          boxShadow: "0 0 10px rgba(239, 68, 68, 0.8)",
-        }}
-      />
-
-      <style jsx>{`
-        @keyframes scan {
-          0% {
-            left: 0;
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            left: 100%;
-            opacity: 0;
-          }
-        }
-      `}</style>
+      {/* Dynamic scanning line effect */}
+      {controls.showScanner && (
+        <div
+          className="absolute top-0 w-1 h-full bg-red-500 transition-opacity duration-200"
+          style={{
+            left: `${scannerPosition}px`,
+            opacity: controls.scannerOpacity,
+            boxShadow: "0 0 10px rgba(239, 68, 68, 0.8)",
+          }}
+        />
+      )}
     </div>
   )
 }
