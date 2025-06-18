@@ -420,6 +420,17 @@ export const patternGenerators: PatternGenerator[] = [
         defaultValue: 0.95,
       },
       {
+        id: "trailQuality",
+        label: "Trail Quality",
+        type: "select",
+        defaultValue: "medium",
+        options: [
+          { value: "low", label: "LOW_PERF" },
+          { value: "medium", label: "MEDIUM_PERF" },
+          { value: "high", label: "HIGH_PERF" },
+        ],
+      },
+      {
         id: "colorPalette",
         label: "Color Palette",
         type: "select",

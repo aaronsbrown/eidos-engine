@@ -16,6 +16,7 @@ interface ParticleSystemControls {
   brightness: number
   enableTrails: boolean
   trailDecay: number
+  trailQuality: 'low' | 'medium' | 'high'
   reset?: boolean
 }
 
@@ -49,6 +50,7 @@ export default function ParticleSystemGenerator({
     brightness: (controlValues?.brightness as number) ?? 3.0,
     enableTrails: (controlValues?.enableTrails as boolean) ?? true,
     trailDecay: (controlValues?.trailDecay as number) ?? 0.95,
+    trailQuality: (controlValues?.trailQuality as 'low' | 'medium' | 'high') ?? 'medium',
     reset: (controlValues?.reset as boolean) ?? false
   }), [controlValues])
 
@@ -105,6 +107,7 @@ export default function ParticleSystemGenerator({
       uniform float u_brightness;
       uniform float u_enableTrails;
       uniform float u_trailDecay;
+      uniform float u_trailQuality;
       uniform sampler2D u_feedbackTexture;
 
       // Hash functions for pseudo-random numbers
@@ -376,11 +379,16 @@ export default function ParticleSystemGenerator({
             }
           }
           
-          // Add trail effect when enabled
+          // Add trail effect when enabled (optimized)
           if(u_enableTrails > 0.5) {
-            // Draw particle history as a trail
-            for(int t = 1; t < 20; t++) {
-              float trailTime = u_time - float(t) * 0.05; // Trail spacing
+            // Dynamic trail quality: low=4, medium=8, high=12 segments
+            int maxTrailSegments = int(u_trailQuality * 4.0 + 4.0); // Maps 0,1,2 -> 4,8,12
+            float trailSpacing = 0.08 + (u_trailQuality * 0.02); // Adjust spacing: 0.08-0.12
+            
+            for(int t = 1; t < 13; t++) { // Max possible segments
+              if(t >= maxTrailSegments) break; // Early exit based on quality
+              
+              float trailTime = u_time - float(t) * trailSpacing;
               
               vec2 trailPos = getParticlePos(particleId, trailTime);
               if (trailPos.x < -1.0) continue; // Skip off-screen trail particles
@@ -393,15 +401,35 @@ export default function ParticleSystemGenerator({
               
               if (trailAge < 0.0 || trailAge > trailLife) continue;
               
-              // Make trail particles smaller and dimmer
-              float trailSize = particleSize * 0.7 * (1.0 - float(t) / 20.0);
+              // Calculate trail particle age and size multiplier for this trail segment
+              float trailAgeRatio = trailAge / trailLife;
+              float trailSizeMultiplier = 1.0 - trailAgeRatio * 0.5; // Same aging as main particle
               
-              if(trailDist < trailSize) {
+              // Progressive tapering: each trail segment is smaller than the previous
+              float trailProgress = float(t) / float(maxTrailSegments); // 0.0 (newest) to 1.0 (oldest)
+              float taperFactor = 1.0 - trailProgress * 0.8; // Taper to 20% of original size
+              
+              // Combine the particle size with trail-specific scaling
+              float baseTrailSize = (u_particleSize / 800.0) * trailSizeMultiplier / sqrt(aspect);
+              float trailCoreSize = baseTrailSize * taperFactor;
+              float trailGlowSize = trailCoreSize * 2.0;
+              
+              // Early exit if trail is too far away (performance optimization)
+              if(trailDist > trailGlowSize) continue;
+              
+              // Calculate shared values once
+              float trailAlpha = (1.0 - trailProgress) * u_trailDecay;
+              vec3 trailColor = getParticleColor(trailAge, trailLife, u_colorPalette);
+              
+              // Draw trail particle core
+              if(trailDist < trailCoreSize) {
                 float trailIntensity = 1.0 / (1.0 + trailDist * 600.0 * aspect);
-                float trailAlpha = (1.0 - float(t) / 20.0) * u_trailDecay;
-                vec3 trailColor = getParticleColor(trailAge, trailLife, u_colorPalette);
-                color += trailColor * trailIntensity * u_brightness * 0.4 * trailAlpha;
+                color += trailColor * trailIntensity * u_brightness * 0.5 * trailAlpha;
               }
+              
+              // Draw trail particle glow (softer, larger)
+              float trailGlowIntensity = 1.0 / (1.0 + trailDist * 300.0 * aspect);
+              color += trailColor * trailGlowIntensity * u_brightness * 0.3 * trailAlpha * 0.6;
             }
           }
         }
@@ -508,6 +536,7 @@ export default function ParticleSystemGenerator({
     const brightnessLocation = gl.getUniformLocation(program, "u_brightness")
     const enableTrailsLocation = gl.getUniformLocation(program, "u_enableTrails")
     const trailDecayLocation = gl.getUniformLocation(program, "u_trailDecay")
+    const trailQualityLocation = gl.getUniformLocation(program, "u_trailQuality")
     const feedbackTextureLocation = gl.getUniformLocation(program, "u_feedbackTexture")
 
     gl.useProgram(program)
@@ -536,6 +565,10 @@ export default function ParticleSystemGenerator({
       gl.uniform1f(brightnessLocation, controls.brightness)
       gl.uniform1f(enableTrailsLocation, controls.enableTrails ? 1.0 : 0.0)
       gl.uniform1f(trailDecayLocation, controls.trailDecay)
+      
+      // Convert trail quality to float: low=0, medium=1, high=2
+      const qualityMap = { 'low': 0, 'medium': 1, 'high': 2 }
+      gl.uniform1f(trailQualityLocation, qualityMap[controls.trailQuality] || 1)
       
       // Convert color palette to float
       const paletteMap = { 'classic': 0, 'fire': 1, 'plasma': 2, 'ice': 3, 'electric': 4 }
