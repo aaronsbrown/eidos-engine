@@ -338,39 +338,46 @@ export default function PatternGeneratorShowcase() {
                   
                   return (
                     (prevButton || nextButton) && (
-                      <div className="flex items-center space-x-6">
-                        {prevButton && (
-                          <Button
-                            onClick={() => {
-                              handleControlChange(prevButton.id, true)
-                              setTimeout(() => handleControlChange(prevButton.id, false), 100)
-                            }}
-                            variant="outline"
-                            size="sm"
-                            className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-                          >
-                            {prevButton.label}
-                          </Button>
-                        )}
-                        
-                        {/* Rule counter display */}
-                        <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
-                          {currentRule.toString().padStart(3, '0')} / 255
+                      <div className="space-y-3">
+                        {/* Rule Number Header */}
+                        <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                          Rule Number
                         </div>
                         
-                        {nextButton && (
-                          <Button
-                            onClick={() => {
-                              handleControlChange(nextButton.id, true)
-                              setTimeout(() => handleControlChange(nextButton.id, false), 100)
-                            }}
-                            variant="outline"
-                            size="sm"
-                            className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-                          >
-                            {nextButton.label}
-                          </Button>
-                        )}
+                        <div className="flex items-center space-x-6">
+                          {prevButton && (
+                            <Button
+                              onClick={() => {
+                                handleControlChange(prevButton.id, true)
+                                setTimeout(() => handleControlChange(prevButton.id, false), 100)
+                              }}
+                              variant="outline"
+                              size="sm"
+                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+                            >
+                              {prevButton.label}
+                            </Button>
+                          )}
+                          
+                          {/* Rule counter display */}
+                          <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
+                            {currentRule.toString().padStart(3, '0')} / 255
+                          </div>
+                          
+                          {nextButton && (
+                            <Button
+                              onClick={() => {
+                                handleControlChange(nextButton.id, true)
+                                setTimeout(() => handleControlChange(nextButton.id, false), 100)
+                              }}
+                              variant="outline"
+                              size="sm"
+                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+                            >
+                              {nextButton.label}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     )
                   )

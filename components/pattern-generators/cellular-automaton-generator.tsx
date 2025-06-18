@@ -108,10 +108,10 @@ export default function CellularAutomatonGenerator({
     }
   }, [controls.ruleNext, rule, onControlChange])
 
-  // Initialize rule state in parent on mount
+  // AIDEV-NOTE: Initialize rule state in parent on mount only once to avoid infinite loops
   useEffect(() => {
     onControlChange?.('rule', rule)
-  }, [onControlChange, rule])  // Include all dependencies
+  }, [])  // Empty dependency array - only run on mount
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -224,12 +224,6 @@ export default function CellularAutomatonGenerator({
         <div className="absolute top-2 left-2 text-yellow-500 text-xs font-mono bg-black/80 px-2 py-1 rounded">
           RULE {rule}
         </div>
-        
-        {/* Technical corner markers */}
-        <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-yellow-500"></div>
-        <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-yellow-500"></div>
-        <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-yellow-500"></div>
-        <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-yellow-500"></div>
       </div>
     </div>
   )
