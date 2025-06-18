@@ -25,7 +25,7 @@ export const patternGenerators: PatternGenerator[] = [
         defaultValue: 2,
       },
       {
-        id: "barDensity",  
+        id: "barDensity",
         label: "Bar Density",
         type: "range",
         min: 0.2,
@@ -35,7 +35,7 @@ export const patternGenerators: PatternGenerator[] = [
       },
       {
         id: "scannerSpeed",
-        label: "Scanner Speed", 
+        label: "Scanner Speed",
         type: "range",
         min: 0.5,
         max: 5.0,
@@ -45,7 +45,7 @@ export const patternGenerators: PatternGenerator[] = [
       {
         id: "scannerOpacity",
         label: "Scanner Opacity",
-        type: "range", 
+        type: "range",
         min: 0.1,
         max: 1.0,
         step: 0.1,
@@ -454,7 +454,7 @@ export const patternGenerators: PatternGenerator[] = [
   },
   {
     id: "cellular-automaton",
-    name: "Cellular Automaton",
+    name: "1D CELLULAR AUTOMATA",
     component: CellularAutomatonGenerator,
     technology: 'CANVAS_2D',
     controls: [
@@ -465,7 +465,7 @@ export const patternGenerators: PatternGenerator[] = [
         defaultValue: false,
       },
       {
-        id: "ruleNext", 
+        id: "ruleNext",
         label: "NEXT →",
         type: "button",
         defaultValue: false,

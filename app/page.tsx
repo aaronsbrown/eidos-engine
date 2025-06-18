@@ -7,11 +7,20 @@ import { patternGenerators } from "@/components/pattern-generators"
 
 export default function PatternGeneratorShowcase() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
-  const [dimensions, setDimensions] = useState({ width: 534, height: 300 })
+  const [dimensions, setDimensions] = useState({ width: 700, height: 394 })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
   const [sidebarWidth, setSidebarWidth] = useState(380) // Default sidebar width
   const [isResizing, setIsResizing] = useState(false)
+  const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
+  const [isAnimating, setIsAnimating] = useState(false) // Track animation state
+
+  // How many patterns to show at once (fits in ~20rem container)
+  const patternsPerPage = 5
+  const totalPatterns = patternGenerators.length
+  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
+  const canGoToPrevious = currentIndex > 0 && !isAnimating
+  const canGoToNext = currentIndex < totalPatterns - 1 && !isAnimating
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
@@ -20,7 +29,7 @@ export default function PatternGeneratorShowcase() {
   const initializeControlValues = (patternId: string) => {
     const pattern = patternGenerators.find(p => p.id === patternId)
     if (!pattern?.controls) return {}
-    
+
     const defaults: Record<string, number | string | boolean> = {}
     pattern.controls.forEach(control => {
       defaults[control.id] = control.defaultValue
@@ -48,6 +57,40 @@ export default function PatternGeneratorShowcase() {
       }
     }))
   }
+
+  // Handle pattern navigation (previous/next pattern selection)
+  const handlePreviousPattern = () => {
+    const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
+    if (currentIndex > 0) {
+      const prevPattern = patternGenerators[currentIndex - 1]
+      setSelectedPatternId(prevPattern.id)
+
+      // Adjust visible window if needed to show the selected pattern
+      if (currentIndex - 1 < visiblePatternStart) {
+        setIsAnimating(true)
+        setVisiblePatternStart(currentIndex - 1)
+        setTimeout(() => setIsAnimating(false), 300)
+      }
+    }
+  }
+
+  const handleNextPattern = () => {
+    const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
+    if (currentIndex < totalPatterns - 1) {
+      const nextPattern = patternGenerators[currentIndex + 1]
+      setSelectedPatternId(nextPattern.id)
+
+      // Adjust visible window if needed to show the selected pattern
+      if (currentIndex + 1 >= visiblePatternStart + patternsPerPage) {
+        setIsAnimating(true)
+        // Ensure we don't scroll past the last possible position
+        const maxStart = Math.max(0, totalPatterns - patternsPerPage)
+        setVisiblePatternStart(Math.min(currentIndex + 1 - patternsPerPage + 1, maxStart))
+        setTimeout(() => setIsAnimating(false), 300)
+      }
+    }
+  }
+
 
   // Handle sidebar resizing
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -82,14 +125,15 @@ export default function PatternGeneratorShowcase() {
     if (!isFullscreen) {
       setDimensions({ width: window.innerWidth - 40, height: window.innerHeight - 120 })
     } else {
-      setDimensions({ width: 534, height: 300 })
+      setDimensions({ width: 700, height: 394 })
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
       {/* Technical Grid Background */}
-      <div 
+      <div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{
           backgroundImage: "linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)",
@@ -112,9 +156,9 @@ export default function PatternGeneratorShowcase() {
             <div className="text-xs font-mono text-muted-foreground border border-border px-2 py-1 bg-background">
               [{String(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).padStart(2, '0')}/{String(patternGenerators.length).padStart(2, '0')}]
             </div>
-            <Button 
+            <Button
               onClick={toggleFullscreen}
-              variant="outline" 
+              variant="outline"
               size="sm"
               className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
             >
@@ -126,36 +170,88 @@ export default function PatternGeneratorShowcase() {
 
       <div className="flex relative">
         {/* Left Sidebar - Pattern Selection & Specifications */}
-        <aside className="w-64 border-r border-border p-6 bg-background/50 backdrop-blur-sm space-y-6">
-          {/* Pattern Selection */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
+        <aside className="w-64 border-r border-border bg-background/50 backdrop-blur-sm flex flex-col">
+          {/* AIDEV-NOTE: Made sidebar flex column to enable proper scrolling layout */}
+          <div className="p-6 pb-4">
+            {/* Pattern Selection Header */}
+            <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
             </div>
-            <div className="space-y-1">
-              {patternGenerators.map((pattern, index) => (
-                <button
-                  key={pattern.id}
-                  onClick={() => setSelectedPatternId(pattern.id)}
-                  className={`w-full text-left p-3 border transition-all font-mono text-xs ${
-                    selectedPatternId === pattern.id
+          </div>
+
+          {/* Previous Pattern Button */}
+          <div className="px-6 mb-1">
+            <button
+              onClick={handlePreviousPattern}
+              disabled={!canGoToPrevious}
+              className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToPrevious
+                ? "border-yellow-400 bg-yellow-400 hover:bg-yellow-500 cursor-pointer"
+                : "border-gray-300 bg-gray-200 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed"
+                }`}
+            >
+              <span className={`font-bold ${canGoToPrevious ? "text-black" : "text-gray-400 dark:text-gray-500"}`}>
+                ↑
+              </span>
+            </button>
+          </div>
+
+          {/* Pattern List - Animated Pagination */}
+          <div
+            className="px-6 overflow-hidden"
+            style={{ height: `${patternsPerPage * 70 + 20}px` }}
+          >
+            {/* AIDEV-NOTE: Fixed height container to show exactly 5 patterns + padding */}
+            <div
+              className="space-y-1 pt-1 pb-4 transition-transform duration-300 ease-in-out"
+              style={{
+                transform: `translateY(${-visiblePatternStart * 60}px)` //
+              }}
+            >
+              {patternGenerators.map((pattern, index) => {
+                const isVisible = index >= visiblePatternStart && index < visiblePatternStart + patternsPerPage
+                return (
+                  <button
+                    key={pattern.id}
+                    onClick={() => setSelectedPatternId(pattern.id)}
+                    className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
                       ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
                       : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="uppercase tracking-wider">{pattern.name}</span>
-                    <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
-                  </div>
-                  <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
-                </button>
-              ))}
+                      }`}
+                    style={{
+                      pointerEvents: isVisible ? 'auto' : 'none'
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="uppercase tracking-wider">{pattern.name}</span>
+                      <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                    </div>
+                    <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          {/* Pattern Specifications */}
-          <div className="border-t border-border pt-6">
+          {/* Next Pattern Button */}
+          <div className="px-6 mt-1 mb-2.5">
+            <button
+              onClick={handleNextPattern}
+              disabled={!canGoToNext}
+              className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToNext
+                ? "border-yellow-400 bg-yellow-400 hover:bg-yellow-500 cursor-pointer"
+                : "border-gray-300 bg-gray-200 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed"
+                }`}
+            >
+              <span className={`font-bold ${canGoToNext ? "text-black" : "text-gray-400 dark:text-gray-500"}`}>
+                ↓
+              </span>
+            </button>
+          </div>
+
+
+          {/* Pattern Specifications - Fixed at bottom */}
+          <div className="p-6 pt-4 border-t border-border">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
@@ -216,17 +312,17 @@ export default function PatternGeneratorShowcase() {
               <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-yellow-400"></div>
               <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-yellow-400"></div>
               <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
-              
 
-              <div 
+
+              <div
                 className="border-2 border-border bg-background shadow-lg"
-                style={{ 
-                  width: dimensions.width, 
-                  height: dimensions.height 
+                style={{
+                  width: dimensions.width,
+                  height: dimensions.height
                 }}
               >
-                <PatternComponent 
-                  width={dimensions.width} 
+                <PatternComponent
+                  width={dimensions.width}
                   height={dimensions.height}
                   className="w-full h-full"
                   controls={selectedPattern.controls}
@@ -236,50 +332,18 @@ export default function PatternGeneratorShowcase() {
               </div>
             </div>
 
-            {/* Pattern Navigation with technical styling */}
-            <div className="flex items-center space-x-6 mt-12">
-              <Button
-                onClick={() => {
-                  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
-                  const prevIndex = currentIndex === 0 ? patternGenerators.length - 1 : currentIndex - 1
-                  setSelectedPatternId(patternGenerators[prevIndex].id)
-                }}
-                variant="outline"
-                size="sm"
-                className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-              >
-                ← PREV
-              </Button>
-              
-              <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
-                {(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).toString().padStart(2, '0')} / {patternGenerators.length.toString().padStart(2, '0')}
-              </div>
-              
-              <Button
-                onClick={() => {
-                  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
-                  const nextIndex = currentIndex === patternGenerators.length - 1 ? 0 : currentIndex + 1
-                  setSelectedPatternId(patternGenerators[nextIndex].id)
-                }}
-                variant="outline"
-                size="sm"
-                className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-              >
-                NEXT →
-              </Button>
-            </div>
           </div>
 
         </main>
 
         {/* Resize Handle */}
-        <div 
+        <div
           className={`w-1 bg-border hover:bg-yellow-400 cursor-col-resize transition-colors ${isResizing ? 'bg-yellow-400' : ''}`}
           onMouseDown={handleMouseDown}
         />
 
         {/* Right Sidebar - Viewport & Simulation Parameters */}
-        <aside 
+        <aside
           className="border-l border-border p-6 space-y-4 bg-background/50 backdrop-blur-sm"
           style={{ width: `${sidebarWidth}px` }}
         >
@@ -329,13 +393,13 @@ export default function PatternGeneratorShowcase() {
             </div>
             {selectedPattern.controls ? (
               <div className="space-y-4">
-                {/* Navigation buttons first - only for cellular automaton */}
+                {/* Navigation buttons first - only for 1D CELLULAR AUTOMATA */}
                 {selectedPattern.id === 'cellular-automaton' && (() => {
                   const buttonControls = selectedPattern.controls.filter(control => control.type === 'button')
                   const prevButton = buttonControls.find(c => c.id === 'rulePrev')
                   const nextButton = buttonControls.find(c => c.id === 'ruleNext')
                   const currentRule = getCurrentControlValues()['rule'] ?? 30
-                  
+
                   return (
                     (prevButton || nextButton) && (
                       <div className="space-y-3">
@@ -343,7 +407,7 @@ export default function PatternGeneratorShowcase() {
                         <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                           Rule Number
                         </div>
-                        
+
                         <div className="flex items-center space-x-6">
                           {prevButton && (
                             <Button
@@ -358,12 +422,12 @@ export default function PatternGeneratorShowcase() {
                               {prevButton.label}
                             </Button>
                           )}
-                          
+
                           {/* Rule counter display */}
                           <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
                             {currentRule.toString().padStart(3, '0')} / 255
                           </div>
-                          
+
                           {nextButton && (
                             <Button
                               onClick={() => {
@@ -387,7 +451,7 @@ export default function PatternGeneratorShowcase() {
                 <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
                   {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
                     const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-                    
+
                     if (control.type === 'range') {
                       return (
                         <div key={control.id} className="flex flex-col h-full">
@@ -404,7 +468,7 @@ export default function PatternGeneratorShowcase() {
                             />
                           </div>
                           <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
-                            {control.step && control.step < 1 
+                            {control.step && control.step < 1
                               ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
                               : currentValue
                             }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
@@ -451,11 +515,11 @@ export default function PatternGeneratorShowcase() {
                     return null
                   })}
                 </div>
-                
+
                 {/* Button controls at bottom */}
                 {selectedPattern.controls.filter(control => {
                   if (control.type !== 'button') return false
-                  // For cellular automaton, exclude navigation buttons (they're rendered at top)
+                  // For 1D CELLULAR AUTOMATA, exclude navigation buttons (they're rendered at top)
                   if (selectedPattern.id === 'cellular-automaton') {
                     return control.id !== 'rulePrev' && control.id !== 'ruleNext'
                   }

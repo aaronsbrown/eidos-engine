@@ -42,6 +42,7 @@ Follow these steps precisely:
      - Proposed labels, milestones, or assignees (based only on repo conventions).
 
 4. **GitHub Issue Generation**
+   - Prompt the user to confirm whether the generated issue is acceptable.
    - Upon plan approval:
      - Write the issue in `<github_issue>` tags.
      - Format using Markdown:
@@ -52,26 +53,23 @@ Follow these steps precisely:
        - **Acceptance Criteria**
        - **Additional Context / Resources**
      - Ensure clarity and conciseness.
+     - use the GitHub CLI (`gh issue create`) to submit the issue.
+     - Example command:
+
+      ```bash
+         gh issue create --title "[title]" --body "[body]" --label [bug|enhancement] --repo [owner/repo]
+      ```
+
+   - Replace placeholders with actual values based on the approved issue content.
 
 5. **Final Output**
    - Output only the content within `<github_issue>` tags.
    - This should be directly compatible with GitHub’s issue creation.
    - Do **not** include any AI commentary or reasoning in the final block.
 
-6. **GitHub Issue Submission**
-   - Prompt the user to confirm whether the generated issue is acceptable.
-   - If the user accepts, use the GitHub CLI (`gh issue create`) to submit the issue.
-   - Example command:
-
-     ```bash
-     gh issue create --title "[title]" --body "[body]" --label [bug|enhancement] --repo [owner/repo]
-     ```
-
-   - Replace placeholders with actual values based on the approved issue content.
-
 ## Format
 
-```
+```xml
 <feature_description>
 [...provided by user...]
 </feature_description>

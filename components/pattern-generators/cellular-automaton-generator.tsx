@@ -12,9 +12,9 @@ interface CellularAutomatonControls {
   initialCondition: 'single' | 'random' | 'center'
 }
 
-export default function CellularAutomatonGenerator({ 
-  width, 
-  height, 
+export default function CellularAutomatonGenerator({
+  width,
+  height,
   className = "",
   controlValues,
   onControlChange
@@ -39,7 +39,7 @@ export default function CellularAutomatonGenerator({
     initialCondition: (controlValues?.initialCondition as 'single' | 'random' | 'center') ?? 'single'
   }), [controlValues])
 
-  // Generate lookup table for cellular automaton rule
+  // Generate lookup table for 1D CELLULAR AUTOMATA rule
   const getRuleLookup = (rule: number): boolean[] => {
     const lookup: boolean[] = new Array(8)
     for (let i = 0; i < 8; i++) {
@@ -48,10 +48,10 @@ export default function CellularAutomatonGenerator({
     return lookup
   }
 
-  // Initialize cellular automaton
+  // Initialize 1D CELLULAR AUTOMATA
   const initializeCells = (cellCount: number, condition: 'single' | 'random' | 'center'): number[] => {
     const cells = new Array(cellCount).fill(0)
-    
+
     switch (condition) {
       case 'single':
         cells[0] = 1 // Single cell at left
@@ -65,27 +65,27 @@ export default function CellularAutomatonGenerator({
         }
         break
     }
-    
+
     return cells
   }
 
-  // Apply cellular automaton rule to get next generation
+  // Apply 1D CELLULAR AUTOMATA rule to get next generation
   const applyRule = (cells: number[], ruleLookup: boolean[]): number[] => {
     const newCells = new Array(cells.length).fill(0)
-    
+
     for (let i = 0; i < cells.length; i++) {
       // Get left, center, right neighbors (wrap around edges)
       const left = cells[(i - 1 + cells.length) % cells.length]
       const center = cells[i]
       const right = cells[(i + 1) % cells.length]
-      
+
       // Convert to binary index (left=4, center=2, right=1)
       const index = left * 4 + center * 2 + right
-      
+
       // Apply rule
       newCells[i] = ruleLookup[index] ? 1 : 0
     }
-    
+
     return newCells
   }
 
@@ -149,12 +149,12 @@ export default function CellularAutomatonGenerator({
       if (timeRef.current >= 1.0 && generationRef.current < maxGenerations - 1) {
         timeRef.current = 0
         generationRef.current++
-        
+
         // Generate next generation
         const nextCells = applyRule(cellsRef.current, ruleLookup)
         cellsRef.current = nextCells
         historyRef.current.push(nextCells.slice())
-        
+
         // Keep history from growing too large
         if (historyRef.current.length > maxGenerations) {
           historyRef.current.shift()
@@ -169,7 +169,7 @@ export default function CellularAutomatonGenerator({
       for (let gen = 0; gen < historyRef.current.length; gen++) {
         const generation = historyRef.current[gen]
         const y = gen * cellSize
-        
+
         for (let x = 0; x < generation.length; x++) {
           if (generation[x] === 1) {
             // Alive cells - bright yellow
@@ -182,7 +182,7 @@ export default function CellularAutomatonGenerator({
       // Add grid lines for better visibility
       ctx.strokeStyle = '#1a1a1a'
       ctx.lineWidth = 0.5
-      
+
       // Vertical lines
       for (let x = 0; x <= cellsPerRow; x++) {
         ctx.beginPath()
@@ -190,7 +190,7 @@ export default function CellularAutomatonGenerator({
         ctx.lineTo(x * cellSize, Math.min(historyRef.current.length * cellSize, height))
         ctx.stroke()
       }
-      
+
       // Horizontal lines
       for (let y = 0; y <= Math.min(historyRef.current.length, maxGenerations); y++) {
         ctx.beginPath()
@@ -219,7 +219,7 @@ export default function CellularAutomatonGenerator({
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <canvas ref={canvasRef} className="w-full h-full" />
-        
+
         {/* Rule indicator overlay */}
         <div className="absolute top-2 left-2 text-yellow-500 text-xs font-mono bg-black/80 px-2 py-1 rounded">
           RULE {rule}
