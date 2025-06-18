@@ -111,7 +111,7 @@ export default function CellularAutomatonGenerator({
   // AIDEV-NOTE: Initialize rule state in parent on mount only once to avoid infinite loops
   useEffect(() => {
     onControlChange?.('rule', rule)
-  }, [])  // Empty dependency array - only run on mount
+  }, [onControlChange, rule])  // Include dependencies to satisfy ESLint
 
   useEffect(() => {
     const canvas = canvasRef.current
