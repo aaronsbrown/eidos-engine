@@ -126,14 +126,23 @@ export default function PatternGeneratorShowcase() {
 
       <div className="flex relative">
         {/* Left Sidebar - Pattern Selection & Specifications */}
-        <aside className="w-64 border-r border-border p-6 bg-background/50 backdrop-blur-sm space-y-6">
-          {/* Pattern Selection */}
-          <div>
+        <aside className="w-64 border-r border-border bg-background/50 backdrop-blur-sm flex flex-col">
+          {/* AIDEV-NOTE: Made sidebar flex column to enable proper scrolling layout */}
+          <div className="p-6 pb-4">
+            {/* Pattern Selection Header */}
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
             </div>
-            <div className="space-y-1">
+          </div>
+          
+          {/* Scrollable Pattern List */}
+          <div 
+            className="px-6 overflow-y-auto" 
+            style={{ maxHeight: '24rem' }}
+          >
+            {/* AIDEV-NOTE: Fixed height of 24rem (~384px) to show max 6 patterns and force scrolling */}
+            <div className="space-y-1 pb-4">
               {patternGenerators.map((pattern, index) => (
                 <button
                   key={pattern.id}
@@ -143,6 +152,11 @@ export default function PatternGeneratorShowcase() {
                       ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
                       : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
                   }`}
+                  ref={selectedPatternId === pattern.id ? (el) => {
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                    }
+                  } : undefined}
                 >
                   <div className="flex justify-between items-center">
                     <span className="uppercase tracking-wider">{pattern.name}</span>
@@ -154,8 +168,8 @@ export default function PatternGeneratorShowcase() {
             </div>
           </div>
 
-          {/* Pattern Specifications */}
-          <div className="border-t border-border pt-6">
+          {/* Pattern Specifications - Fixed at bottom */}
+          <div className="p-6 pt-4 border-t border-border">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
