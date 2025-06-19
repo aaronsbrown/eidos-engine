@@ -21,7 +21,8 @@
       "Bash(npm run test:coverage:*)",
       "Bash(mkdir:*)",
       "Bash(npm run lint)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   }
