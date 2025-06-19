@@ -1,6 +1,6 @@
 // AIDEV-NOTE: Theme Context tests - ThemeProvider, useTheme hook, localStorage, DOM updates
 import React from 'react'
-import { render, screen, act, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeProvider, useTheme } from './theme-context'
 
@@ -317,7 +317,7 @@ describe('ThemeContext', () => {
     })
 
     it('returns theme context value when used within provider', async () => {
-      let themeContextValue: any
+      let themeContextValue: ReturnType<typeof useTheme> | undefined
 
       const TestHookComponent = () => {
         themeContextValue = useTheme()
