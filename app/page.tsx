@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
@@ -14,6 +14,7 @@ export default function PatternGeneratorShowcase() {
   const [isResizing, setIsResizing] = useState(false)
   const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
   const [isAnimating, setIsAnimating] = useState(false) // Track animation state
+  const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
 
   // How many patterns to show at once (fits in ~20rem container)
   const patternsPerPage = 5
@@ -39,13 +40,17 @@ export default function PatternGeneratorShowcase() {
 
   // Get current control values for the selected pattern
   const getCurrentControlValues = () => {
-    if (!controlValues[selectedPatternId]) {
+    return controlValues[selectedPatternId] || {}
+  }
+
+  // Initialize control values when pattern changes
+  useEffect(() => {
+    if (!controlValues[selectedPatternId] && !initializedPatternsRef.current.has(selectedPatternId)) {
       const defaults = initializeControlValues(selectedPatternId)
       setControlValues(prev => ({ ...prev, [selectedPatternId]: defaults }))
-      return defaults
+      initializedPatternsRef.current.add(selectedPatternId)
     }
-    return controlValues[selectedPatternId]
-  }
+  }, [selectedPatternId, controlValues])
 
   // Handle control changes
   const handleControlChange = (controlId: string, value: number | string | boolean) => {
