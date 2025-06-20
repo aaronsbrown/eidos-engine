@@ -73,8 +73,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
             controls={mobileLayout.essentialControls}
             controlValues={controlValues}
             onControlChange={onControlChange}
-            isMobile={true}
-            className="mobile-essential-controls"
+            sidebarWidth={viewport.width}
           />
         ) : (
           <div className="text-xs text-muted-foreground font-mono">
@@ -135,8 +134,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
             controls={mobileLayout.ungroupedControls}
             controlValues={controlValues}
             onControlChange={onControlChange}
-            isMobile={true}
-            className="mobile-ungrouped-controls"
+            sidebarWidth={viewport.width}
           />
         </div>
       )}
