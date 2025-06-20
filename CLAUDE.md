@@ -16,6 +16,7 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | G-1 | Add/update **`AIDEV-NOTE:` anchor comments** near non-trivial edited code. | ❌ Delete or mangle existing `AIDEV-` comments.                                     |
 | G-2 | For changes >300 LOC or >3 files, **ask for confirmation**.            | ❌ Refactor large modules without human guidance.                                     |
 | G-3 | Stay within the current task context. Inform the dev if it'd be better to start afresh.     | ❌ Continue work from a prior prompt after "new task" – start a fresh session.      |
+| G-4 | **NEVER** merge feature branches to main without explicit approval.    | ❌ Merge feature branches, even if "working state" - always ask for approval first. |
 
 ---
 
@@ -54,7 +55,9 @@ export default function BarcodeGenerator...
 - **Always use feature branches** for development work (never commit directly to main)
 - **Branch naming**: Use descriptive names like `feature/enhance-rar-testbench`, `fix/uart-timeout-bug`
 - **Create branches early**: Before making any code changes
-- **Single developer workflow**: Create feature branch → develop → test → merge to main
+- **Single developer workflow**: Create feature branch → develop → test → **get approval** → merge to main
+- **🚨 CRITICAL**: **NEVER merge feature branches to main without explicit developer approval**
+- **Merging protocol**: Always ask "Should I merge this feature branch to main?" before executing merge commands
 
 ### Commit Standards
 
