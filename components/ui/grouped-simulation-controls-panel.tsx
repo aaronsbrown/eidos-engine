@@ -38,8 +38,10 @@ export default function GroupedSimulationControlsPanel({
       return groupCellularAutomatonControls(controls)
     }
     
-    // If few controls, don't group them
-    if (controls.length <= 6) {
+    // If few controls, don't group them (except for patterns with special layouts)
+    if (controls.length <= 6 && 
+        patternId !== 'four-pole-gradient' && 
+        patternId !== 'cellular-automaton') {
       return null
     }
 

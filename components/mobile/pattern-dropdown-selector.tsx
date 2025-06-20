@@ -28,7 +28,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
   
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const optionsRef = useRef<HTMLDivElement[]>([])
+  const optionsRef = useRef<HTMLButtonElement[]>([])
 
   // Find selected pattern
   const selectedPattern = patterns.find(p => p.id === selectedId)

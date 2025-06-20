@@ -43,8 +43,8 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
-    getMobileResponsiveClasses(isMobile, isTablet, isDesktop),
-    [isMobile, isTablet, isDesktop]
+    getMobileResponsiveClasses(isMobile, isTablet),
+    [isMobile, isTablet]
   )
 
   // Calculate optimal visualization dimensions
@@ -73,7 +73,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       width: squareSize,
       height: squareSize
     }
-  }, [isTablet, isDesktop, viewport, isAdvancedExpanded])
+  }, [isTablet, isDesktop, viewport])
 
   // Initialize control values for pattern
   const initializeControlValues = useCallback((patternId: string) => {
@@ -123,11 +123,6 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     setIsMenuOpen(!isMenuOpen)
   }, [isMenuOpen])
 
-  // Handle theme toggle
-  const handleThemeToggle = useCallback(() => {
-    // Theme toggle is handled by the ThemeToggle component internally
-  }, [])
-
   // If desktop, render the existing desktop layout
   if (isDesktop) {
     return (
@@ -155,7 +150,6 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
             total: patternGenerators.length
           }}
           onMenuToggle={handleMenuToggle}
-          onThemeToggle={handleThemeToggle}
         />
         
         <div className="flex-1 flex">
@@ -209,7 +203,6 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           total: patternGenerators.length
         }}
         onMenuToggle={handleMenuToggle}
-        onThemeToggle={handleThemeToggle}
       />
 
       {/* Pattern Selector */}
@@ -261,15 +254,15 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       {/* Menu Overlay for mobile */}
       {isMenuOpen && (
         <div 
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-          onClick={() => setIsMenuOpen(false)}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+          onClick={handleMenuToggle}
         >
-          <div className="absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4">
+          <div className="absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4 transform transition-transform duration-300 ease-in-out translate-x-0">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-mono text-sm uppercase tracking-wider">Menu</h2>
               <button 
-                onClick={() => setIsMenuOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
+                onClick={handleMenuToggle}
+                className="text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Close menu"
               >
                 ✕

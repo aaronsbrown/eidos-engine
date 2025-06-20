@@ -18,8 +18,8 @@ export function getEssentialControls(
     'brownian-motion': ['particleCount', 'speed', 'brightness'],
     'trigonometric-circle': ['speed'],
     'particle-system': ['particleCount', 'movementSpeed', 'brightness'],
-    'cellular-automaton': ['cellSize', 'animationSpeed', 'initialCondition'],
-    'four-pole-gradient': ['pole1Color', 'pole2Color', 'interpolationPower']
+    'cellular-automaton': ['rulePrev', 'ruleNext'],
+    'four-pole-gradient': ['pole1Color', 'pole2Color', 'pole3Color', 'pole4Color']
   }
 
   const patternEssentials = essentialControlIds[patternId] || []
@@ -34,8 +34,8 @@ export function getEssentialControls(
     return controls.slice(0, 3)
   }
 
-  // Ensure we don't exceed 3 essential controls for mobile layout
-  return essentialControls.slice(0, 3)
+  // Return all essential controls for the pattern
+  return essentialControls
 }
 
 /**
@@ -185,8 +185,7 @@ export function getOptimalCanvasDimensions(
  */
 export function getMobileResponsiveClasses(
   isMobile: boolean,
-  isTablet: boolean,
-  _isDesktop: boolean
+  isTablet: boolean
 ): {
   container: string
   header: string

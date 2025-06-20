@@ -3,8 +3,7 @@
 
 import React, { memo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Menu, Moon, Sun } from 'lucide-react'
-import { useTheme } from '@/lib/theme-context'
+import { Menu } from 'lucide-react'
 
 export interface MobileHeaderProps {
   title: string
@@ -19,15 +18,6 @@ const MobileHeader = memo(function MobileHeader({
   onMenuToggle,
   onThemeToggle
 }: MobileHeaderProps) {
-  const { theme, toggleTheme } = useTheme()
-
-  const handleThemeToggle = () => {
-    if (onThemeToggle) {
-      onThemeToggle()
-    } else {
-      toggleTheme()
-    }
-  }
 
   // Format pattern counter with zero padding
   const formatCounter = (current: number, total: number): string => {
@@ -41,26 +31,14 @@ const MobileHeader = memo(function MobileHeader({
       data-testid="mobile-header"
       className="h-12 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 py-2 relative z-20"
     >
-      {/* Left side - Menu button */}
-      <Button
-        data-testid="menu-toggle"
-        variant="ghost"
-        size="sm"
-        onClick={onMenuToggle}
-        className="min-h-[44px] min-w-[44px] p-2 hover:bg-muted/50"
-        aria-label="Open menu"
-      >
-        <Menu className="h-5 w-5 text-muted-foreground" />
-      </Button>
-
-      {/* Center - Title */}
-      <div className="flex-1 flex items-center justify-center px-2">
-        <h1 className="font-mono text-sm md:text-base uppercase tracking-wider text-foreground truncate text-center">
+      {/* Left side - Title */}
+      <div className="flex-1 flex items-center justify-start px-2">
+        <h1 className="font-mono text-sm md:text-base uppercase tracking-wider text-foreground truncate">
           {title || 'PATTERN GENERATOR'}
         </h1>
       </div>
 
-      {/* Right side - Pattern counter and theme toggle */}
+      {/* Right side - Pattern counter and menu button */}
       <div data-testid="header-controls" className="flex items-center space-x-2">
         {/* Pattern Counter */}
         <div
@@ -71,20 +49,16 @@ const MobileHeader = memo(function MobileHeader({
           {formatCounter(patternCount.current, patternCount.total)}
         </div>
 
-        {/* Theme Toggle */}
+        {/* Menu button */}
         <Button
-          data-testid="theme-toggle"
+          data-testid="menu-toggle"
           variant="ghost"
           size="sm"
-          onClick={handleThemeToggle}
+          onClick={onMenuToggle}
           className="min-h-[44px] min-w-[44px] p-2 hover:bg-muted/50"
-          aria-label="Toggle theme"
+          aria-label="Open menu"
         >
-          {theme === 'dark' ? (
-            <Sun className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <Moon className="h-4 w-4 text-muted-foreground" />
-          )}
+          <Menu className="h-5 w-5 text-muted-foreground" />
         </Button>
       </div>
     </header>
