@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
-import CompactColorPicker from "@/components/ui/compact-color-picker"
+import { SimulationControlsPanel } from "@/components/ui/simulation-controls-panel"
 
 export default function PatternGeneratorShowcase() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -389,7 +389,7 @@ export default function PatternGeneratorShowcase() {
             </div>
           </div>
 
-          {/* Simulation Parameters */}
+          {/* Simulation Parameters - AIDEV-NOTE: Refactored into dedicated component for maintainability */}
           <div className="border-t border-border pt-4">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-yellow-400"></div>
@@ -397,269 +397,13 @@ export default function PatternGeneratorShowcase() {
                 {selectedPattern.controls ? "Simulation Parameters" : "Pattern Controls"}
               </h3>
             </div>
-            {selectedPattern.controls ? (
-              <div className="space-y-4">
-                {/* Navigation buttons first - only for 1D CELLULAR AUTOMATA */}
-                {selectedPattern.id === 'cellular-automaton' && (() => {
-                  const buttonControls = selectedPattern.controls.filter(control => control.type === 'button')
-                  const prevButton = buttonControls.find(c => c.id === 'rulePrev')
-                  const nextButton = buttonControls.find(c => c.id === 'ruleNext')
-                  const currentRule = getCurrentControlValues()['rule'] ?? 30
-
-                  return (
-                    (prevButton || nextButton) && (
-                      <div className="space-y-3">
-                        {/* Rule Number Header */}
-                        <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                          Rule Number
-                        </div>
-
-                        <div className="flex items-center space-x-6">
-                          {prevButton && (
-                            <Button
-                              onClick={() => {
-                                handleControlChange(prevButton.id, true)
-                                setTimeout(() => handleControlChange(prevButton.id, false), 100)
-                              }}
-                              variant="outline"
-                              size="sm"
-                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-                            >
-                              {prevButton.label}
-                            </Button>
-                          )}
-
-                          {/* Rule counter display */}
-                          <div className="text-xs font-mono text-muted-foreground border border-border bg-background px-3 py-2">
-                            {currentRule.toString().padStart(3, '0')} / 255
-                          </div>
-
-                          {nextButton && (
-                            <Button
-                              onClick={() => {
-                                handleControlChange(nextButton.id, true)
-                                setTimeout(() => handleControlChange(nextButton.id, false), 100)
-                              }}
-                              variant="outline"
-                              size="sm"
-                              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-                            >
-                              {nextButton.label}
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  )
-                })()}
-
-                {/* Special layout for 4-pole gradient pattern */}
-                {selectedPattern.id === 'four-pole-gradient' ? (
-                  <div className="space-y-4">
-                    {/* Color pickers in 2x2 grid */}
-                    <div>
-                      <div className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">
-                        Pole Colors
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {selectedPattern.controls.filter(control => control.type === 'color').map((control) => {
-                          const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-                          return (
-                            <CompactColorPicker
-                              key={control.id}
-                              value={currentValue as string}
-                              onChange={(color) => handleControlChange(control.id, color)}
-                              label={control.label}
-                            />
-                          )
-                        })}
-                      </div>
-                    </div>
-                    
-                    {/* Other controls in regular grid */}
-                    <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                      {selectedPattern.controls.filter(control => control.type !== 'button' && control.type !== 'color').map((control) => {
-                        const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-
-                        if (control.type === 'range') {
-                          return (
-                            <div key={control.id} className="flex flex-col h-full">
-                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                              <div className="flex-1 flex flex-col justify-center">
-                                <input
-                                  type="range"
-                                  min={control.min}
-                                  max={control.max}
-                                  step={control.step}
-                                  value={currentValue as number}
-                                  onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
-                                  className="w-full accent-yellow-400"
-                                />
-                              </div>
-                              <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
-                                {control.step && control.step < 1
-                                  ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
-                                  : currentValue
-                                }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
-                              </div>
-                            </div>
-                          )
-                        } else if (control.type === 'select') {
-                          return (
-                            <div key={control.id} className="flex flex-col h-full col-span-full">
-                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                              <div className="flex-1 flex flex-col justify-center">
-                                <select
-                                  value={currentValue as string}
-                                  onChange={(e) => handleControlChange(control.id, e.target.value)}
-                                  className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
-                                >
-                                  {control.options?.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-                          )
-                        } else if (control.type === 'checkbox') {
-                          return (
-                            <div key={control.id} className="flex flex-col h-full col-span-full">
-                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                              <div className="flex-1 flex items-center">
-                                <label className="flex items-center space-x-3 cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={currentValue as boolean}
-                                    onChange={(e) => handleControlChange(control.id, e.target.checked)}
-                                    className="w-4 h-4 accent-yellow-400"
-                                  />
-                                  <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
-                                </label>
-                              </div>
-                            </div>
-                          )
-                        }
-                        return null
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  /* Default layout for other patterns */
-                  <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
-                    {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
-                      const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-
-                      if (control.type === 'range') {
-                        return (
-                          <div key={control.id} className="flex flex-col h-full">
-                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                            <div className="flex-1 flex flex-col justify-center">
-                              <input
-                                type="range"
-                                min={control.min}
-                                max={control.max}
-                                step={control.step}
-                                value={currentValue as number}
-                                onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
-                                className="w-full accent-yellow-400"
-                              />
-                            </div>
-                            <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
-                              {control.step && control.step < 1
-                                ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
-                                : currentValue
-                              }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
-                            </div>
-                          </div>
-                        )
-                      } else if (control.type === 'select') {
-                        return (
-                          <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
-                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                            <div className="flex-1 flex flex-col justify-center">
-                              <select
-                                value={currentValue as string}
-                                onChange={(e) => handleControlChange(control.id, e.target.value)}
-                                className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
-                              >
-                                {control.options?.map((option) => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )
-                      } else if (control.type === 'checkbox') {
-                        return (
-                          <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
-                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                            <div className="flex-1 flex items-center">
-                              <label className="flex items-center space-x-3 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={currentValue as boolean}
-                                  onChange={(e) => handleControlChange(control.id, e.target.checked)}
-                                  className="w-4 h-4 accent-yellow-400"
-                                />
-                                <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
-                              </label>
-                            </div>
-                          </div>
-                        )
-                      } else if (control.type === 'color') {
-                        return (
-                          <CompactColorPicker
-                            key={control.id}
-                            value={currentValue as string}
-                            onChange={(color) => handleControlChange(control.id, color)}
-                            label={control.label}
-                          />
-                        )
-                      }
-                      return null
-                    })}
-                  </div>
-                )}
-
-                {/* Button controls at bottom */}
-                {selectedPattern.controls.filter(control => {
-                  if (control.type !== 'button') return false
-                  // For 1D CELLULAR AUTOMATA, exclude navigation buttons (they're rendered at top)
-                  if (selectedPattern.id === 'cellular-automaton') {
-                    return control.id !== 'rulePrev' && control.id !== 'ruleNext'
-                  }
-                  // For other patterns, include all button controls
-                  return true
-                }).map((control) => {
-                  const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-                  return (
-                    <div key={control.id} className="pt-2">
-                      <Button
-                        onClick={() => {
-                          handleControlChange(control.id, !currentValue)
-                          // Auto-reset the button state after a brief moment
-                          setTimeout(() => handleControlChange(control.id, false), 100)
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="w-full font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20 uppercase"
-                      >
-                        {control.label}
-                      </Button>
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="border border-border p-3 bg-background">
-                <div className="text-xs font-mono text-muted-foreground mb-3 uppercase">No Controls Available</div>
-                <div className="text-xs text-muted-foreground/60">This pattern does not have interactive controls</div>
-              </div>
-            )}
+            <SimulationControlsPanel
+              patternId={selectedPattern.id}
+              controls={selectedPattern.controls || []}
+              currentValues={getCurrentControlValues()}
+              onControlChange={handleControlChange}
+              sidebarWidth={sidebarWidth}
+            />
           </div>
         </aside>
 
