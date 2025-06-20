@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PatternDropdownSelector from './pattern-dropdown-selector'
-import { patternGenerators } from '@/components/pattern-generators'
+// import { patternGenerators } from '@/components/pattern-generators'
 
 // Mock pattern generators for testing
 const mockPatterns = [
@@ -104,7 +104,7 @@ describe('PatternDropdownSelector', () => {
     })
 
     it('updates displayed value when new pattern is selected', async () => {
-      const user = userEvent.setup()
+      userEvent.setup()
       const { rerender } = render(<PatternDropdownSelector {...defaultProps} />)
       
       // Change selected pattern

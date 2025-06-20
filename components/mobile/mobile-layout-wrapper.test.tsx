@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import MobileLayoutWrapper from './mobile-layout-wrapper'
-import { patternGenerators } from '@/components/pattern-generators'
+// import { patternGenerators } from '@/components/pattern-generators'
 
 // Mock the pattern generators to avoid rendering complex canvas/WebGL
 jest.mock('@/components/pattern-generators', () => ({
@@ -149,7 +149,7 @@ describe('MobileLayoutWrapper', () => {
     it('shows essential controls by default', () => {
       render(<MobileLayoutWrapper />)
       
-      const disclosurePanel = screen.getByTestId('progressive-disclosure-panel')
+      screen.getByTestId('progressive-disclosure-panel')
       
       // Essential controls should be visible
       expect(screen.getByLabelText('Speed')).toBeInTheDocument()
@@ -172,7 +172,7 @@ describe('MobileLayoutWrapper', () => {
 
     it('preserves pattern-specific control layouts in mobile', async () => {
       // Test with four-pole gradient pattern that has 2x2 color grid
-      const fourPolePattern = {
+      /* const fourPolePattern = {
         id: 'four-pole-gradient',
         name: '4-Pole Gradient',
         component: () => <div>Four Pole</div>,
@@ -183,7 +183,7 @@ describe('MobileLayoutWrapper', () => {
           { id: 'pole3Color', label: 'Pole 3 Color', type: 'color', defaultValue: '#0000ff' },
           { id: 'pole4Color', label: 'Pole 4 Color', type: 'color', defaultValue: '#ffff00' },
         ]
-      }
+      } */
 
       render(<MobileLayoutWrapper initialPatternId="four-pole-gradient" />)
       

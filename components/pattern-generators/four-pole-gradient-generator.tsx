@@ -435,7 +435,7 @@ export default function FourPoleGradientGenerator({
     }
   }, [isDragging, width, height, controls.animationEnabled])
 
-  const handleTouchEnd = useCallback((_event: React.TouchEvent<HTMLCanvasElement>) => {
+  const handleTouchEnd = useCallback(() => {
     if (controls.animationEnabled) return // Disable interaction during animation
     setIsDragging(null)
     // Don't prevent default on touch end to allow normal touch behavior

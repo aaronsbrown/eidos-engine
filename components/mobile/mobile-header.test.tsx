@@ -159,7 +159,7 @@ describe('MobileHeader', () => {
       
       render(<MobileHeader {...defaultProps} />)
       
-      const header = screen.getByTestId('mobile-header')
+      screen.getByTestId('mobile-header')
       const title = screen.getByText('PATTERN GENERATOR SYSTEM')
       const controls = screen.getByTestId('header-controls')
       

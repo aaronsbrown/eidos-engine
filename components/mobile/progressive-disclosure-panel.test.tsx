@@ -1,5 +1,5 @@
 // AIDEV-NOTE: TDD implementation per G-5 - Progressive disclosure panel tests written before implementation
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProgressiveDisclosurePanel from './progressive-disclosure-panel'
 
@@ -225,7 +225,7 @@ describe('ProgressiveDisclosurePanel', () => {
 
   describe('Touch Interactions', () => {
     it('handles touch events on controls properly', async () => {
-      const user = userEvent.setup()
+      userEvent.setup()
       render(<ProgressiveDisclosurePanel {...defaultProps} />)
       
       const speedSlider = screen.getByLabelText('Speed')

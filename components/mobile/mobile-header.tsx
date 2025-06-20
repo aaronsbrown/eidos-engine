@@ -9,14 +9,12 @@ export interface MobileHeaderProps {
   title: string
   patternCount: { current: number; total: number }
   onMenuToggle: () => void
-  onThemeToggle?: () => void
 }
 
 const MobileHeader = memo(function MobileHeader({
   title,
   patternCount,
-  onMenuToggle,
-  onThemeToggle
+  onMenuToggle
 }: MobileHeaderProps) {
 
   // Format pattern counter with zero padding
