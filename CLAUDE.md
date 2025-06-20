@@ -149,6 +149,31 @@ interface PatternControl {
 2. Implement `PatternGeneratorProps` interface
 3. Add to exports in `components/pattern-generators/index.ts`
 4. Follow existing patterns for control panel implementation
+5. For WebGL generators, use external shader loading system
+
+### Shader Loading System (Issue #14)
+
+**External Shader Architecture:**
+- **Shader files** stored in `shaders/vertex/` and `shaders/fragment/`
+- **Dynamic loading** via `loadShader()` utility function
+- **Type-safe uniforms** with TypeScript definitions
+- **TouchDesigner import** workflow for external shader integration
+
+**Implementation Pattern:**
+```typescript
+import { loadShader, createShaderProgram } from "@/lib/shader-loader"
+
+// Load external shaders
+const shaderProgram = await loadShader('shader-name')
+const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.fragment)
+```
+
+**Benefits:**
+- GLSL syntax highlighting in external `.frag` and `.vert` files
+- Improved maintainability and code organization
+- Easy TouchDesigner shader imports
+- Hot reload support during development
+- Shader reusability across multiple generators
 
 ### Control Panel Architecture
 
@@ -181,10 +206,12 @@ interface PatternControl {
 
 ### WebGL Patterns
 
-- Use constant loop bounds in GLSL shaders
-- Minimize uniform updates per frame
-- Proper cleanup with `cancelAnimationFrame`
-- Efficient vertex buffer management
+- **External shaders**: Use `loadShader()` for shader management
+- **Constant loop bounds**: GLSL shaders must use compile-time constants
+- **Uniform optimization**: Minimize uniform updates per frame
+- **Proper cleanup**: `cancelAnimationFrame` and shader program deletion
+- **Efficient buffers**: Vertex buffer management and reuse
+- **Type safety**: Use shader type definitions from `lib/shader-types.ts`
 
 ### Canvas 2D Patterns
 
@@ -263,7 +290,7 @@ components/
     frequency-spectrum-generator.tsx  # ✅ Implemented, needs controls  
     noise-field-generator.tsx   # ✅ Implemented, needs controls
     pixelated-noise-generator.tsx  # ✅ Implemented, ✅ controls
-    brownian-motion-generator.tsx  # ✅ Implemented, ✅ controls
+    brownian-motion-generator.tsx  # ✅ Implemented, ✅ controls, ✅ external shaders
   ui/
     button.tsx                  # shadcn/ui button component
     checkbox.tsx                # shadcn/ui checkbox component
@@ -271,8 +298,20 @@ components/
     viewport-constrained-panel.tsx # ✅ Viewport height management (Issue #19) 
     grouped-simulation-controls-panel.tsx # ✅ Enhanced controls panel (Issue #19)
 lib/
+  shader-loader.ts             # External shader loading utility
+  shader-types.ts              # TypeScript definitions for shaders
   simplex-noise.ts             # 3D Simplex noise implementation
   utils.ts                     # Utility functions
+shaders/
+  vertex/
+    fullscreen-quad.vert        # Common vertex shader for full-screen effects
+  fragment/
+    brownian-motion.frag        # Brownian motion particle system shader
+  touchdesigner-imports/
+    README.md                   # TouchDesigner import workflow guide
+    example-td-shader.frag      # Example converted TouchDesigner shader
+public/
+  shaders/                      # Static shader files served by Next.js
 app/
   page.tsx                     # Main pattern showcase page
   layout.tsx                   # Root layout
@@ -373,10 +412,13 @@ When working on this project:
 
 1. **Maintain consistency** with existing code patterns
 2. **Follow the established architecture** for new generators
-3. **Implement control panels** using the established pattern
-4. **Ensure type safety** throughout all changes
-5. **Test performance** for real-time parameter changes
-6. **Keep technical aesthetic** in UI design choices
+3. **Use external shader loading** for WebGL-based pattern generators
+4. **Implement control panels** using the established pattern
+5. **Ensure type safety** throughout all changes (including shader uniforms)
+6. **Test performance** for real-time parameter changes (60fps target)
+7. **Keep technical aesthetic** in UI design choices
+8. **Add AIDEV-NOTE comments** for significant architectural changes
+9. **Update CLAUDE.md** when implementing major system enhancements
 
 ## Repository Information
 
