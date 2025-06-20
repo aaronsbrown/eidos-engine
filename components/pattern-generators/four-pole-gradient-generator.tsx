@@ -19,6 +19,10 @@ interface FourPoleGradientControls {
   animationEnabled: boolean
   animationSpeed: number
   animationPattern: string
+  noiseEnabled: boolean
+  noiseIntensity: number
+  noiseScale: number
+  noiseType: string
 }
 
 export default function FourPoleGradientGenerator({ 
@@ -31,7 +35,7 @@ export default function FourPoleGradientGenerator({
   const [isDragging, setIsDragging] = useState<number | null>(null)
   const [hoveredPole, setHoveredPole] = useState<number | null>(null)
   const animationFrameRef = useRef<number | null>(null)
-  const animationTimeRef = useRef<number>(0)
+  const animationTimeRef = useRef<number>(0)\n  const noiseTimeRef = useRef<number>(0)
   
   // Use passed control values or defaults
   const controls: FourPoleGradientControls = useMemo(() => ({
@@ -42,7 +46,11 @@ export default function FourPoleGradientGenerator({
     interpolationPower: (controlValues?.interpolationPower as number) ?? 2.0,
     animationEnabled: (controlValues?.animationEnabled as boolean) ?? false,
     animationSpeed: (controlValues?.animationSpeed as number) ?? 1.0,
-    animationPattern: (controlValues?.animationPattern as string) ?? "circular"
+    animationPattern: (controlValues?.animationPattern as string) ?? "circular",
+    noiseEnabled: (controlValues?.noiseEnabled as boolean) ?? false,
+    noiseIntensity: (controlValues?.noiseIntensity as number) ?? 0.3,
+    noiseScale: (controlValues?.noiseScale as number) ?? 0.02,
+    noiseType: (controlValues?.noiseType as string) ?? "analog"
   }), [controlValues])
 
   // AIDEV-NOTE: Initialize 4 poles at corners with slight inset for better interaction
@@ -80,7 +88,7 @@ export default function FourPoleGradientGenerator({
   }, [poleColors])
 
 
-  // AIDEV-NOTE: Animation pattern calculation functions for different movement types
+  // AIDEV-NOTE: Noise generation functions for analogue-style overlay effects\n  const generateNoise = useCallback((x: number, y: number, scale: number, type: string, time: number = 0) => {\n    // Pseudo-random number generator using coordinates as seed\n    const seed = (x * 12.9898 + y * 78.233 + time * 0.001) % 1\n    const noise = Math.sin(seed * 43758.5453) * 0.5 + 0.5\n    \n    switch (type) {\n      case 'analog': {\n        // Smooth analog grain with temporal variation\n        const grain1 = Math.sin((x + time * 0.1) * scale * 127.1) * Math.cos((y + time * 0.05) * scale * 311.7)\n        const grain2 = Math.cos((x - time * 0.08) * scale * 74.3) * Math.sin((y + time * 0.12) * scale * 183.9)\n        return (grain1 + grain2 + noise * 2) * 0.25\n      }\n      case 'digital': {\n        // Sharp digital static\n        const staticX = Math.floor(x * scale * 50) / (scale * 50)\n        const staticY = Math.floor(y * scale * 50) / (scale * 50)\n        const digitalSeed = (staticX * 12.9898 + staticY * 78.233 + Math.floor(time * 10) * 0.1) % 1\n        return (Math.sin(digitalSeed * 43758.5453) > 0.7) ? 1 : -0.3\n      }\n      case 'film': {\n        // Film grain with vertical streaks\n        const verticalNoise = Math.sin(x * scale * 200 + time * 0.02) * 0.3\n        const randomGrain = (Math.sin((x + y + time * 0.05) * scale * 150.7) + \n                           Math.cos((x * 1.3 + y * 0.7 + time * 0.08) * scale * 89.2)) * 0.35\n        return verticalNoise + randomGrain + noise * 0.3\n      }\n      default:\n        return noise * 2 - 1\n    }\n  }, [])\n\n  // AIDEV-NOTE: Animation pattern calculation functions for different movement types
   const getAnimatedPolePosition = useCallback((poleIndex: number, time: number, pattern: string, speed: number) => {
     const centerX = width / 2
     const centerY = height / 2
@@ -225,7 +233,7 @@ export default function FourPoleGradientGenerator({
     }
 
     const animate = (currentTime: number) => {
-      animationTimeRef.current = currentTime
+      animationTimeRef.current = currentTime\n      noiseTimeRef.current = currentTime
       
       // Update pole positions based on animation pattern
       setPoles(prevPoles => {
@@ -255,7 +263,7 @@ export default function FourPoleGradientGenerator({
         animationFrameRef.current = null
       }
     }
-  }, [controls.animationEnabled, controls.animationPattern, controls.animationSpeed, getAnimatedPolePosition, width, height])
+  }, [controls.animationEnabled, controls.animationPattern, controls.animationSpeed, getAnimatedPolePosition, width, height])\n\n  // AIDEV-NOTE: Separate animation loop for noise when main animation is disabled\n  useEffect(() => {\n    if (!controls.noiseEnabled || controls.animationEnabled) {\n      return // Noise time is handled in main animation loop when animation is enabled\n    }\n\n    let noiseAnimationFrame: number | null = null\n    const animateNoise = (currentTime: number) => {\n      noiseTimeRef.current = currentTime\n      noiseAnimationFrame = requestAnimationFrame(animateNoise)\n    }\n\n    noiseAnimationFrame = requestAnimationFrame(animateNoise)\n    \n    return () => {\n      if (noiseAnimationFrame) {\n        cancelAnimationFrame(noiseAnimationFrame)\n      }\n    }\n  }, [controls.noiseEnabled, controls.animationEnabled])
 
   // Mouse event handlers - disabled when animation is active
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -334,10 +342,30 @@ export default function FourPoleGradientGenerator({
         const pixelIndex = (y * width + x) * 4
         const color = calculatePixelColor(x, y, poles, controls.interpolationPower)
         
-        data[pixelIndex] = color.r     // Red
-        data[pixelIndex + 1] = color.g // Green
-        data[pixelIndex + 2] = color.b // Blue
-        data[pixelIndex + 3] = 255     // Alpha
+        let finalR = color.r
+        let finalG = color.g
+        let finalB = color.b
+        
+        // AIDEV-NOTE: Apply noise overlay if enabled for analogue aesthetic
+        if (controls.noiseEnabled) {
+          const noiseValue = generateNoise(
+            x, y, 
+            controls.noiseScale, 
+            controls.noiseType, 
+            noiseTimeRef.current
+          )
+          const noiseAmount = noiseValue * controls.noiseIntensity * 255
+          
+          // Apply noise additively with clamping
+          finalR = Math.max(0, Math.min(255, color.r + noiseAmount))
+          finalG = Math.max(0, Math.min(255, color.g + noiseAmount))
+          finalB = Math.max(0, Math.min(255, color.b + noiseAmount))
+        }
+        
+        data[pixelIndex] = finalR     // Red
+        data[pixelIndex + 1] = finalG // Green
+        data[pixelIndex + 2] = finalB // Blue
+        data[pixelIndex + 3] = 255    // Alpha
       }
     }
 
@@ -365,7 +393,7 @@ export default function FourPoleGradientGenerator({
       ctx.textAlign = "center"
       ctx.fillText(`${index + 1}`, pole.x, pole.y + 3)
     })
-  }, [width, height, poles, hoveredPole, isDragging, controls.interpolationPower, calculatePixelColor])
+  }, [width, height, poles, hoveredPole, isDragging, controls.interpolationPower, controls.noiseEnabled, controls.noiseIntensity, controls.noiseScale, controls.noiseType, calculatePixelColor, generateNoise])
 
   return (
     <div className={className}>
@@ -386,7 +414,7 @@ export default function FourPoleGradientGenerator({
         
         {/* Pattern type indicator with animation status */}
         <div className="absolute top-2 left-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
-          4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'}
+          4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'} {controls.noiseEnabled && '/ NOISE_OVERLAY'}
         </div>
         
         {/* Animation status indicator */}
