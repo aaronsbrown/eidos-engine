@@ -35,7 +35,8 @@ export default function FourPoleGradientGenerator({
   const [isDragging, setIsDragging] = useState<number | null>(null)
   const [hoveredPole, setHoveredPole] = useState<number | null>(null)
   const animationFrameRef = useRef<number | null>(null)
-  const animationTimeRef = useRef<number>(0)\n  const noiseTimeRef = useRef<number>(0)
+  const animationTimeRef = useRef<number>(0)
+  const noiseTimeRef = useRef<number>(0)
   
   // Use passed control values or defaults
   const controls: FourPoleGradientControls = useMemo(() => ({
@@ -88,7 +89,39 @@ export default function FourPoleGradientGenerator({
   }, [poleColors])
 
 
-  // AIDEV-NOTE: Noise generation functions for analogue-style overlay effects\n  const generateNoise = useCallback((x: number, y: number, scale: number, type: string, time: number = 0) => {\n    // Pseudo-random number generator using coordinates as seed\n    const seed = (x * 12.9898 + y * 78.233 + time * 0.001) % 1\n    const noise = Math.sin(seed * 43758.5453) * 0.5 + 0.5\n    \n    switch (type) {\n      case 'analog': {\n        // Smooth analog grain with temporal variation\n        const grain1 = Math.sin((x + time * 0.1) * scale * 127.1) * Math.cos((y + time * 0.05) * scale * 311.7)\n        const grain2 = Math.cos((x - time * 0.08) * scale * 74.3) * Math.sin((y + time * 0.12) * scale * 183.9)\n        return (grain1 + grain2 + noise * 2) * 0.25\n      }\n      case 'digital': {\n        // Sharp digital static\n        const staticX = Math.floor(x * scale * 50) / (scale * 50)\n        const staticY = Math.floor(y * scale * 50) / (scale * 50)\n        const digitalSeed = (staticX * 12.9898 + staticY * 78.233 + Math.floor(time * 10) * 0.1) % 1\n        return (Math.sin(digitalSeed * 43758.5453) > 0.7) ? 1 : -0.3\n      }\n      case 'film': {\n        // Film grain with vertical streaks\n        const verticalNoise = Math.sin(x * scale * 200 + time * 0.02) * 0.3\n        const randomGrain = (Math.sin((x + y + time * 0.05) * scale * 150.7) + \n                           Math.cos((x * 1.3 + y * 0.7 + time * 0.08) * scale * 89.2)) * 0.35\n        return verticalNoise + randomGrain + noise * 0.3\n      }\n      default:\n        return noise * 2 - 1\n    }\n  }, [])\n\n  // AIDEV-NOTE: Animation pattern calculation functions for different movement types
+  // AIDEV-NOTE: Noise generation functions for analogue-style overlay effects
+  const generateNoise = useCallback((x: number, y: number, scale: number, type: string, time: number = 0) => {
+    // Pseudo-random number generator using coordinates as seed
+    const seed = (x * 12.9898 + y * 78.233 + time * 0.001) % 1
+    const noise = Math.sin(seed * 43758.5453) * 0.5 + 0.5
+    
+    switch (type) {
+      case 'analog': {
+        // Smooth analog grain with temporal variation
+        const grain1 = Math.sin((x + time * 0.1) * scale * 127.1) * Math.cos((y + time * 0.05) * scale * 311.7)
+        const grain2 = Math.cos((x - time * 0.08) * scale * 74.3) * Math.sin((y + time * 0.12) * scale * 183.9)
+        return (grain1 + grain2 + noise * 2) * 0.25
+      }
+      case 'digital': {
+        // Sharp digital static
+        const staticX = Math.floor(x * scale * 50) / (scale * 50)
+        const staticY = Math.floor(y * scale * 50) / (scale * 50)
+        const digitalSeed = (staticX * 12.9898 + staticY * 78.233 + Math.floor(time * 10) * 0.1) % 1
+        return (Math.sin(digitalSeed * 43758.5453) > 0.7) ? 1 : -0.3
+      }
+      case 'film': {
+        // Film grain with vertical streaks
+        const verticalNoise = Math.sin(x * scale * 200 + time * 0.02) * 0.3
+        const randomGrain = (Math.sin((x + y + time * 0.05) * scale * 150.7) + 
+                           Math.cos((x * 1.3 + y * 0.7 + time * 0.08) * scale * 89.2)) * 0.35
+        return verticalNoise + randomGrain + noise * 0.3
+      }
+      default:
+        return noise * 2 - 1
+    }
+  }, [])
+
+  // AIDEV-NOTE: Animation pattern calculation functions for different movement types
   const getAnimatedPolePosition = useCallback((poleIndex: number, time: number, pattern: string, speed: number) => {
     const centerX = width / 2
     const centerY = height / 2
@@ -233,7 +266,8 @@ export default function FourPoleGradientGenerator({
     }
 
     const animate = (currentTime: number) => {
-      animationTimeRef.current = currentTime\n      noiseTimeRef.current = currentTime
+      animationTimeRef.current = currentTime
+      noiseTimeRef.current = currentTime
       
       // Update pole positions based on animation pattern
       setPoles(prevPoles => {
@@ -263,7 +297,28 @@ export default function FourPoleGradientGenerator({
         animationFrameRef.current = null
       }
     }
-  }, [controls.animationEnabled, controls.animationPattern, controls.animationSpeed, getAnimatedPolePosition, width, height])\n\n  // AIDEV-NOTE: Separate animation loop for noise when main animation is disabled\n  useEffect(() => {\n    if (!controls.noiseEnabled || controls.animationEnabled) {\n      return // Noise time is handled in main animation loop when animation is enabled\n    }\n\n    let noiseAnimationFrame: number | null = null\n    const animateNoise = (currentTime: number) => {\n      noiseTimeRef.current = currentTime\n      noiseAnimationFrame = requestAnimationFrame(animateNoise)\n    }\n\n    noiseAnimationFrame = requestAnimationFrame(animateNoise)\n    \n    return () => {\n      if (noiseAnimationFrame) {\n        cancelAnimationFrame(noiseAnimationFrame)\n      }\n    }\n  }, [controls.noiseEnabled, controls.animationEnabled])
+  }, [controls.animationEnabled, controls.animationPattern, controls.animationSpeed, getAnimatedPolePosition, width, height])
+
+  // AIDEV-NOTE: Separate animation loop for noise when main animation is disabled
+  useEffect(() => {
+    if (!controls.noiseEnabled || controls.animationEnabled) {
+      return // Noise time is handled in main animation loop when animation is enabled
+    }
+
+    let noiseAnimationFrame: number | null = null
+    const animateNoise = (currentTime: number) => {
+      noiseTimeRef.current = currentTime
+      noiseAnimationFrame = requestAnimationFrame(animateNoise)
+    }
+
+    noiseAnimationFrame = requestAnimationFrame(animateNoise)
+    
+    return () => {
+      if (noiseAnimationFrame) {
+        cancelAnimationFrame(noiseAnimationFrame)
+      }
+    }
+  }, [controls.noiseEnabled, controls.animationEnabled])
 
   // Mouse event handlers - disabled when animation is active
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
