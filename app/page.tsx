@@ -453,83 +453,177 @@ export default function PatternGeneratorShowcase() {
                   )
                 })()}
 
-                {/* Main controls grid (excluding buttons) */}
-                <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
-                  {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
-                    const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
-
-                    if (control.type === 'range') {
-                      return (
-                        <div key={control.id} className="flex flex-col h-full">
-                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                          <div className="flex-1 flex flex-col justify-center">
-                            <input
-                              type="range"
-                              min={control.min}
-                              max={control.max}
-                              step={control.step}
-                              value={currentValue as number}
-                              onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
-                              className="w-full accent-yellow-400"
-                            />
-                          </div>
-                          <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
-                            {control.step && control.step < 1
-                              ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
-                              : currentValue
-                            }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
-                          </div>
-                        </div>
-                      )
-                    } else if (control.type === 'select') {
-                      return (
-                        <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
-                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                          <div className="flex-1 flex flex-col justify-center">
-                            <select
+                {/* Special layout for 4-pole gradient pattern */}
+                {selectedPattern.id === 'four-pole-gradient' ? (
+                  <div className="space-y-4">
+                    {/* Color pickers in 2x2 grid */}
+                    <div>
+                      <div className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">
+                        Pole Colors
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {selectedPattern.controls.filter(control => control.type === 'color').map((control) => {
+                          const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+                          return (
+                            <CompactColorPicker
+                              key={control.id}
                               value={currentValue as string}
-                              onChange={(e) => handleControlChange(control.id, e.target.value)}
-                              className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
-                            >
-                              {control.options?.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      )
-                    } else if (control.type === 'checkbox') {
-                      return (
-                        <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
-                          <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
-                          <div className="flex-1 flex items-center">
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                              onChange={(color) => handleControlChange(control.id, color)}
+                              label={control.label}
+                            />
+                          )
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Other controls in regular grid */}
+                    <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                      {selectedPattern.controls.filter(control => control.type !== 'button' && control.type !== 'color').map((control) => {
+                        const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+
+                        if (control.type === 'range') {
+                          return (
+                            <div key={control.id} className="flex flex-col h-full">
+                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                              <div className="flex-1 flex flex-col justify-center">
+                                <input
+                                  type="range"
+                                  min={control.min}
+                                  max={control.max}
+                                  step={control.step}
+                                  value={currentValue as number}
+                                  onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
+                                  className="w-full accent-yellow-400"
+                                />
+                              </div>
+                              <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
+                                {control.step && control.step < 1
+                                  ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
+                                  : currentValue
+                                }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
+                              </div>
+                            </div>
+                          )
+                        } else if (control.type === 'select') {
+                          return (
+                            <div key={control.id} className="flex flex-col h-full col-span-full">
+                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                              <div className="flex-1 flex flex-col justify-center">
+                                <select
+                                  value={currentValue as string}
+                                  onChange={(e) => handleControlChange(control.id, e.target.value)}
+                                  className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
+                                >
+                                  {control.options?.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          )
+                        } else if (control.type === 'checkbox') {
+                          return (
+                            <div key={control.id} className="flex flex-col h-full col-span-full">
+                              <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                              <div className="flex-1 flex items-center">
+                                <label className="flex items-center space-x-3 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={currentValue as boolean}
+                                    onChange={(e) => handleControlChange(control.id, e.target.checked)}
+                                    className="w-4 h-4 accent-yellow-400"
+                                  />
+                                  <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
+                                </label>
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  /* Default layout for other patterns */
+                  <div className={`grid gap-4 ${sidebarWidth > 500 ? 'grid-cols-3' : sidebarWidth > 400 ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ gridAutoRows: '1fr' }}>
+                    {selectedPattern.controls.filter(control => control.type !== 'button').map((control) => {
+                      const currentValue = getCurrentControlValues()[control.id] ?? control.defaultValue
+
+                      if (control.type === 'range') {
+                        return (
+                          <div key={control.id} className="flex flex-col h-full">
+                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                            <div className="flex-1 flex flex-col justify-center">
                               <input
-                                type="checkbox"
-                                checked={currentValue as boolean}
-                                onChange={(e) => handleControlChange(control.id, e.target.checked)}
-                                className="w-4 h-4 accent-yellow-400"
+                                type="range"
+                                min={control.min}
+                                max={control.max}
+                                step={control.step}
+                                value={currentValue as number}
+                                onChange={(e) => handleControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
+                                className="w-full accent-yellow-400"
                               />
-                              <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
-                            </label>
+                            </div>
+                            <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
+                              {control.step && control.step < 1
+                                ? (currentValue as number).toFixed(control.step.toString().split('.')[1]?.length || 1)
+                                : currentValue
+                              }{control.id.includes('Speed') || control.id.includes('brightness') || control.id.includes('colorIntensity') ? '×' : control.id.includes('Size') ? 'px' : ''}
+                            </div>
                           </div>
-                        </div>
-                      )
-                    } else if (control.type === 'color') {
-                      return (
-                        <CompactColorPicker
-                          key={control.id}
-                          value={currentValue as string}
-                          onChange={(color) => handleControlChange(control.id, color)}
-                          label={control.label}
-                        />
-                      )
-                    }
-                    return null
-                  })}
-                </div>
+                        )
+                      } else if (control.type === 'select') {
+                        return (
+                          <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
+                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                            <div className="flex-1 flex flex-col justify-center">
+                              <select
+                                value={currentValue as string}
+                                onChange={(e) => handleControlChange(control.id, e.target.value)}
+                                className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
+                              >
+                                {control.options?.map((option) => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )
+                      } else if (control.type === 'checkbox') {
+                        return (
+                          <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
+                            <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
+                            <div className="flex-1 flex items-center">
+                              <label className="flex items-center space-x-3 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={currentValue as boolean}
+                                  onChange={(e) => handleControlChange(control.id, e.target.checked)}
+                                  className="w-4 h-4 accent-yellow-400"
+                                />
+                                <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
+                              </label>
+                            </div>
+                          </div>
+                        )
+                      } else if (control.type === 'color') {
+                        return (
+                          <CompactColorPicker
+                            key={control.id}
+                            value={currentValue as string}
+                            onChange={(color) => handleControlChange(control.id, color)}
+                            label={control.label}
+                          />
+                        )
+                      }
+                      return null
+                    })}
+                  </div>
+                )}
 
                 {/* Button controls at bottom */}
                 {selectedPattern.controls.filter(control => {

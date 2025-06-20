@@ -16,6 +16,9 @@ interface FourPoleGradientControls {
   pole3Color: string
   pole4Color: string
   interpolationPower: number
+  animationEnabled: boolean
+  animationSpeed: number
+  animationPattern: string
 }
 
 export default function FourPoleGradientGenerator({ 
@@ -27,6 +30,8 @@ export default function FourPoleGradientGenerator({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDragging, setIsDragging] = useState<number | null>(null)
   const [hoveredPole, setHoveredPole] = useState<number | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const animationTimeRef = useRef<number>(0)
   
   // Use passed control values or defaults
   const controls: FourPoleGradientControls = useMemo(() => ({
@@ -34,7 +39,10 @@ export default function FourPoleGradientGenerator({
     pole2Color: (controlValues?.pole2Color as string) ?? "#00FF00", 
     pole3Color: (controlValues?.pole3Color as string) ?? "#0000FF",
     pole4Color: (controlValues?.pole4Color as string) ?? "#FFFF00",
-    interpolationPower: (controlValues?.interpolationPower as number) ?? 2.0
+    interpolationPower: (controlValues?.interpolationPower as number) ?? 2.0,
+    animationEnabled: (controlValues?.animationEnabled as boolean) ?? false,
+    animationSpeed: (controlValues?.animationSpeed as number) ?? 1.0,
+    animationPattern: (controlValues?.animationPattern as string) ?? "circular"
   }), [controlValues])
 
   // AIDEV-NOTE: Initialize 4 poles at corners with slight inset for better interaction
@@ -70,6 +78,103 @@ export default function FourPoleGradientGenerator({
       color: poleColors[index]
     })))
   }, [poleColors])
+
+
+  // AIDEV-NOTE: Animation pattern calculation functions for different movement types
+  const getAnimatedPolePosition = useCallback((poleIndex: number, time: number, pattern: string, speed: number) => {
+    const centerX = width / 2
+    const centerY = height / 2
+    const radiusX = Math.min(width, height) * 0.3
+    const radiusY = Math.min(width, height) * 0.3
+    const t = (time * speed) / 1000 // Convert to seconds and apply speed
+    
+    switch (pattern) {
+      case 'circular': {
+        // Each pole moves in a circle, offset by 90 degrees
+        const angle = (t + poleIndex * Math.PI / 2) % (2 * Math.PI)
+        return {
+          x: centerX + radiusX * Math.cos(angle),
+          y: centerY + radiusY * Math.sin(angle)
+        }
+      }
+      
+      case 'figure8': {
+        // Figure-8 pattern using parametric equations
+        const phaseOffset = poleIndex * Math.PI / 2
+        const angle = t + phaseOffset
+        const scale = 0.7
+        return {
+          x: centerX + radiusX * scale * Math.sin(angle),
+          y: centerY + radiusY * scale * Math.sin(2 * angle) / 2
+        }
+      }
+      
+      case 'oscillating': {
+        // Oscillating wave pattern
+        const xOffset = (poleIndex % 2) * width * 0.3
+        const yOffset = Math.floor(poleIndex / 2) * height * 0.3
+        return {
+          x: centerX - width * 0.15 + xOffset + radiusX * 0.5 * Math.sin(t + poleIndex),
+          y: centerY - height * 0.15 + yOffset + radiusY * 0.5 * Math.cos(t * 1.3 + poleIndex)
+        }
+      }
+      
+      case 'random': {
+        // Smooth random walk using multiple sine waves
+        const seedX = poleIndex * 1.37 // Prime number for pseudo-randomness
+        const seedY = poleIndex * 2.73
+        return {
+          x: centerX + radiusX * 0.6 * (
+            Math.sin(t * 0.7 + seedX) * 0.5 + 
+            Math.sin(t * 1.3 + seedX * 2) * 0.3 +
+            Math.sin(t * 0.4 + seedX * 3) * 0.2
+          ),
+          y: centerY + radiusY * 0.6 * (
+            Math.cos(t * 0.8 + seedY) * 0.5 + 
+            Math.cos(t * 1.1 + seedY * 2) * 0.3 +
+            Math.cos(t * 0.6 + seedY * 3) * 0.2
+          )
+        }
+      }
+      
+      case 'curl': {
+        // Smooth turbulent swirling motion with continuous chaos
+        const angle = (t * 0.8 + poleIndex * Math.PI / 2) % (2 * Math.PI)
+        const swirl = t * 0.3 + poleIndex
+        
+        // Multiple layers of smooth turbulence at different frequencies
+        const turbulence1 = Math.sin(t * 1.2 + poleIndex * 3.7) * 0.4
+        const turbulence2 = Math.cos(t * 2.1 + poleIndex * 1.9) * 0.25
+        const turbulence3 = Math.sin(t * 0.7 + poleIndex * 5.3) * 0.15
+        const turbulence4 = Math.cos(t * 3.1 + poleIndex * 1.3) * 0.1
+        
+        // Smooth radial variations - multiple waves for complexity
+        const radialNoise = Math.sin(t * 1.5 + poleIndex * 2.8) * 0.3 + 
+                           Math.cos(t * 0.9 + poleIndex * 4.2) * 0.2
+        const baseRadius = radiusX * (0.5 + Math.sin(swirl) * 0.3 + radialNoise)
+        
+        // Angular turbulence - makes the circular motion irregular but smooth
+        const angularTurbulence = (turbulence1 + turbulence2 + turbulence4 * 2) * 0.6
+        const chaosAngle = angle + angularTurbulence
+        
+        // Position turbulence - adds chaotic but continuous displacement
+        const chaosX = (turbulence1 * 0.5 + turbulence3 * 0.7 + turbulence4 * 0.3) * radiusX
+        const chaosY = (turbulence2 * 0.5 - turbulence3 * 0.4 + turbulence4 * 0.6) * radiusY
+        
+        // Smooth direction variation - gradual changes instead of snaps
+        const directionWave = Math.sin(t * 0.4 + poleIndex * 2.1) * 0.3
+        const smoothDirection = 1.0 + directionWave
+        
+        return {
+          x: centerX + (baseRadius * Math.cos(chaosAngle) + chaosX) * smoothDirection,
+          y: centerY + (baseRadius * Math.sin(chaosAngle) + chaosY) * smoothDirection
+        }
+      }
+      
+      default:
+        return { x: centerX, y: centerY }
+    }
+  }, [width, height])
 
   // AIDEV-NOTE: Inverse distance weighting interpolation for smooth 4-pole gradients  
   const calculatePixelColor = useCallback((x: number, y: number, poles: GradientPole[], interpolationPower: number) => {
@@ -108,8 +213,54 @@ export default function FourPoleGradientGenerator({
     return null
   }, [poles])
 
-  // Mouse event handlers
+
+  // AIDEV-NOTE: Animation loop using requestAnimationFrame for smooth 60fps performance
+  useEffect(() => {
+    if (!controls.animationEnabled) {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+      return
+    }
+
+    const animate = (currentTime: number) => {
+      animationTimeRef.current = currentTime
+      
+      // Update pole positions based on animation pattern
+      setPoles(prevPoles => {
+        return prevPoles.map((pole, index) => {
+          const newPos = getAnimatedPolePosition(
+            index, 
+            currentTime, 
+            controls.animationPattern, 
+            controls.animationSpeed
+          )
+          return {
+            ...pole,
+            x: Math.max(0, Math.min(width, newPos.x)),
+            y: Math.max(0, Math.min(height, newPos.y))
+          }
+        })
+      })
+      
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate)
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+    }
+  }, [controls.animationEnabled, controls.animationPattern, controls.animationSpeed, getAnimatedPolePosition, width, height])
+
+  // Mouse event handlers - disabled when animation is active
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (controls.animationEnabled) return // Disable interaction during animation
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -121,9 +272,11 @@ export default function FourPoleGradientGenerator({
     if (poleIndex !== null) {
       setIsDragging(poleIndex)
     }
-  }, [getPoleAtPosition])
+  }, [getPoleAtPosition, controls.animationEnabled])
 
   const handleMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (controls.animationEnabled) return // Disable interaction during animation
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -147,16 +300,18 @@ export default function FourPoleGradientGenerator({
       const hoveredPoleIndex = getPoleAtPosition(x, y)
       setHoveredPole(hoveredPoleIndex)
     }
-  }, [isDragging, width, height, getPoleAtPosition])
+  }, [isDragging, width, height, getPoleAtPosition, controls.animationEnabled])
 
   const handleMouseUp = useCallback(() => {
+    if (controls.animationEnabled) return // Disable interaction during animation
     setIsDragging(null)
-  }, [])
+  }, [controls.animationEnabled])
 
   const handleMouseLeave = useCallback(() => {
+    if (controls.animationEnabled) return // Disable interaction during animation
     setIsDragging(null)
     setHoveredPole(null)
-  }, [])
+  }, [controls.animationEnabled])
 
   // Render gradient and poles
   useEffect(() => {
@@ -215,7 +370,9 @@ export default function FourPoleGradientGenerator({
   return (
     <div className={className}>
       <div
-        className="overflow-hidden relative cursor-crosshair"
+        className={`overflow-hidden relative ${
+          controls.animationEnabled ? 'cursor-default' : 'cursor-crosshair'
+        }`}
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <canvas 
@@ -227,10 +384,17 @@ export default function FourPoleGradientGenerator({
           onMouseLeave={handleMouseLeave}
         />
         
-        {/* Pattern type indicator */}
+        {/* Pattern type indicator with animation status */}
         <div className="absolute top-2 left-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
-          4-POLE GRADIENT / CANVAS_2D
+          4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'}
         </div>
+        
+        {/* Animation status indicator */}
+        {controls.animationEnabled && (
+          <div className="absolute top-2 right-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
+            {controls.animationPattern.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}
+          </div>
+        )}
       </div>
     </div>
   )
