@@ -36,14 +36,22 @@ Follow these steps precisely:
    - Review examples from high-quality open-source repositories (e.g., Microsoft, Vercel, Facebook).
 
 3. **Plan Presentation**
-   - Draft a plan in `<plan>` tags:
+   - Draft a complete issue plan in `<plan>` tags:
      - Structure of the GitHub issue.
      - Intended issue type (`bug`, `enhancement`, or `question`).
      - Proposed labels, milestones, or assignees (based only on repo conventions).
+   - **STOP and wait for explicit user approval**
+   - Present the complete issue draft for review
+   - Include "**AWAITING USER APPROVAL BEFORE CREATION**" in the plan
 
-4. **GitHub Issue Generation**
-   - Prompt the user to confirm whether the generated issue is acceptable.
-   - Upon plan approval:
+4. **Plan Approval Gate**
+   - **CRITICAL**: Do NOT proceed to issue creation without explicit user approval
+   - Wait for user to respond with "approved", "yes", "create it", or similar confirmation
+   - If user requests changes, revise the plan and seek approval again
+   - If unsure about approval status, ask: "Should I create this issue now?"
+
+5. **GitHub Issue Creation (Only After Approval)**
+   - Upon explicit user approval only:
      - Write the issue in `<github_issue>` tags.
      - Format using Markdown:
        - **Title**
@@ -53,7 +61,7 @@ Follow these steps precisely:
        - **Acceptance Criteria**
        - **Additional Context / Resources**
      - Ensure clarity and conciseness.
-     - use the GitHub CLI (`gh issue create`) to submit the issue.
+     - Use the GitHub CLI (`gh issue create`) to submit the issue.
      - Example command:
 
       ```bash
@@ -79,8 +87,10 @@ Follow these steps precisely:
 
 <plan>
 [...AI-generated plan for issue creation...]
+**AWAITING USER APPROVAL BEFORE CREATION**
 </plan>
 
+<!-- Only after explicit user approval -->
 <github_issue>
 ### Title: [...]
 ### Description:
@@ -109,6 +119,7 @@ This prompt is designed for:
 - Only use `bug` or `enhancement` as labels unless the repository defines others.
 - Ensure accessibility and clarity in all descriptions.
 - Never auto-assign or mention maintainers unless explicitly allowed.
+- **NEVER execute `gh issue create` without explicit user approval**
 
 ## Iteration Protocol
 
