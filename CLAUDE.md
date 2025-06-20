@@ -18,6 +18,8 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | G-3 | Stay within the current task context. Inform the dev if it'd be better to start afresh.     | ❌ Continue work from a prior prompt after "new task" – start a fresh session.      |
 | G-4 | **NEVER** merge feature branches to main without explicit approval.    | ❌ Merge feature branches, even if "working state" - always ask for approval first. |
 | G-5 | **Main UI features MUST be implemented via TDD**. Write tests first, then implement. | ❌ Implement main UI features without tests. Note: Visualizations don't need pixel-level verification, focus on React app behavior. |
+| G-6 | **Create implementation notes for significant enhancements**. Document in `docs/implementation_notes/ISSUE_N_IMPLEMENTATION_SUMMARY.md`. | ❌ Skip documentation for major features, architectural changes, or complex integrations. |
+| G-7 | **Before refactoring UI components, audit ALL pattern-specific special cases**. Each pattern may have unique layouts, behaviors, or controls that must be preserved. | ❌ Refactor UI components without cataloging existing pattern-specific customizations. This leads to lost functionality. |
 
 ---
 
@@ -211,6 +213,45 @@ npm run lint
 
 ---
 
+## Implementation Notes Documentation
+
+### When to Create Implementation Notes
+
+Following Golden Rule G-6, create comprehensive implementation documentation for:
+
+- ✅ **New features** (enhancements that add significant functionality)
+- ✅ **Major architectural changes** (refactoring that affects multiple components)  
+- ✅ **Complex integrations** (new patterns, external APIs, performance optimizations)
+- ✅ **Accessibility improvements** (significant UX/accessibility enhancements)
+
+**Do NOT create implementation notes for:**
+- ❌ Bug fixes (unless they require architectural changes)
+- ❌ Small refactorings (single file, minor improvements)
+- ❌ Documentation updates or dependency updates
+
+### Documentation Process
+
+1. **During Planning**: Create design documents in `docs/implementation_notes/`
+2. **During Implementation**: Follow TDD or documented approaches
+3. **Upon Completion**: Create `ISSUE_N_IMPLEMENTATION_SUMMARY.md` with:
+   - Problem/solution overview
+   - Technical implementation details
+   - Testing approach and coverage
+   - User experience impact
+   - Future considerations
+
+### Documentation Location
+
+- **Directory**: `docs/implementation_notes/`
+- **Primary Document**: `ISSUE_N_IMPLEMENTATION_SUMMARY.md`
+- **Supporting Documents**: `ISSUE_N_[DESCRIPTIVE_NAME].md`
+
+**Example**: Issue #19 (Collapsible Control Panels)
+- `docs/implementation_notes/ISSUE_19_IMPLEMENTATION_SUMMARY.md`
+- `docs/implementation_notes/ISSUE_19_CONTROL_GROUPS_DESIGN.md`
+
+---
+
 ## File Structure
 
 ```
@@ -226,6 +267,9 @@ components/
   ui/
     button.tsx                  # shadcn/ui button component
     checkbox.tsx                # shadcn/ui checkbox component
+    collapsible-control-group.tsx  # ✅ Collapsible control groups (Issue #19)
+    viewport-constrained-panel.tsx # ✅ Viewport height management (Issue #19) 
+    grouped-simulation-controls-panel.tsx # ✅ Enhanced controls panel (Issue #19)
 lib/
   simplex-noise.ts             # 3D Simplex noise implementation
   utils.ts                     # Utility functions
@@ -233,6 +277,11 @@ app/
   page.tsx                     # Main pattern showcase page
   layout.tsx                   # Root layout
   globals.css                  # Global styles
+docs/
+  implementation_notes/
+    README.md                   # Documentation standards and index
+    ISSUE_19_IMPLEMENTATION_SUMMARY.md # Issue #19 comprehensive documentation
+    ISSUE_19_CONTROL_GROUPS_DESIGN.md  # Issue #19 design decisions
 ```
 
 ---
@@ -244,6 +293,59 @@ app/
 - **Performance**: Target 60fps for all animations
 - **Accessibility**: Maintain keyboard navigation support
 - **Browser Support**: Modern browsers with WebGL support
+
+---
+
+## Pattern-Specific Refactoring Guidelines
+
+As the number of pattern generators increases, each will likely develop unique UI requirements, layouts, and behaviors. This section documents lessons learned from Issue #19 refactoring.
+
+### **Critical Pre-Refactoring Steps**
+
+Before refactoring any UI component that handles multiple patterns:
+
+1. **🔍 Audit ALL existing special cases**:
+   ```bash
+   # Search for pattern-specific code
+   rg "patternId.*===|if.*pattern.*===" components/
+   rg "switch.*patternId|case.*'" components/
+   ```
+
+2. **📋 Create preservation checklist**:
+   - Document each pattern's unique layouts (e.g., 2x2 color grids, compact navigation)
+   - Note special control behaviors (e.g., button interactions, state management)  
+   - Identify custom styling or positioning
+
+3. **🧪 Write preservation tests FIRST**:
+   ```typescript
+   it('preserves four-pole gradient 2x2 color layout', () => { ... })
+   it('preserves cellular automaton compact navigation', () => { ... })
+   ```
+
+4. **👁️ Visual regression verification**: Before and after screenshots for each pattern
+
+### **Common Pattern Specializations**
+
+Based on current codebase patterns:
+
+- **Four-Pole Gradient**: 2x2 color picker grid layout
+- **Cellular Automaton**: Compact prev/next navigation with rule display  
+- **Particle Systems**: Reset buttons must remain prominently accessible
+- **Future patterns**: Will likely require similar unique layouts
+
+### **Refactoring Anti-Patterns to Avoid**
+
+❌ **Generic-first thinking**: Focusing on new architecture before preserving existing functionality  
+❌ **Reactive discovery**: Finding special cases only when reported as bugs  
+❌ **Missing preservation tests**: Only testing new functionality, not existing behaviors  
+❌ **Grouping essential controls**: Hiding reset buttons or primary actions in collapsible groups
+
+### **Success Patterns**
+
+✅ **Preservation-first approach**: Ensure 100% existing functionality before adding features  
+✅ **Explicit special case handling**: Clear conditional logic for pattern-specific needs  
+✅ **Accessible primary actions**: Keep reset buttons and critical controls ungrouped  
+✅ **Comprehensive testing**: Both new features AND preserved behaviors
 
 ---
 

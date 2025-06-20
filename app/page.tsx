@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
-import { SimulationControlsPanel } from "@/components/ui/simulation-controls-panel"
+import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
 
 export default function PatternGeneratorShowcase() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -397,10 +397,10 @@ export default function PatternGeneratorShowcase() {
                 {selectedPattern.controls ? "Simulation Parameters" : "Pattern Controls"}
               </h3>
             </div>
-            <SimulationControlsPanel
+            <GroupedSimulationControlsPanel
               patternId={selectedPattern.id}
               controls={selectedPattern.controls || []}
-              currentValues={getCurrentControlValues()}
+              controlValues={getCurrentControlValues()}
               onControlChange={handleControlChange}
               sidebarWidth={sidebarWidth}
             />
