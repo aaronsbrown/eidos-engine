@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useMemo, memo } from 'react'
 import { useMobileDetection } from '@/components/hooks/useMobileDetection'
-import { getMobileResponsiveClasses, calculateVisualizationHeight, getOptimalCanvasDimensions } from '@/lib/mobile-utils'
+import { getMobileResponsiveClasses } from '@/lib/mobile-utils'
 import MobileHeader from './mobile-header'
 import PatternDropdownSelector from './pattern-dropdown-selector'
 import ProgressiveDisclosurePanel from './progressive-disclosure-panel'
@@ -49,30 +49,36 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
   // Calculate optimal visualization dimensions
   const visualizationDimensions = useMemo(() => {
-    if (!isMobile) {
-      // For non-mobile, return desktop defaults
+    if (isDesktop) {
+      // For desktop, return desktop defaults
       return { width: 700, height: 394 }
     }
-
-    const essentialControlsHeight = isAdvancedExpanded ? 200 : 120
-    const height = calculateVisualizationHeight(
-      viewport.height,
-      48, // header height
-      44, // selector height  
-      essentialControlsHeight
-    )
     
-    const { width: canvasWidth, height: canvasHeight } = getOptimalCanvasDimensions(
-      viewport.width - 32, // account for padding
-      height,
-      window.devicePixelRatio || 1
-    )
+    if (isTablet) {
+      // For tablet, use full available space minus sidebar
+      const availableWidth = viewport.width - 320 // subtract sidebar width (320px)
+      const availableHeight = viewport.height - 48 // subtract header height (48px)
+      
+      return {
+        width: availableWidth,
+        height: availableHeight
+      }
+    }
+
+    // For mobile, use the full available space
+    // Estimated control panel heights: collapsed ~150px, expanded ~300px
+    const controlPanelHeight = isAdvancedExpanded ? 300 : 150
+    const headerHeight = 48
+    const selectorHeight = 44
+    
+    const availableHeight = viewport.height - headerHeight - selectorHeight - controlPanelHeight
+    const availableWidth = viewport.width
 
     return {
-      width: canvasWidth,
-      height: canvasHeight
+      width: availableWidth,
+      height: Math.max(availableHeight, 250) // minimum 250px height for patterns
     }
-  }, [isMobile, viewport, isAdvancedExpanded])
+  }, [isTablet, isDesktop, viewport, isAdvancedExpanded])
 
   // Initialize control values for pattern
   const initializeControlValues = useCallback((patternId: string) => {
@@ -178,26 +184,18 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           </aside>
           
           {/* Main content area */}
-          <main className="flex-1 p-6">
-            <div data-testid="tablet-visualization-area" className="w-full h-full flex items-center justify-center">
-              <div
-                className="border-2 border-border bg-background shadow-lg"
-                style={{
-                  width: visualizationDimensions.width,
-                  height: visualizationDimensions.height
-                }}
-              >
-                {selectedPattern && (
-                  <selectedPattern.component
-                    width={visualizationDimensions.width}
-                    height={visualizationDimensions.height}
-                    className="w-full h-full"
-                    controls={selectedPattern.controls}
-                    controlValues={getCurrentControlValues()}
-                    onControlChange={handleControlChange}
-                  />
-                )}
-              </div>
+          <main className="flex-1">
+            <div data-testid="tablet-visualization-area" className="w-full h-full bg-background">
+              {selectedPattern && (
+                <selectedPattern.component
+                  width={visualizationDimensions.width}
+                  height={visualizationDimensions.height}
+                  className="w-full h-full"
+                  controls={selectedPattern.controls}
+                  controlValues={getCurrentControlValues()}
+                  onControlChange={handleControlChange}
+                />
+              )}
             </div>
           </main>
         </div>
@@ -231,39 +229,19 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       {/* Visualization Area */}
       <div 
         data-testid="mobile-visualization-area"
-        className="flex-1 flex items-center justify-center p-4 bg-muted/20"
-        style={{
-          height: `calc(100vh - 140px - ${isAdvancedExpanded ? '200px' : '120px'})`,
-          minHeight: '200px'
-        }}
+        className="flex-1 bg-background"
         aria-label="Pattern visualization"
       >
-        {/* Technical corner markers */}
-        <div className="relative">
-          <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-yellow-400"></div>
-          <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-yellow-400"></div>
-          <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-yellow-400"></div>
-          <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
-
-          <div
-            className="border-2 border-border bg-background shadow-lg"
-            style={{
-              width: visualizationDimensions.width,
-              height: visualizationDimensions.height
-            }}
-          >
-            {selectedPattern && (
-              <selectedPattern.component
-                width={visualizationDimensions.width}
-                height={visualizationDimensions.height}
-                className="w-full h-full"
-                controls={selectedPattern.controls}
-                controlValues={getCurrentControlValues()}
-                onControlChange={handleControlChange}
-              />
-            )}
-          </div>
-        </div>
+        {selectedPattern && (
+          <selectedPattern.component
+            width={visualizationDimensions.width}
+            height={visualizationDimensions.height}
+            className="w-full h-full"
+            controls={selectedPattern.controls}
+            controlValues={getCurrentControlValues()}
+            onControlChange={handleControlChange}
+          />
+        )}
       </div>
 
       {/* Progressive Disclosure Controls */}
