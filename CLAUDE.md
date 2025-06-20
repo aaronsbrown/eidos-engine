@@ -17,6 +17,7 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | G-2 | For changes >300 LOC or >3 files, **ask for confirmation**.            | ❌ Refactor large modules without human guidance.                                     |
 | G-3 | Stay within the current task context. Inform the dev if it'd be better to start afresh.     | ❌ Continue work from a prior prompt after "new task" – start a fresh session.      |
 | G-4 | **NEVER** merge feature branches to main without explicit approval.    | ❌ Merge feature branches, even if "working state" - always ask for approval first. |
+| G-5 | **Main UI features MUST be implemented via TDD**. Write tests first, then implement. | ❌ Implement main UI features without tests. Note: Visualizations don't need pixel-level verification, focus on React app behavior. |
 
 ---
 
