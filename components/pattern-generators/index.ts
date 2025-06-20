@@ -6,6 +6,7 @@ import BrownianMotionGenerator from "./brownian-motion-generator"
 import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
 import CellularAutomatonGenerator from "./cellular-automaton-generator"
+import FourPoleGradientGenerator from "./four-pole-gradient-generator"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
@@ -507,7 +508,48 @@ export const patternGenerators: PatternGenerator[] = [
       },
     ],
   },
+  {
+    id: "four-pole-gradient",
+    name: "4-Pole Gradient",
+    component: FourPoleGradientGenerator,
+    technology: 'CANVAS_2D',
+    controls: [
+      {
+        id: "pole1Color",
+        label: "Pole 1 Color",
+        type: "color",
+        defaultValue: "#FF0000",
+      },
+      {
+        id: "pole2Color",
+        label: "Pole 2 Color", 
+        type: "color",
+        defaultValue: "#00FF00",
+      },
+      {
+        id: "pole3Color",
+        label: "Pole 3 Color",
+        type: "color",
+        defaultValue: "#0000FF",
+      },
+      {
+        id: "pole4Color",
+        label: "Pole 4 Color",
+        type: "color",
+        defaultValue: "#FFFF00",
+      },
+      {
+        id: "interpolationPower",
+        label: "Interpolation Power",
+        type: "range",
+        min: 0.5,
+        max: 4.0,
+        step: 0.1,
+        defaultValue: 2.0,
+      },
+    ],
+  },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator }
+export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
