@@ -23,6 +23,7 @@ interface FourPoleGradientControls {
   noiseIntensity: number
   noiseScale: number
   noiseType: string
+  showPoles: boolean
 }
 
 export default function FourPoleGradientGenerator({ 
@@ -51,7 +52,8 @@ export default function FourPoleGradientGenerator({
     noiseEnabled: (controlValues?.noiseEnabled as boolean) ?? false,
     noiseIntensity: (controlValues?.noiseIntensity as number) ?? 0.3,
     noiseScale: (controlValues?.noiseScale as number) ?? 0.02,
-    noiseType: (controlValues?.noiseType as string) ?? "analog"
+    noiseType: (controlValues?.noiseType as string) ?? "analog",
+    showPoles: (controlValues?.showPoles as boolean) ?? true
   }), [controlValues])
 
   // AIDEV-NOTE: Initialize 4 poles at corners with slight inset for better interaction
@@ -426,29 +428,31 @@ export default function FourPoleGradientGenerator({
 
     ctx.putImageData(imageData, 0, 0)
 
-    // Draw pole indicators
-    poles.forEach((pole, index) => {
-      const isHovered = hoveredPole === index
-      const isDragged = isDragging === index
-      
-      // Pole circle
-      ctx.beginPath()
-      ctx.arc(pole.x, pole.y, isDragged ? 12 : (isHovered ? 10 : 8), 0, 2 * Math.PI)
-      ctx.fillStyle = `rgb(${pole.color.r}, ${pole.color.g}, ${pole.color.b})`
-      ctx.fill()
-      
-      // Border with project's yellow accent
-      ctx.strokeStyle = isDragged || isHovered ? "#FACC15" : "#FFFFFF"
-      ctx.lineWidth = isDragged ? 3 : 2
-      ctx.stroke()
-      
-      // Pole number label (technical aesthetic)
-      ctx.fillStyle = "#FFFFFF"
-      ctx.font = "10px monospace"
-      ctx.textAlign = "center"
-      ctx.fillText(`${index + 1}`, pole.x, pole.y + 3)
-    })
-  }, [width, height, poles, hoveredPole, isDragging, controls.interpolationPower, controls.noiseEnabled, controls.noiseIntensity, controls.noiseScale, controls.noiseType, calculatePixelColor, generateNoise])
+    // AIDEV-NOTE: Draw pole indicators only if showPoles is enabled
+    if (controls.showPoles) {
+      poles.forEach((pole, index) => {
+        const isHovered = hoveredPole === index
+        const isDragged = isDragging === index
+        
+        // Pole circle
+        ctx.beginPath()
+        ctx.arc(pole.x, pole.y, isDragged ? 12 : (isHovered ? 10 : 8), 0, 2 * Math.PI)
+        ctx.fillStyle = `rgb(${pole.color.r}, ${pole.color.g}, ${pole.color.b})`
+        ctx.fill()
+        
+        // Border with project's yellow accent
+        ctx.strokeStyle = isDragged || isHovered ? "#FACC15" : "#FFFFFF"
+        ctx.lineWidth = isDragged ? 3 : 2
+        ctx.stroke()
+        
+        // Pole number label (technical aesthetic)
+        ctx.fillStyle = "#FFFFFF"
+        ctx.font = "10px monospace"
+        ctx.textAlign = "center"
+        ctx.fillText(`${index + 1}`, pole.x, pole.y + 3)
+      })
+    }
+  }, [width, height, poles, hoveredPole, isDragging, controls.interpolationPower, controls.noiseEnabled, controls.noiseIntensity, controls.noiseScale, controls.noiseType, controls.showPoles, calculatePixelColor, generateNoise])
 
   return (
     <div className={className}>
@@ -469,7 +473,7 @@ export default function FourPoleGradientGenerator({
         
         {/* Pattern type indicator with animation status */}
         <div className="absolute top-2 left-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
-          4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'} {controls.noiseEnabled && '/ NOISE_OVERLAY'}
+          4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'} {controls.noiseEnabled && '/ NOISE_OVERLAY'} {!controls.showPoles && '/ HIDDEN_POLES'}
         </div>
         
         {/* Animation status indicator */}

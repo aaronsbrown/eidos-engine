@@ -610,6 +610,12 @@ export const patternGenerators: PatternGenerator[] = [
           { value: "film", label: "FILM_GRAIN" },
         ],
       },
+      {
+        id: "showPoles",
+        label: "Show Pole Indicators",
+        type: "checkbox",
+        defaultValue: true,
+      },
     ],
   },
 ]
