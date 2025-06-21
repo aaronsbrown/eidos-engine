@@ -65,9 +65,9 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
     >
       {/* Essential Controls - Always Visible */}
       <div data-testid="essential-controls-area">
-        <div className="flex items-center space-x-2 mb-4">
+        <div className="flex items-center space-x-2 mb-5">
           <div className="w-2 h-2 bg-yellow-400"></div>
-          <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">
+          <h3 className="mobile-typography-label md:text-sm text-muted-foreground">
             Quick Controls
           </h3>
         </div>
@@ -81,7 +81,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
             sidebarWidth={viewport.width}
           />
         ) : (
-          <div className="text-xs text-muted-foreground font-mono">
+          <div className="mobile-typography-small md:text-xs text-muted-foreground">
             No essential controls available
           </div>
         )}
@@ -107,7 +107,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
           <div className="px-4 py-3 flex items-center justify-between min-h-[44px]">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-yellow-400"></div>
-              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              <span className="mobile-typography-label md:text-xs text-muted-foreground">
                 {expanded ? 'Less Controls' : 'Advanced Controls'}
               </span>
             </div>

@@ -14,12 +14,25 @@ The mobile design maintains the technical blueprint aesthetic while optimizing f
 
 ### Typography Hierarchy
 ```css
-/* Mobile Typography Scale */
---text-header: 16px (monospace, uppercase tracking)
---text-label: 12px (monospace, uppercase tracking)  
---text-value: 12px (monospace, numeric)
---text-pattern: 14px (monospace, title case)
+/* Mobile Typography Scale - Enhanced for Accessibility (Issue #26) */
+--mobile-text-header: 18px (monospace, uppercase tracking)     /* Main titles - REVERTED to 14px in header for layout */
+--mobile-text-pattern: 16px (monospace, title case)            /* Pattern names, group titles - ENHANCED +2px */
+--mobile-text-label: 14px (monospace, uppercase tracking)      /* Control labels, section headers - ENHANCED +2px */
+--mobile-text-value: 14px (monospace, numeric)                 /* Control values - ENHANCED +2px */
+--mobile-text-small: 12px (monospace)                          /* Fine print, counters - unchanged */
 ```
+
+**Implementation Notes:**
+- CSS variables defined in `app/globals.css` 
+- Responsive classes apply only on mobile (max-width: 767px)
+- Main header title kept at 14px to preserve hamburger menu visibility
+- All other text enhanced by +2px for improved readability and WCAG compliance
+
+**Test Coverage:**
+- Comprehensive behavioral tests in `mobile-typography-enhancement.test.tsx`
+- Tests focus on user-observable outcomes (readability, consistency, accessibility)
+- 12 test scenarios covering typography hierarchy, layout stability, and responsive behavior
+- All existing tests updated to reflect new typography classes
 
 ### Spacing System
 ```css

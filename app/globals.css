@@ -41,6 +41,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* AIDEV-NOTE: Mobile typography scale for enhanced accessibility and readability */
+  --mobile-text-header: 18px;
+  --mobile-text-pattern: 16px;
+  --mobile-text-label: 14px;
+  --mobile-text-value: 14px;
+  --mobile-text-small: 12px;
 }
 
 :root {
@@ -121,8 +128,70 @@
   }
 }
 
-/* AIDEV-NOTE: Mobile-friendly slider touch targets - invisible padding approach */
+/* AIDEV-NOTE: Mobile typography utility classes for consistent text sizing */
 @layer components {
+  .mobile-text-header {
+    font-size: var(--mobile-text-header);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .mobile-text-pattern {
+    font-size: var(--mobile-text-pattern);
+    font-family: var(--font-mono);
+  }
+  
+  .mobile-text-label {
+    font-size: var(--mobile-text-label);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .mobile-text-value {
+    font-size: var(--mobile-text-value);
+    font-family: var(--font-mono);
+  }
+  
+  .mobile-text-small {
+    font-size: var(--mobile-text-small);
+    font-family: var(--font-mono);
+  }
+
+  /* Only apply mobile typography on mobile breakpoints */
+  @media (max-width: 767px) {
+    .mobile-typography-header {
+      font-size: var(--mobile-text-header);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .mobile-typography-pattern {
+      font-size: var(--mobile-text-pattern);
+      font-family: var(--font-mono);
+    }
+    
+    .mobile-typography-label {
+      font-size: var(--mobile-text-label);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .mobile-typography-value {
+      font-size: var(--mobile-text-value);
+      font-family: var(--font-mono);
+    }
+    
+    .mobile-typography-small {
+      font-size: var(--mobile-text-small);
+      font-family: var(--font-mono);
+    }
+  }
+
+  /* AIDEV-NOTE: Mobile-friendly slider touch targets - invisible padding approach */
   .range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;

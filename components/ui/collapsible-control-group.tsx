@@ -38,10 +38,10 @@ export default function CollapsibleControlGroup({
         return (
           <div key={control.id} className="space-y-2">
             <div className="flex justify-between items-center">
-              <label htmlFor={control.id} className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              <label htmlFor={control.id} className="mobile-typography-label md:text-xs text-muted-foreground">
                 {control.label}
               </label>
-              <span className="font-mono text-xs text-yellow-500">
+              <span className="mobile-typography-value md:text-xs text-yellow-500">
                 {typeof value === 'number' ? value.toFixed(2) : value}
               </span>
             </div>
@@ -136,7 +136,7 @@ export default function CollapsibleControlGroup({
         aria-expanded={isExpanded}
         aria-controls={controlsId}
       >
-        <h3 className="font-mono text-sm font-semibold uppercase tracking-wide text-foreground">
+        <h3 className="mobile-typography-pattern md:text-sm font-semibold text-foreground">
           {title}
         </h3>
         <ChevronDown 
