@@ -6,8 +6,7 @@ describe('MobileHeader', () => {
   const defaultProps = {
     title: 'PATTERN GENERATOR SYSTEM',
     patternCount: { current: 3, total: 9 },
-    onMenuToggle: jest.fn(),
-    onThemeToggle: jest.fn()
+    onMenuToggle: jest.fn()
   }
 
   beforeEach(() => {
@@ -116,41 +115,7 @@ describe('MobileHeader', () => {
     })
   })
 
-  describe('Theme Toggle', () => {
-    it('renders theme toggle button', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const themeButton = screen.getByTestId('theme-toggle')
-      expect(themeButton).toBeInTheDocument()
-    })
-
-    it('calls onThemeToggle when theme button is clicked', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const themeButton = screen.getByTestId('theme-toggle')
-      fireEvent.click(themeButton)
-      
-      expect(defaultProps.onThemeToggle).toHaveBeenCalledTimes(1)
-    })
-
-    it('has minimum 44px touch target', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const themeButton = screen.getByTestId('theme-toggle')
-      const styles = window.getComputedStyle(themeButton)
-      
-      expect(parseInt(styles.minHeight || styles.height)).toBeGreaterThanOrEqual(44)
-      expect(parseInt(styles.minWidth || styles.width)).toBeGreaterThanOrEqual(44)
-    })
-
-    it('has proper accessibility attributes', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const themeButton = screen.getByTestId('theme-toggle')
-      expect(themeButton).toHaveAttribute('aria-label', 'Toggle theme')
-      expect(themeButton).toHaveAttribute('type', 'button')
-    })
-  })
+  // Theme toggle has been moved to the menu overlay, not in the header
 
   describe('Responsive Behavior', () => {
     it('maintains layout integrity on small screens', () => {

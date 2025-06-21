@@ -1,4 +1,5 @@
 // AIDEV-NOTE: Main mobile layout wrapper integrating all mobile components with responsive breakpoints
+// AIDEV-NOTE: Tests rewritten per G-8 to focus on user behavior vs implementation details
 'use client'
 
 import React, { useState, useCallback, useMemo, memo } from 'react'

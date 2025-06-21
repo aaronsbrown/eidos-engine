@@ -1,4 +1,5 @@
 // AIDEV-NOTE: Progressive disclosure panel for mobile control layout with pattern-specific preservation
+// AIDEV-NOTE: Tests rewritten per G-8 to focus on user behavior vs implementation details
 'use client'
 
 import React, { useState, useMemo, memo } from 'react'
@@ -43,6 +44,11 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
 
   // Get advanced controls (all controls not in essential or ungrouped)
   const advancedControls = useMemo(() => {
+    // Safety check for undefined controls
+    if (!controls || !Array.isArray(controls)) {
+      return []
+    }
+
     const essentialIds = new Set(mobileLayout.essentialControls.map(c => c.id))
     const ungroupedIds = new Set(mobileLayout.ungroupedControls.map(c => c.id))
     

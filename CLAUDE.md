@@ -20,6 +20,7 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | G-5 | **Main UI features MUST be implemented via TDD**. Write tests first, then implement. | ❌ Implement main UI features without tests. Note: Visualizations don't need pixel-level verification, focus on React app behavior. |
 | G-6 | **Create implementation notes for significant enhancements**. Document in `docs/implementation_notes/ISSUE_N_IMPLEMENTATION_SUMMARY.md`. | ❌ Skip documentation for major features, architectural changes, or complex integrations. |
 | G-7 | **Before refactoring UI components, audit ALL pattern-specific special cases**. Each pattern may have unique layouts, behaviors, or controls that must be preserved. | ❌ Refactor UI components without cataloging existing pattern-specific customizations. This leads to lost functionality. |
+| G-8 | **TDD tests MUST focus on user behavior, not implementation details**. Test what users can do (select patterns, change values) not how it's implemented (CSS classes, DOM structure, exact HTML elements). | ❌ Write brittle tests that assert implementation details like specific CSS classes, DOM structure, or element types. These break when refactoring and waste enormous development time. |
 
 ---
 

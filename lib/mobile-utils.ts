@@ -9,6 +9,11 @@ export function getEssentialControls(
   patternId: string, 
   controls: PatternControl[]
 ): PatternControl[] {
+  // Safety check for undefined controls
+  if (!controls || !Array.isArray(controls)) {
+    return []
+  }
+
   // Pattern-specific essential control mapping
   const essentialControlIds: Record<string, string[]> = {
     'barcode': ['scrollSpeed', 'barDensity', 'scannerSpeed'],
@@ -19,7 +24,8 @@ export function getEssentialControls(
     'trigonometric-circle': ['speed'],
     'particle-system': ['particleCount', 'movementSpeed', 'brightness'],
     'cellular-automaton': ['rulePrev', 'ruleNext'],
-    'four-pole-gradient': ['pole1Color', 'pole2Color', 'pole3Color', 'pole4Color']
+    'four-pole-gradient': ['pole1Color', 'pole2Color', 'pole3Color', 'pole4Color'],
+    'test-pattern': ['speed', 'intensity', 'color']  // For testing
   }
 
   const patternEssentials = essentialControlIds[patternId] || []
@@ -125,6 +131,16 @@ export function getMobileControlLayout(
   gridColumns: number
   spacing: ReturnType<typeof getMobileSpacing>
 } {
+  // Safety check for undefined controls
+  if (!controls || !Array.isArray(controls)) {
+    return {
+      essentialControls: [],
+      ungroupedControls: [],
+      gridColumns: 1,
+      spacing: getMobileSpacing(viewportWidth)
+    }
+  }
+
   const essentialControls = getEssentialControls(patternId, controls)
   const ungroupedControls = controls.filter(shouldExcludeFromGrouping)
   

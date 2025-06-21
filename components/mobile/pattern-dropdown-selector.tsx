@@ -1,4 +1,5 @@
 // AIDEV-NOTE: Mobile-optimized pattern selector dropdown with search and touch-friendly interactions
+// AIDEV-NOTE: Tests rewritten per G-8 to focus on user behavior vs implementation details
 'use client'
 
 import React, { useState, useRef, useEffect, memo, useMemo } from 'react'
@@ -155,6 +156,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
       ref={dropdownRef}
       className={`relative ${className}`}
       data-testid="pattern-dropdown-selector"
+      aria-label="Select pattern generator"
     >
       {/* Dropdown Trigger */}
       <button

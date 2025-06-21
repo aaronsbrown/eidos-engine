@@ -27,7 +27,8 @@ const MobileHeader = memo(function MobileHeader({
   return (
     <header
       data-testid="mobile-header"
-      className="h-12 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 py-2 relative z-20"
+      className="h-12 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 py-2 relative z-20 font-mono uppercase tracking-wider"
+      style={{ height: '48px' }}
     >
       {/* Left side - Title */}
       <div className="flex-1 flex items-center justify-start px-2">
@@ -50,11 +51,13 @@ const MobileHeader = memo(function MobileHeader({
         {/* Menu button */}
         <Button
           data-testid="menu-toggle"
+          type="button"
           variant="ghost"
           size="sm"
           onClick={onMenuToggle}
           className="min-h-[44px] min-w-[44px] p-2 hover:bg-muted/50"
           aria-label="Open menu"
+          style={{ minHeight: '44px', minWidth: '44px' }}
         >
           <Menu className="h-5 w-5 text-muted-foreground" />
         </Button>
