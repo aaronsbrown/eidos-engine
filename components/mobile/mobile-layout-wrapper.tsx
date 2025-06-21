@@ -66,13 +66,14 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       }
     }
 
-    // For mobile, use a square aspect ratio for optimal balance
-    const availableWidth = viewport.width
-    const squareSize = Math.min(availableWidth, viewport.height * 0.6) // max 60% of viewport height
+    // For mobile, use 4:3 aspect ratio with full screen width
+    const availableWidth = viewport.width // use full screen width
+    const optimalHeight = availableWidth * 0.75 // 4:3 aspect ratio
+    const maxHeight = viewport.height * 0.5 // don't exceed 50% of viewport
     
     return {
-      width: squareSize,
-      height: squareSize
+      width: availableWidth,
+      height: Math.min(optimalHeight, maxHeight)
     }
   }, [isTablet, isDesktop, viewport])
 
@@ -218,26 +219,23 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       {/* Visualization Area */}
       <div 
         data-testid="mobile-visualization-area"
-        className="flex-1 bg-background flex items-center justify-center"
+        className="flex-shrink-0 bg-background"
         aria-label="Pattern visualization"
+        style={{
+          width: visualizationDimensions.width,
+          height: visualizationDimensions.height
+        }}
       >
-        <div 
-          style={{
-            width: visualizationDimensions.width,
-            height: visualizationDimensions.height
-          }}
-        >
-          {selectedPattern && (
-            <selectedPattern.component
-              width={visualizationDimensions.width}
-              height={visualizationDimensions.height}
-              className="w-full h-full"
-              controls={selectedPattern.controls}
-              controlValues={getCurrentControlValues()}
-              onControlChange={handleControlChange}
-            />
-          )}
-        </div>
+        {selectedPattern && (
+          <selectedPattern.component
+            width={visualizationDimensions.width}
+            height={visualizationDimensions.height}
+            className="w-full h-full"
+            controls={selectedPattern.controls}
+            controlValues={getCurrentControlValues()}
+            onControlChange={handleControlChange}
+          />
+        )}
       </div>
 
       {/* Progressive Disclosure Controls */}
