@@ -4,7 +4,6 @@
 
 import React, { useState, useMemo, memo } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import GroupedSimulationControlsPanel from '@/components/ui/grouped-simulation-controls-panel'
 import type { PatternControl } from '@/components/pattern-generators/types'
 import { getMobileControlLayout } from '@/lib/mobile-utils'
