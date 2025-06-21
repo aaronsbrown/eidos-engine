@@ -101,9 +101,9 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
           >
             <span>{expanded ? 'Less Controls' : 'Advanced Controls'}</span>
             {expanded ? (
-              <ChevronUp data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200 rotate-180" />
+              <ChevronUp data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200" />
             ) : (
-              <ChevronDown data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200 rotate-0" />
+              <ChevronDown data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200" />
             )}
           </Button>
         </div>
