@@ -341,8 +341,8 @@ describe('CollapsibleControlGroup', () => {
         />
       )
 
-      const selectElement = screen.getByDisplayValue('RETRO')
-      expect(selectElement).toBeInTheDocument()
+      const selectButton = screen.getByRole('combobox', { name: /color scheme/i })
+      expect(selectButton).toHaveTextContent('RETRO')
     })
 
     it('forwards control change events correctly', async () => {

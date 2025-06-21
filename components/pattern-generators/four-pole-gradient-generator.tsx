@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useMemo, useState, useCallback } from "react"
 import type { PatternGeneratorProps } from "./types"
+import { triggerHapticFeedback } from "@/lib/mobile-utils"
 
 // AIDEV-NOTE: 4-pole gradient system using inverse distance weighting for smooth interpolation
 interface GradientPole {
@@ -378,6 +379,75 @@ export default function FourPoleGradientGenerator({
     setHoveredPole(null)
   }, [controls.animationEnabled])
 
+  // AIDEV-NOTE: Touch event handlers using manual listeners to avoid passive listener issues
+  const handleTouchStart = useCallback((event: TouchEvent) => {
+    if (controls.animationEnabled) return // Disable interaction during animation
+    
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const touch = event.touches[0]
+    const x = touch.clientX - rect.left
+    const y = touch.clientY - rect.top
+
+    const poleIndex = getPoleAtPosition(x, y)
+    if (poleIndex !== null) {
+      setIsDragging(poleIndex)
+      triggerHapticFeedback('light') // Provide touch feedback when starting to drag
+      event.preventDefault() // Safe to call since we registered as non-passive
+    }
+  }, [getPoleAtPosition, controls.animationEnabled])
+
+  const handleTouchMove = useCallback((event: TouchEvent) => {
+    if (controls.animationEnabled) return // Disable interaction during animation
+    
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const touch = event.touches[0]
+    const x = touch.clientX - rect.left
+    const y = touch.clientY - rect.top
+
+    if (isDragging !== null) {
+      // Update pole position while dragging
+      setPoles(prevPoles => {
+        const newPoles = [...prevPoles]
+        newPoles[isDragging] = {
+          ...newPoles[isDragging],
+          x: Math.max(0, Math.min(width, x)),
+          y: Math.max(0, Math.min(height, y))
+        }
+        return newPoles
+      })
+      event.preventDefault() // Safe to call since we registered as non-passive
+    }
+  }, [isDragging, width, height, controls.animationEnabled])
+
+  const handleTouchEnd = useCallback(() => {
+    if (controls.animationEnabled) return // Disable interaction during animation
+    setIsDragging(null)
+    // Don't prevent default on touch end to allow normal touch behavior
+  }, [controls.animationEnabled])
+
+  // AIDEV-NOTE: Register touch event listeners manually with non-passive option
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    // Add touch listeners with non-passive option to allow preventDefault
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    canvas.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleTouchStart)
+      canvas.removeEventListener('touchmove', handleTouchMove)
+      canvas.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd])
+
   // Render gradient and poles
   useEffect(() => {
     const canvas = canvasRef.current
@@ -469,6 +539,7 @@ export default function FourPoleGradientGenerator({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
+          style={{ touchAction: 'none' }}
         />
         
         {/* Pattern type indicator with animation status */}

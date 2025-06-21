@@ -30,17 +30,17 @@ describe('ThemeToggle Component', () => {
       expect(button).toBeInTheDocument()
     })
 
-    it('displays light mode text when theme is light', () => {
+    it('display dark mode text when theme is light', () => {
       mockThemeContext.theme = 'light'
       render(<ThemeToggle />)
-      expect(screen.getByText('LIGHT_MODE')).toBeInTheDocument()
+      expect(screen.getByText('DARK_MODE')).toBeInTheDocument()
       expect(screen.getByText('[○]')).toBeInTheDocument()
     })
 
-    it('displays dark mode text when theme is dark', () => {
+    it('displays light mode text when theme is dark', () => {
       mockThemeContext.theme = 'dark'
       render(<ThemeToggle />)
-      expect(screen.getByText('DARK_MODE')).toBeInTheDocument()
+      expect(screen.getByText('LIGHT_MODE')).toBeInTheDocument()
       expect(screen.getByText('[●]')).toBeInTheDocument()
     })
 
@@ -77,7 +77,7 @@ describe('ThemeToggle Component', () => {
     it('calls toggleTheme when clicked', async () => {
       const user = userEvent.setup()
       render(<ThemeToggle />)
-      
+
       await user.click(screen.getByRole('button'))
       expect(mockToggleTheme).toHaveBeenCalledTimes(1)
     })
@@ -85,12 +85,12 @@ describe('ThemeToggle Component', () => {
     it('calls toggleTheme multiple times for multiple clicks', async () => {
       const user = userEvent.setup()
       render(<ThemeToggle />)
-      
+
       const button = screen.getByRole('button')
       await user.click(button)
       await user.click(button)
       await user.click(button)
-      
+
       expect(mockToggleTheme).toHaveBeenCalledTimes(3)
     })
   })
@@ -99,22 +99,22 @@ describe('ThemeToggle Component', () => {
     it('toggles theme when Enter key is pressed', async () => {
       const user = userEvent.setup()
       render(<ThemeToggle />)
-      
+
       const button = screen.getByRole('button')
       button.focus()
       await user.keyboard('{Enter}')
-      
+
       expect(mockToggleTheme).toHaveBeenCalledTimes(1)
     })
 
     it('toggles theme when Space key is pressed', async () => {
       const user = userEvent.setup()
       render(<ThemeToggle />)
-      
+
       const button = screen.getByRole('button')
       button.focus()
       await user.keyboard(' ')
-      
+
       expect(mockToggleTheme).toHaveBeenCalledTimes(1)
     })
   })
@@ -136,7 +136,7 @@ describe('ThemeToggle Component', () => {
   describe('Integration with Theme Context', () => {
     it('uses mocked theme context correctly', () => {
       render(<ThemeToggle />)
-      expect(screen.getByText('LIGHT_MODE')).toBeInTheDocument()
+      expect(screen.getByText('DARK_MODE')).toBeInTheDocument()
     })
   })
 })

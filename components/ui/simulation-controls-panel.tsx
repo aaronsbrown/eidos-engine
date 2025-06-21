@@ -3,6 +3,7 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
 import CompactColorPicker from "@/components/ui/compact-color-picker"
+import CustomSelect from "./custom-select"
 import { PatternControl } from "@/components/pattern-generators/types"
 
 // AIDEV-NOTE: Extracted from app/page.tsx to improve maintainability and prepare for future UI features
@@ -149,17 +150,11 @@ export function SimulationControlsPanel({
         <div key={control.id} className={`flex flex-col h-full ${sidebarWidth > 500 ? '' : 'col-span-full'}`}>
           <label className="block text-xs font-mono text-muted-foreground mb-2 uppercase">{control.label}</label>
           <div className="flex-1 flex flex-col justify-center">
-            <select
+            <CustomSelect
               value={currentValue as string}
-              onChange={(e) => onControlChange(control.id, e.target.value)}
-              className="w-full border border-border p-2 text-xs font-mono bg-background text-foreground"
-            >
-              {control.options?.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              options={control.options || []}
+              onChange={(newValue) => onControlChange(control.id, newValue)}
+            />
           </div>
         </div>
       )
