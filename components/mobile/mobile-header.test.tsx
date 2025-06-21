@@ -75,7 +75,7 @@ describe('MobileHeader', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const counter = screen.getByTestId('pattern-counter')
-      expect(counter).toHaveClass('font-mono', 'text-xs')
+      expect(counter).toHaveClass('mobile-typography-small')
     })
   })
 

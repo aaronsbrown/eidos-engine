@@ -164,7 +164,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         disabled={loading || patterns.length === 0}
-        className="w-full min-h-[44px] bg-background border border-border rounded-md px-4 py-2 text-left font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between hover:border-muted-foreground transition-colors"
+        className="w-full min-h-[44px] bg-background border border-border rounded-md px-4 py-2 text-left mobile-typography-pattern md:text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between hover:border-muted-foreground transition-colors"
         aria-label="Select pattern generator"
         aria-expanded={isOpen}
         aria-controls="pattern-options-listbox"
@@ -205,7 +205,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                     setHighlightedIndex(-1)
                   }}
                   placeholder="Search patterns..."
-                  className="w-full pl-10 pr-4 py-2 font-mono text-sm bg-background border border-border rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                  className="w-full pl-10 pr-4 py-2 mobile-typography-pattern md:text-sm bg-background border border-border rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                   aria-label="Search patterns"
                 />
               </div>
@@ -218,7 +218,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {filteredPatterns.length === 0 ? (
-              <div className="px-4 py-8 text-center text-muted-foreground font-mono text-sm">
+              <div className="px-4 py-8 text-center text-muted-foreground mobile-typography-pattern md:text-sm">
                 No patterns found
               </div>
             ) : (
@@ -241,15 +241,15 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-mono text-sm font-medium text-foreground truncate">
+                      <div className="mobile-typography-pattern md:text-sm font-medium text-foreground truncate">
                         {pattern.name}
                       </div>
-                      <div className="font-mono text-xs text-muted-foreground mt-0.5">
+                      <div className="mobile-typography-small md:text-xs text-muted-foreground mt-0.5">
                         {pattern.id}
                       </div>
                     </div>
                     <div className="ml-3 flex-shrink-0">
-                      <span className="inline-block px-2 py-1 text-xs font-mono bg-muted text-muted-foreground rounded">
+                      <span className="inline-block px-2 py-1 mobile-typography-small md:text-xs bg-muted text-muted-foreground rounded">
                         {pattern.technology}
                       </span>
                     </div>

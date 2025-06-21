@@ -342,7 +342,7 @@ describe('Accessibility Integration Tests', () => {
       // Group title should be properly styled as a heading
       const groupTitle = screen.getByText('Animation Settings')
       expect(groupTitle.tagName).toBe('H3')
-      expect(groupTitle).toHaveClass('font-mono', 'text-sm', 'font-semibold')
+      expect(groupTitle).toHaveClass('mobile-typography-pattern', 'font-semibold')
     })
   })
 })

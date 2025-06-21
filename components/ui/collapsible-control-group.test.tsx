@@ -91,7 +91,7 @@ describe('CollapsibleControlGroup', () => {
       )
 
       const titleElement = screen.getByText('Animation Settings')
-      expect(titleElement).toHaveClass('font-mono', 'text-sm', 'font-semibold')
+      expect(titleElement).toHaveClass('mobile-typography-pattern', 'font-semibold')
     })
   })
 
