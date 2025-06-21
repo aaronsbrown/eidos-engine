@@ -119,9 +119,10 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* AIDEV-NOTE: Fixed mobile dropdown focus bug by removing global outline-ring/50 from * selector */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
