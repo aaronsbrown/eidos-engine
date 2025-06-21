@@ -90,45 +90,68 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
 
       {/* Advanced Controls Toggle */}
       {advancedControls.length > 0 && (
-        <div className="mt-6">
-          <Button
-            data-testid={expanded ? 'collapse-advanced-controls' : 'expand-advanced-controls'}
-            onClick={toggleExpanded}
-            variant="outline"
-            className="w-full font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20 min-h-[44px] flex items-center justify-center space-x-2"
-            aria-expanded={expanded}
-            aria-controls="advanced-controls-panel"
-          >
-            <span>{expanded ? 'Less Controls' : 'Advanced Controls'}</span>
+        <div 
+          className="mt-6 -mx-4 border-t border-border cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-950/20 transition-colors duration-200"
+          data-testid={expanded ? 'collapse-advanced-controls' : 'expand-advanced-controls'}
+          onClick={toggleExpanded}
+          role="button"
+          tabIndex={0}
+          aria-expanded={expanded}
+          aria-controls="advanced-controls-panel"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              toggleExpanded()
+            }
+          }}
+        >
+          <div className="px-4 py-3 flex items-center justify-between min-h-[44px]">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-yellow-400"></div>
+              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                {expanded ? 'Less Controls' : 'Advanced Controls'}
+              </span>
+            </div>
             {expanded ? (
-              <ChevronUp data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200" />
+              <ChevronUp data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200 text-muted-foreground" />
             ) : (
-              <ChevronDown data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200" />
+              <ChevronDown data-testid="chevron-icon" className="h-4 w-4 transition-transform duration-200 text-muted-foreground" />
             )}
-          </Button>
+          </div>
         </div>
       )}
 
-      {/* Advanced Controls Panel - Expandable */}
-      {expanded && advancedControls.length > 0 && (
+      {/* Advanced Controls Panel - Accordion Drawer */}
+      {advancedControls.length > 0 && (
         <div
           data-testid="advanced-controls-panel"
-          className="mt-4 max-h-[40vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 transition-all duration-300 ease-in-out"
-          style={{ 
-            WebkitOverflowScrolling: 'touch',
-            scrollBehavior: 'smooth'
-          }}
+          className={`
+            mt-4 overflow-hidden transition-all duration-300 ease-in-out
+            ${expanded 
+              ? 'max-h-[40vh] opacity-100' 
+              : 'max-h-0 opacity-0'
+            }
+          `}
           role="region"
           aria-label="Advanced pattern controls"
+          aria-hidden={!expanded}
         >
-          {/* Use existing grouped controls component for advanced controls */}
-          <GroupedSimulationControlsPanel
-            patternId={patternId}
-            controls={advancedControls}
-            controlValues={controlValues}
-            onControlChange={onControlChange}
-            sidebarWidth={viewport.width}
-          />
+          <div 
+            className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 max-h-[40vh]"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth'
+            }}
+          >
+            {/* Use existing grouped controls component for advanced controls */}
+            <GroupedSimulationControlsPanel
+              patternId={patternId}
+              controls={advancedControls}
+              controlValues={controlValues}
+              onControlChange={onControlChange}
+              sidebarWidth={viewport.width}
+            />
+          </div>
         </div>
       )}
 
