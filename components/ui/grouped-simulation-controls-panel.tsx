@@ -8,6 +8,7 @@ import { Button } from './button'
 import CollapsibleControlGroup from './collapsible-control-group'
 import ViewportConstrainedPanel from './viewport-constrained-panel'
 import CompactColorPicker from './compact-color-picker'
+import CustomSelect from './custom-select'
 import type { PatternControl } from '@/components/pattern-generators/types'
 
 interface ControlGroup {
@@ -515,18 +516,12 @@ function renderControl(
           <label htmlFor={control.id} className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
             {control.label}
           </label>
-          <select
+          <CustomSelect
             id={control.id}
             value={value as string}
-            onChange={(e) => onControlChange(control.id, e.target.value)}
-            className="w-full font-mono text-xs bg-background border border-border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          >
-            {control.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            options={control.options || []}
+            onChange={(newValue) => onControlChange(control.id, newValue)}
+          />
         </div>
       )
 
