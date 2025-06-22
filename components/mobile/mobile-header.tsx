@@ -42,7 +42,7 @@ const MobileHeader = memo(function MobileHeader({
         {/* Pattern Counter */}
         <div
           data-testid="pattern-counter"
-          className="mobile-typography-small text-muted-foreground bg-background border border-yellow-400 px-2 py-1 min-w-[50px] text-center"
+          className="mobile-typography-small text-muted-foreground bg-background border border-accent-primary px-2 py-1 min-w-[50px] text-center"
           aria-label={`Pattern ${patternCount.current} of ${patternCount.total}`}
         >
           {formatCounter(patternCount.current, patternCount.total)}

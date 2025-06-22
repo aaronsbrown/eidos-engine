@@ -101,7 +101,7 @@ export default function ViewportConstrainedPanel({
       role="region"
       aria-label="Scrollable control panel"
       tabIndex={0}
-      className={`overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-inset ${className}`}
+      className={`overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 focus:outline-none focus:ring-2 focus:ring-focus-ring focus:ring-inset ${className}`}
       style={{ maxHeight: `${maxHeight}px` }}
       onKeyDown={handleKeyDown}
     >
