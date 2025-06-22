@@ -251,12 +251,15 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       </div>
 
       {/* Menu Overlay for mobile */}
-      {isMenuOpen && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
-          onClick={handleMenuToggle}
-        >
-          <div className="absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4 transform transition-transform duration-300 ease-in-out translate-x-0">
+      <div 
+        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={handleMenuToggle}
+      >
+        <div className={`absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4 transform transition-transform duration-300 ease-in-out ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-mono text-sm uppercase tracking-wider">Menu</h2>
               <button 
@@ -281,8 +284,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
             </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
   )
 })
 
