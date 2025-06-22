@@ -543,13 +543,13 @@ export default function FourPoleGradientGenerator({
         />
         
         {/* Pattern type indicator with animation status */}
-        <div className="absolute top-2 left-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
+        <div className="absolute top-2 left-2 text-accent-primary text-xs font-mono uppercase pointer-events-none">
           4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'} {controls.noiseEnabled && '/ NOISE_OVERLAY'} {!controls.showPoles && '/ HIDDEN_POLES'}
         </div>
         
         {/* Animation status indicator */}
         {controls.animationEnabled && (
-          <div className="absolute top-2 right-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
+          <div className="absolute top-2 right-2 text-accent-primary text-xs font-mono uppercase pointer-events-none">
             {controls.animationPattern.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}
           </div>
         )}

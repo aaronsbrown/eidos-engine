@@ -43,17 +43,13 @@ const preview: Preview = {
       const theme = context.globals.theme || 'light';
       
       return (
-        <html lang="en">
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            <ThemeProvider>
-              <div className={theme === 'dark' ? 'dark' : ''}>
-                <div className="bg-background text-foreground min-h-screen p-4">
-                  <Story />
-                </div>
-              </div>
-            </ThemeProvider>
-          </body>
-        </html>
+        <div className={`${geistSans.variable} ${geistMono.variable} antialiased ${theme === 'dark' ? 'dark' : ''}`}>
+          <ThemeProvider>
+            <div className="bg-background text-foreground p-4">
+              <Story />
+            </div>
+          </ThemeProvider>
+        </div>
       );
     },
   ],

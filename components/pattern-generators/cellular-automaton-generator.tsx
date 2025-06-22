@@ -216,13 +216,13 @@ export default function CellularAutomatonGenerator({
     <div className={className}>
       {/* Canvas Container */}
       <div
-        className="overflow-hidden relative border border-yellow-500/20"
+        className="overflow-hidden relative border border-accent-primary/20"
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <canvas ref={canvasRef} className="w-full h-full" />
 
         {/* Rule indicator overlay */}
-        <div className="absolute top-2 left-2 text-yellow-500 text-xs font-mono bg-black/80 px-2 py-1 rounded">
+        <div className="absolute top-2 left-2 text-accent-primary text-xs font-mono bg-background/80 border border-border px-2 py-1 rounded">
           RULE {rule}
         </div>
       </div>

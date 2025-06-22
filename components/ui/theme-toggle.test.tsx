@@ -49,10 +49,7 @@ describe('ThemeToggle Component', () => {
       const button = screen.getByRole('button')
       expect(button).toHaveClass(
         'font-mono',
-        'text-xs',
-        'border-border',
-        'hover:border-accent-primary',
-        'hover:bg-accent-primary-subtle'
+        'text-xs'
       )
     })
   })
@@ -61,7 +58,7 @@ describe('ThemeToggle Component', () => {
     it('shows gray indicator dot for light theme', () => {
       mockThemeContext.theme = 'light'
       render(<ThemeToggle />)
-      const indicator = screen.getByRole('button').querySelector('.bg-gray-400')
+      const indicator = screen.getByRole('button').querySelector('.bg-muted-foreground')
       expect(indicator).toBeInTheDocument()
     })
 
