@@ -51,8 +51,8 @@ describe('ThemeToggle Component', () => {
         'font-mono',
         'text-xs',
         'border-border',
-        'hover:border-yellow-400',
-        'hover:bg-yellow-50'
+        'hover:border-accent-primary',
+        'hover:bg-accent-primary-subtle'
       )
     })
   })
@@ -68,7 +68,7 @@ describe('ThemeToggle Component', () => {
     it('shows yellow indicator dot for dark theme', () => {
       mockThemeContext.theme = 'dark'
       render(<ThemeToggle />)
-      const indicator = screen.getByRole('button').querySelector('.bg-yellow-400')
+      const indicator = screen.getByRole('button').querySelector('.bg-accent-primary')
       expect(indicator).toBeInTheDocument()
     })
   })

@@ -162,7 +162,7 @@ describe('MobileHeader', () => {
       const counter = screen.getByTestId('pattern-counter')
       
       // Counter should have yellow accent styling
-      expect(counter).toHaveClass('border-yellow-400')
+      expect(counter).toHaveClass('border-accent-primary')
     })
 
     it('has proper contrast and readability', () => {
