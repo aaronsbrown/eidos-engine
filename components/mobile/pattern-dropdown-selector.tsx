@@ -164,7 +164,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         disabled={loading || patterns.length === 0}
-        className="w-full min-h-[44px] bg-background border border-border rounded-md px-4 py-2 text-left mobile-typography-pattern md:text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between hover:border-muted-foreground transition-colors"
+        className="w-full min-h-[44px] bg-background border border-border rounded-md px-4 py-2 text-left mobile-typography-pattern md:text-sm focus:outline-none focus:ring-2 focus:ring-focus-ring focus:border-focus-ring disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between hover:border-muted-foreground transition-colors"
         aria-label="Select pattern generator"
         aria-expanded={isOpen}
         aria-controls="pattern-options-listbox"
@@ -205,7 +205,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                     setHighlightedIndex(-1)
                   }}
                   placeholder="Search patterns..."
-                  className="w-full pl-10 pr-4 py-2 mobile-typography-pattern md:text-sm bg-background border border-border rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                  className="w-full pl-10 pr-4 py-2 mobile-typography-pattern md:text-sm bg-background border border-border rounded focus:outline-none focus:ring-2 focus:ring-focus-ring focus:border-focus-ring"
                   aria-label="Search patterns"
                 />
               </div>
@@ -231,7 +231,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                   type="button"
                   onClick={() => handleSelect(pattern.id)}
                   className={`w-full px-4 py-3 text-left hover:bg-muted focus:bg-muted focus:outline-none transition-colors ${
-                    pattern.id === selectedId ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''
+                    pattern.id === selectedId ? 'bg-accent-primary-subtle dark:bg-accent-primary-subtle' : ''
                   } ${
                     index === highlightedIndex ? 'bg-muted' : ''
                   }`}

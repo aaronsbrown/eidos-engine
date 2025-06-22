@@ -56,7 +56,7 @@ export function SimulationControlsPanel({
               }}
               variant="outline"
               size="sm"
-              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+              className="font-mono text-xs border-border hover:border-accent-primary hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle"
             >
               {prevButton.label}
             </Button>
@@ -72,7 +72,7 @@ export function SimulationControlsPanel({
               }}
               variant="outline"
               size="sm"
-              className="font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+              className="font-mono text-xs border-border hover:border-accent-primary hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle"
             >
               {nextButton.label}
             </Button>
@@ -134,7 +134,7 @@ export function SimulationControlsPanel({
               step={control.step}
               value={currentValue as number}
               onChange={(e) => onControlChange(control.id, control.step && control.step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value))}
-              className="w-full accent-yellow-400"
+              className="w-full accent-form-accent"
             />
           </div>
           <div className="text-xs font-mono text-muted-foreground mt-1 text-right">
@@ -168,7 +168,7 @@ export function SimulationControlsPanel({
                 type="checkbox"
                 checked={currentValue as boolean}
                 onChange={(e) => onControlChange(control.id, e.target.checked)}
-                className="w-4 h-4 accent-yellow-400"
+                className="w-4 h-4 accent-form-accent"
               />
               <span className="text-xs font-mono text-muted-foreground uppercase">ENABLED</span>
             </label>
@@ -212,7 +212,7 @@ export function SimulationControlsPanel({
             }}
             variant="outline"
             size="sm"
-            className="w-full font-mono text-xs border-border hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20 uppercase"
+            className="w-full font-mono text-xs border-border hover:border-accent-primary hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle uppercase"
           >
             {control.label}
           </Button>

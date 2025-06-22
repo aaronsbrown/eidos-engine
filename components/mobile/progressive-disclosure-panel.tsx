@@ -66,7 +66,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
       {/* Essential Controls - Always Visible */}
       <div data-testid="essential-controls-area">
         <div className="flex items-center space-x-2 mb-5">
-          <div className="w-2 h-2 bg-yellow-400"></div>
+          <div className="w-2 h-2 bg-accent-primary"></div>
           <h3 className="mobile-typography-label md:text-sm text-muted-foreground">
             Quick Controls
           </h3>
@@ -90,7 +90,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
       {/* Advanced Controls Toggle */}
       {advancedControls.length > 0 && (
         <div 
-          className="mt-6 -mx-4 border-t border-border cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-950/20 transition-colors duration-200"
+          className="mt-6 -mx-4 border-t border-border cursor-pointer hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle transition-colors duration-200"
           data-testid={expanded ? 'collapse-advanced-controls' : 'expand-advanced-controls'}
           onClick={toggleExpanded}
           role="button"
@@ -106,7 +106,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
         >
           <div className="px-4 py-3 flex items-center justify-between min-h-[44px]">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-yellow-400"></div>
+              <div className="w-2 h-2 bg-accent-primary"></div>
               <span className="mobile-typography-label md:text-xs text-muted-foreground">
                 {expanded ? 'Less Controls' : 'Advanced Controls'}
               </span>

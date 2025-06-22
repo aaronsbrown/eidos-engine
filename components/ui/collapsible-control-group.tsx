@@ -41,7 +41,7 @@ export default function CollapsibleControlGroup({
               <label htmlFor={control.id} className="mobile-typography-label md:text-xs text-muted-foreground">
                 {control.label}
               </label>
-              <span className="mobile-typography-value md:text-xs text-yellow-500">
+              <span className="mobile-typography-value md:text-xs text-accent-primary-strong">
                 {typeof value === 'number' ? value.toFixed(2) : value}
               </span>
             </div>
@@ -53,7 +53,8 @@ export default function CollapsibleControlGroup({
               step={control.step}
               value={value as number}
               onChange={(e) => onControlChange(control.id, parseFloat(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 range-slider"
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer range-slider"
+              style={{ background: 'var(--control-track)' }}
             />
           </div>
         )
@@ -66,7 +67,7 @@ export default function CollapsibleControlGroup({
               type="checkbox"
               checked={value as boolean}
               onChange={(e) => onControlChange(control.id, e.target.checked)}
-              className="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0"
+              className="rounded border-form text-accent-primary-strong focus:ring-accent-primary focus:ring-offset-0"
             />
             <label htmlFor={control.id} className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
               {control.label}
@@ -110,7 +111,7 @@ export default function CollapsibleControlGroup({
           <button
             key={control.id}
             onClick={() => onControlChange(control.id, true)}
-            className="w-full font-mono text-xs uppercase tracking-wide bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-2 rounded transition-colors"
+            className="w-full font-mono text-xs uppercase tracking-wide bg-accent-primary-strong text-accent-primary-foreground hover:bg-accent-primary px-3 py-2 rounded transition-colors"
           >
             {control.label}
           </button>
@@ -132,7 +133,7 @@ export default function CollapsibleControlGroup({
             toggleExpanded()
           }
         }}
-        className="w-full flex items-center justify-between p-3 bg-background/50 hover:bg-background/70 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-inset"
+        className="w-full flex items-center justify-between p-3 bg-background/50 hover:bg-background/70 transition-colors focus:outline-none focus:ring-2 focus:ring-focus-ring focus:ring-inset"
         aria-expanded={isExpanded}
         aria-controls={controlsId}
       >

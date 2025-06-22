@@ -42,6 +42,18 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   
+  /* AIDEV-NOTE: New unified accent system Tailwind classes */
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-strong: var(--accent-primary-strong);
+  --color-accent-primary-subtle: var(--accent-primary-subtle);
+  --color-accent-primary-foreground: var(--accent-primary-foreground);
+  --color-success-foreground: var(--success-foreground);
+  --color-form-accent: var(--form-accent);
+  --color-focus-ring: var(--focus-ring);
+  --color-border-form: var(--border-form);
+  --color-disabled-border: var(--disabled-border);
+  --color-disabled-background: var(--disabled-background);
+  
   /* AIDEV-NOTE: Mobile typography scale for enhanced accessibility and readability */
   --mobile-text-header: 18px;
   --mobile-text-pattern: 16px;
@@ -83,6 +95,29 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  
+  /* AIDEV-NOTE: Unified yellow accent system - matches production color exactly */
+  --accent-primary: oklch(0.852 0.199 91.936);      /* Production yellow */
+  --accent-primary-strong: oklch(0.743 0.184 91.732);  /* Slightly darker for emphasis */
+  --accent-primary-subtle: oklch(0.977 0.042 102.212);  /* Light background variant */
+  --accent-primary-foreground: oklch(0.129 0.042 264.695); /* Black text on yellow */
+  
+  /* Interactive controls - unified yellow system */
+  --control-thumb: var(--accent-primary);           /* Yellow slider thumbs */
+  --control-track: oklch(0.929 0.013 255.508);     /* Light gray track */
+  --control-track-active: var(--accent-primary);   /* Yellow active track */
+  
+  /* Form controls */
+  --form-accent: var(--accent-primary);             /* HTML input accent color */
+  --focus-ring: var(--accent-primary);              /* Focus ring color */
+  --border-form: oklch(0.851 0.013 255.508);       /* Form element borders (gray-300) */
+  
+  /* Disabled states */
+  --disabled-border: oklch(0.851 0.013 255.508);   /* Disabled border (gray-300) */
+  --disabled-background: oklch(0.929 0.013 255.508); /* Disabled background (gray-200) */
+  
+  /* Success states */
+  --success-foreground: oklch(0.627 0.194 149.214); /* Production green-600 exact match */
 }
 
 .dark {
@@ -117,6 +152,17 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  
+  /* Dark mode accent variations */
+  --accent-primary-subtle: oklch(0.180 0.160 91.936 / 0.3); /* yellow-950/30 matching production */
+  
+  /* Dark mode controls */
+  --control-track: oklch(0.279 0.041 260.031);     /* Dark gray track */
+  --success-foreground: oklch(0.792 0.209 151.711); /* Production green-400 exact match */
+  
+  /* Dark mode disabled states */
+  --disabled-background: oklch(0.279 0.041 260.031); /* Disabled background (gray-700) */
+  --disabled-border: oklch(0.354 0.041 260.031);   /* Disabled border (gray-600) */
 }
 
 /* AIDEV-NOTE: Fixed mobile dropdown focus bug by removing global outline-ring/50 from * selector */
@@ -192,14 +238,14 @@
     }
   }
 
-  /* AIDEV-NOTE: Mobile-friendly slider touch targets - invisible padding approach */
+  /* AIDEV-NOTE: Mobile-friendly slider touch targets - unified yellow system */
   .range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: var(--control-thumb);
     cursor: pointer;
     border: none;
     /* Invisible padding for touch target */
@@ -210,7 +256,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: var(--control-thumb);
     cursor: pointer;
     border: none;
     /* Firefox doesn't support box-shadow padding, so we use a larger border */
@@ -222,25 +268,16 @@
   .range-slider::-webkit-slider-track {
     width: 100%;
     height: 8px;
-    background: #374151;
+    background: var(--control-track);
     border-radius: 4px;
   }
 
   .range-slider::-moz-range-track {
     width: 100%;
     height: 8px;
-    background: #374151;
+    background: var(--control-track);
     border-radius: 4px;
     border: none;
-  }
-
-  /* Light mode track */
-  :root:not(.dark) .range-slider::-webkit-slider-track {
-    background: #e5e7eb;
-  }
-
-  :root:not(.dark) .range-slider::-moz-range-track {
-    background: #e5e7eb;
   }
 }
 

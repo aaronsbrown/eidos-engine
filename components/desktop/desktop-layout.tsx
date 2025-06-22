@@ -149,12 +149,12 @@ export default function DesktopLayout() {
       />
 
       {/* Header */}
-      <header className="relative border-b border-gray-300 p-6 bg-white/80 backdrop-blur-sm">
+      <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="w-3 h-3 bg-yellow-400 border border-gray-400"></div>
+            <div className="w-3 h-3 bg-accent-primary border border-gray-400"></div>
             <h1 className="text-xl font-mono tracking-wider uppercase">Pattern Generator System</h1>
-            <div className="text-xs font-mono text-gray-500 bg-white border border-gray-300 px-2 py-1">
+            <div className="text-xs font-mono text-gray-500 bg-white border border-form px-2 py-1">
               v1.0.0
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function DesktopLayout() {
               onClick={toggleFullscreen}
               variant="outline"
               size="sm"
-              className="font-mono text-xs border-gray-400 hover:border-yellow-400 hover:bg-yellow-50"
+              className="font-mono text-xs border-gray-400 hover:border-accent-primary hover:bg-accent-primary-subtle"
             >
               {isFullscreen ? "EXIT_FULLSCREEN" : "FULLSCREEN"}
             </Button>
@@ -182,7 +182,7 @@ export default function DesktopLayout() {
           <div className="p-6 pb-4">
             {/* Pattern Selection Header */}
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-yellow-400"></div>
+              <div className="w-2 h-2 bg-accent-primary"></div>
               <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
             </div>
           </div>
@@ -193,11 +193,11 @@ export default function DesktopLayout() {
               onClick={handlePreviousPattern}
               disabled={!canGoToPrevious}
               className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToPrevious
-                ? "border-yellow-400 bg-yellow-400 hover:bg-yellow-500 cursor-pointer"
-                : "border-gray-300 bg-gray-200 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed"
+                ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
+                : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
                 }`}
             >
-              <span className={`font-bold ${canGoToPrevious ? "text-black" : "text-gray-400 dark:text-gray-500"}`}>
+              <span className={`font-bold ${canGoToPrevious ? "text-accent-primary-foreground" : "text-muted-foreground"}`}>
                 ↑
               </span>
             </button>
@@ -222,7 +222,7 @@ export default function DesktopLayout() {
                     key={pattern.id}
                     onClick={() => setSelectedPatternId(pattern.id)}
                     className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
-                      ? "bg-yellow-100 dark:bg-yellow-950/30 border-yellow-400 text-foreground"
+                      ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
                       : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
                       }`}
                     style={{
@@ -246,11 +246,11 @@ export default function DesktopLayout() {
               onClick={handleNextPattern}
               disabled={!canGoToNext}
               className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToNext
-                ? "border-yellow-400 bg-yellow-400 hover:bg-yellow-500 cursor-pointer"
-                : "border-gray-300 bg-gray-200 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed"
+                ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
+                : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
                 }`}
             >
-              <span className={`font-bold ${canGoToNext ? "text-black" : "text-gray-400 dark:text-gray-500"}`}>
+              <span className={`font-bold ${canGoToNext ? "text-accent-primary-foreground" : "text-muted-foreground"}`}>
                 ↓
               </span>
             </button>
@@ -260,7 +260,7 @@ export default function DesktopLayout() {
           {/* Pattern Specifications - Fixed at bottom */}
           <div className="p-6 pt-4 border-t border-border">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
+              <div className="w-2 h-2 bg-accent-primary"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Specifications</h3>
             </div>
             <div className="border border-border p-3 bg-background space-y-2">
@@ -284,7 +284,7 @@ export default function DesktopLayout() {
               </div>
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">STATUS:</span>
-                <span className="text-green-600 dark:text-green-400">ACTIVE</span>
+                <span className="text-success-foreground">ACTIVE</span>
               </div>
             </div>
           </div>
@@ -315,10 +315,10 @@ export default function DesktopLayout() {
             {/* Pattern Container with technical frame */}
             <div className="relative">
               {/* Corner markers */}
-              <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-yellow-400"></div>
-              <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-yellow-400"></div>
-              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-yellow-400"></div>
-              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-yellow-400"></div>
+              <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-accent-primary"></div>
+              <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-accent-primary"></div>
+              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-accent-primary"></div>
+              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-accent-primary"></div>
 
 
               <div
@@ -345,7 +345,7 @@ export default function DesktopLayout() {
 
         {/* Resize Handle */}
         <div
-          className={`w-1 bg-border hover:bg-yellow-400 cursor-col-resize transition-colors ${isResizing ? 'bg-yellow-400' : ''}`}
+          className={`w-1 bg-border hover:bg-accent-primary cursor-col-resize transition-colors ${isResizing ? 'bg-accent-primary' : ''}`}
           onMouseDown={handleMouseDown}
         />
 
@@ -357,7 +357,7 @@ export default function DesktopLayout() {
           {/* Viewport Controls - Compact */}
           <div>
             <div className="flex items-center space-x-2 mb-3">
-              <div className="w-2 h-2 bg-yellow-400"></div>
+              <div className="w-2 h-2 bg-accent-primary"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Viewport</h3>
             </div>
             <div className="border border-border p-2 bg-background space-y-2">
@@ -370,7 +370,7 @@ export default function DesktopLayout() {
                     max="1280"
                     value={dimensions.width}
                     onChange={(e) => setDimensions(prev => ({ ...prev, width: parseInt(e.target.value) }))}
-                    className="w-full accent-yellow-400"
+                    className="w-full accent-form-accent"
                   />
                   <div className="text-xs font-mono text-muted-foreground text-right">{dimensions.width}px</div>
                 </div>
@@ -382,7 +382,7 @@ export default function DesktopLayout() {
                     max="720"
                     value={dimensions.height}
                     onChange={(e) => setDimensions(prev => ({ ...prev, height: parseInt(e.target.value) }))}
-                    className="w-full accent-yellow-400"
+                    className="w-full accent-form-accent"
                   />
                   <div className="text-xs font-mono text-muted-foreground text-right">{dimensions.height}px</div>
                 </div>
@@ -393,7 +393,7 @@ export default function DesktopLayout() {
           {/* Simulation Parameters - AIDEV-NOTE: Refactored into dedicated component for maintainability */}
           <div className="border-t border-border pt-4">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-yellow-400"></div>
+              <div className="w-2 h-2 bg-accent-primary"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">
                 {selectedPattern.controls ? "Simulation Parameters" : "Pattern Controls"}
               </h3>

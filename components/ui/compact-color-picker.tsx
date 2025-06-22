@@ -54,10 +54,10 @@ export default function CompactColorPicker({ value, onChange, label }: CompactCo
         <button
           ref={buttonRef}
           onClick={handleButtonClick}
-          className="w-full h-8 border-2 border-yellow-400/20 rounded cursor-pointer relative"
+          className="w-full h-8 border-2 border-accent-primary/20 rounded cursor-pointer relative"
           style={{ backgroundColor: localColor }}
         >
-          <div className="absolute inset-0 border-2 border-yellow-400/20 rounded pointer-events-none"></div>
+          <div className="absolute inset-0 border-2 border-accent-primary/20 rounded pointer-events-none"></div>
         </button>
         
         {/* Portal-rendered color picker popup */}
@@ -70,7 +70,7 @@ export default function CompactColorPicker({ value, onChange, label }: CompactCo
             />
             {/* Color picker popup */}
             <div 
-              className="fixed z-50 p-3 bg-background border-2 border-yellow-400/20 rounded shadow-lg"
+              className="fixed z-50 p-3 bg-background border-2 border-accent-primary/20 rounded shadow-lg"
               style={{
                 top: buttonRect.bottom + window.scrollY + 8,
                 left: Math.min(
@@ -80,7 +80,7 @@ export default function CompactColorPicker({ value, onChange, label }: CompactCo
                 maxWidth: '180px'
               }}
             >
-              <div className="[&_.react-colorful]:!w-32 [&_.react-colorful]:!h-32 [&_.react-colorful\_\_saturation]:!rounded [&_.react-colorful\_\_hue]:!rounded [&_.react-colorful\_\_pointer]:!border-2 [&_.react-colorful\_\_pointer]:!border-yellow-400">
+              <div className="[&_.react-colorful]:!w-32 [&_.react-colorful]:!h-32 [&_.react-colorful\_\_saturation]:!rounded [&_.react-colorful\_\_hue]:!rounded [&_.react-colorful\_\_pointer]:!border-2 [&_.react-colorful\_\_pointer]:!border-accent-primary">
                 <HexColorPicker 
                   color={localColor} 
                   onChange={handleColorChange}
