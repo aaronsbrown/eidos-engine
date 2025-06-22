@@ -7,6 +7,7 @@ import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
 import CellularAutomatonGenerator from "./cellular-automaton-generator"
 import FourPoleGradientGenerator from "./four-pole-gradient-generator"
+import QuadtreePattern from "./quadtree-pattern"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
@@ -618,7 +619,48 @@ export const patternGenerators: PatternGenerator[] = [
       },
     ],
   },
+  {
+    id: "quadtree",
+    name: "Quadtree Structure",
+    component: QuadtreePattern,
+    technology: 'CANVAS_2D',
+    controls: [
+      {
+        id: "maxDepth",
+        label: "RECURSION DEPTH",
+        type: "range",
+        min: 1,
+        max: 6,
+        step: 1,
+        defaultValue: 4,
+      },
+      {
+        id: "subdivisionPattern",
+        label: "SUBDIVISION PATTERN",
+        type: "select",
+        defaultValue: "golden",
+        options: [
+          { value: "uniform", label: "UNIFORM GRID" },
+          { value: "golden", label: "GOLDEN SPIRAL" },
+          { value: "checkerboard", label: "CHECKERBOARD" },
+          { value: "spiral", label: "FIBONACCI SPIRAL" },
+          { value: "center", label: "CENTER FOCUS" },
+        ],
+      },
+      {
+        id: "coloringRule",
+        label: "COLOR STYLE",
+        type: "select",
+        defaultValue: "depth",
+        options: [
+          { value: "depth", label: "BY DEPTH" },
+          { value: "grayscale", label: "GRAYSCALE" },
+          { value: "circles", label: "HALF CIRCLES" },
+        ],
+      },
+    ],
+  },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
+export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, QuadtreePattern }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
