@@ -324,6 +324,13 @@ const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.frag
 - [ ] Never "fix Storybook" with CSS overrides - fix the underlying architecture
 - [ ] Create stories that demonstrate actual usage patterns from the app
 
+**Preflight Checks (Before Commits/PRs):**
+
+- [ ] `npm run lint` - ESLint passes
+- [ ] `npm run build` - Next.js build succeeds with type checking
+- [ ] `npm run storybook` - Storybook starts without errors
+- [ ] `npm run test` - All tests pass (if applicable)
+
 ---
 
 ## Appendix
