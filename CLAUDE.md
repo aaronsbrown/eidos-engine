@@ -30,13 +30,16 @@ This document provides context for AI assistants working on the Generative Patte
 2. **Pattern Development**: Use `PatternGeneratorProps` interface + external shaders for WebGL
 3. **UI Changes**: Follow 3-phase development (Wet Paint → Drying Paint → Dry Paint)
 4. **Testing**: Focus on user behavior, not implementation details (G-8)
+5. **Storybook Development**: Components in isolation reveal architecture issues (G-9)
 
 ### 📋 Quick Commands
 
 ```bash
-npm run dev     # Development server
-npm run build   # Build + type check
-npm run lint    # Linting
+npm run dev           # Development server
+npm run build         # Build + type check
+npm run lint          # Linting
+npm run storybook     # Component development environment
+npm run test          # Run tests
 ```
 
 ---
@@ -67,6 +70,7 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | **G-6** | Create implementation notes for significant enhancements | ❌ Skip documentation for major features/architectural changes |
 | **G-7** | **🚨 Before UI refactoring, audit ALL pattern-specific special cases** | ❌ Refactor UI without cataloging existing customizations |
 | **G-8** | **Tests MUST focus on user behavior, not implementation details** | ❌ Write brittle tests asserting CSS classes/DOM structure |
+| **G-9** | **🚨 Storybook component mismatches indicate app architecture issues** | ❌ "Fix Storybook" with overrides; investigate root cause instead |
 
 ---
 
@@ -312,6 +316,21 @@ const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.frag
 - [ ] Maintain technical aesthetic
 - [ ] Test at 60fps performance target
 
+**Storybook Development:**
+
+- [ ] Always use .tsx files when JSX is used in stories
+- [ ] Components in Storybook should match app styling exactly
+- [ ] If Storybook components don't match app, investigate root cause (Rule G-9)
+- [ ] Never "fix Storybook" with CSS overrides - fix the underlying architecture
+- [ ] Create stories that demonstrate actual usage patterns from the app
+
+**Preflight Checks (Before Commits/PRs):**
+
+- [ ] `npm run lint` - ESLint passes
+- [ ] `npm run build` - Next.js build succeeds with type checking
+- [ ] `npm run storybook` - Storybook starts without errors
+- [ ] `npm run test` - All tests pass (if applicable)
+
 ---
 
 ## Appendix
@@ -332,3 +351,7 @@ shaders/                       # External shader files
 app/                          # Next.js app router
 docs/implementation_notes/     # Implementation documentation
 ```
+
+### Development Memories
+
+- Remember to use .tsx files for storybook when using jsx code
