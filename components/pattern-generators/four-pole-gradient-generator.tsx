@@ -510,13 +510,14 @@ export default function FourPoleGradientGenerator({
         ctx.fillStyle = `rgb(${pole.color.r}, ${pole.color.g}, ${pole.color.b})`
         ctx.fill()
         
-        // Border with project's yellow accent
-        ctx.strokeStyle = isDragged || isHovered ? "#FACC15" : "#FFFFFF"
+        // Border with project's yellow accent - adapt to theme
+        const isDarkMode = document.documentElement.classList.contains('dark')
+        ctx.strokeStyle = isDragged || isHovered ? '#FACC15' : (isDarkMode ? '#FFFFFF' : '#000000')
         ctx.lineWidth = isDragged ? 3 : 2
         ctx.stroke()
         
-        // Pole number label (technical aesthetic)
-        ctx.fillStyle = "#FFFFFF"
+        // Pole number label (technical aesthetic) - adapt to theme
+        ctx.fillStyle = isDarkMode ? '#FFFFFF' : '#000000'
         ctx.font = "10px monospace"
         ctx.textAlign = "center"
         ctx.fillText(`${index + 1}`, pole.x, pole.y + 3)
