@@ -9,6 +9,7 @@ import CollapsibleControlGroup from './collapsible-control-group'
 import ViewportConstrainedPanel from './viewport-constrained-panel'
 import CompactColorPicker from './compact-color-picker'
 import CustomSelect from './custom-select'
+import { useMobileDetection } from '@/components/hooks/useMobileDetection'
 import type { PatternControl } from '@/components/pattern-generators/types'
 
 interface ControlGroup {
@@ -32,6 +33,8 @@ export default function GroupedSimulationControlsPanel({
   onControlChange,
   sidebarWidth
 }: GroupedSimulationControlsPanelProps) {
+  // AIDEV-NOTE: Mobile detection for consistent single-column layout on mobile devices (Issue #23)
+  const { isMobile } = useMobileDetection()
   
   const controlGroups = useMemo(() => {
     // Special case: cellular automaton always gets grouped for navigation layout
@@ -81,6 +84,7 @@ export default function GroupedSimulationControlsPanel({
     return (
       <ViewportConstrainedPanel paddingBuffer={paddingBuffer}>
         <div className={`grid gap-4 ${
+          isMobile ? 'grid-cols-1' : 
           sidebarWidth > 500 ? 'grid-cols-3' : 
           sidebarWidth > 400 ? 'grid-cols-2' : 
           'grid-cols-1'
@@ -145,6 +149,7 @@ export default function GroupedSimulationControlsPanel({
         {/* Render ungrouped controls (like reset buttons) at bottom */}
         {ungroupedControls.length > 0 && (
           <div className={`grid gap-4 ${
+            isMobile ? 'grid-cols-1' : 
             sidebarWidth > 500 ? 'grid-cols-3' : 
             sidebarWidth > 400 ? 'grid-cols-2' : 
             'grid-cols-1'
