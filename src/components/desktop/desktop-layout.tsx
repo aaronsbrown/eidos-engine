@@ -9,6 +9,7 @@ import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-c
 import { usePresetPlacement } from "@/components/ui/preset-placement-preview"
 import { ToolbarPresetControls } from "@/components/ui/toolbar-preset-controls"
 import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
+import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 
 export default function DesktopLayout() {
   const { placement } = usePresetPlacement()
@@ -49,6 +50,23 @@ export default function DesktopLayout() {
   const getCurrentControlValues = () => {
     return controlValues[selectedPatternId] || {}
   }
+
+  // AIDEV-NOTE: Initialize preset manager hook for dropdown functionality
+  const {
+    presets,
+    activePresetId,
+    loadPreset,
+    isLoading: isPresetLoading
+  } = usePresetManager({
+    patternId: selectedPatternId,
+    controlValues: getCurrentControlValues(),
+    onControlValuesChange: (newValues) => {
+      Object.entries(newValues).forEach(([controlId, value]) => {
+        handleControlChange(controlId, value)
+      })
+    },
+    patternControls: selectedPattern.controls
+  })
 
   // Initialize control values when pattern changes
   useEffect(() => {
@@ -320,10 +338,20 @@ export default function DesktopLayout() {
               {/* Preset Selection Dropdown */}
               <select
                 className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs"
-                defaultValue=""
+                value={activePresetId || ""}
+                onChange={(e) => {
+                  if (e.target.value && e.target.value !== activePresetId) {
+                    loadPreset(e.target.value)
+                  }
+                }}
+                disabled={isPresetLoading}
               >
                 <option value="">SELECT PRESET</option>
-                <option value="fool_yo">fool yo</option>
+                {presets.map(preset => (
+                  <option key={preset.id} value={preset.id}>
+                    {preset.name}
+                  </option>
+                ))}
               </select>
               
               {/* Preset Manager Button */}
