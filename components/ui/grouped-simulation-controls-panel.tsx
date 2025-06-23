@@ -37,7 +37,7 @@ export default function GroupedSimulationControlsPanel({
   // AIDEV-NOTE: Mobile detection for consistent single-column layout on mobile devices (Issue #23)
   const { isMobile } = useMobileDetection()
   // AIDEV-NOTE: Preset placement logic for conditional rendering
-  const { placement } = usePresetPlacement()
+  usePresetPlacement()
   
   const controlGroups = useMemo(() => {
     // Special case: cellular automaton always gets grouped for navigation layout
