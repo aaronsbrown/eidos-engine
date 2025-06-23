@@ -10,7 +10,6 @@ import ViewportConstrainedPanel from './viewport-constrained-panel'
 import CompactColorPicker from './compact-color-picker'
 import CustomSelect from './custom-select'
 import { useMobileDetection } from '@/components/hooks/useMobileDetection'
-import { usePresetPlacement } from './preset-placement-preview'
 import type { PatternControl } from '@/components/pattern-generators/types'
 
 interface ControlGroup {
@@ -36,8 +35,6 @@ export default function GroupedSimulationControlsPanel({
 }: GroupedSimulationControlsPanelProps) {
   // AIDEV-NOTE: Mobile detection for consistent single-column layout on mobile devices (Issue #23)
   const { isMobile } = useMobileDetection()
-  // AIDEV-NOTE: Preset placement logic for conditional rendering
-  usePresetPlacement()
   
   const controlGroups = useMemo(() => {
     // Special case: cellular automaton always gets grouped for navigation layout
