@@ -8,37 +8,43 @@ const mockPatterns: PatternGenerator[] = [
     id: 'barcode-generator',
     name: 'Barcode Generator',
     component: {} as any,
-    technology: 'CANVAS_2D'
+    technology: 'CANVAS_2D',
+    category: 'Data Visualization'
   },
   {
     id: 'cellular-automaton',
     name: 'Cellular Automaton',
     component: {} as any,
-    technology: 'CANVAS_2D'
+    technology: 'CANVAS_2D',
+    category: 'Simulation'
   },
   {
     id: 'particle-system',
     name: 'Particle System',
     component: {} as any,
-    technology: 'WEBGL_2.0'
+    technology: 'WEBGL_2.0',
+    category: 'Simulation'
   },
   {
     id: 'four-pole-gradient',
     name: 'Four Pole Gradient',
     component: {} as any,
-    technology: 'CANVAS_2D'
+    technology: 'CANVAS_2D',
+    category: 'Geometric'
   },
   {
     id: 'noise-field',
     name: 'Noise Field Generator',
     component: {} as any,
-    technology: 'WEBGL_2.0'
+    technology: 'WEBGL_2.0',
+    category: 'Noise'
   },
   {
     id: 'frequency-spectrum',
     name: 'Frequency Spectrum',
     component: {} as any,
-    technology: 'CANVAS_2D'
+    technology: 'CANVAS_2D',
+    category: 'Data Visualization'
   }
 ]
 
