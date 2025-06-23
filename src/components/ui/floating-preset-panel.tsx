@@ -22,8 +22,6 @@ export function FloatingPresetPanel({
   onClose
 }: FloatingPresetPanelProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false)
-  const [showSaveInput, setShowSaveInput] = useState(false)
-  const [presetName, setPresetName] = useState('')
   
   // Use external onClose if provided, otherwise use internal state
   const isControlledExternally = Boolean(onClose)
@@ -31,11 +29,8 @@ export function FloatingPresetPanel({
   
   const {
     presets,
-    activePresetId,
     isLoading,
     error,
-    savePreset,
-    loadPreset,
     deletePreset,
     clearError,
     exportPreset,
@@ -53,20 +48,6 @@ export function FloatingPresetPanel({
     } else {
       setInternalIsOpen(false)
     }
-  }
-
-  const handleSavePreset = async () => {
-    if (!presetName.trim()) return
-    
-    const success = await savePreset(presetName.trim())
-    if (success) {
-      setPresetName('')
-      setShowSaveInput(false)
-    }
-  }
-
-  const handleLoadPreset = async (presetId: string) => {
-    await loadPreset(presetId)
   }
 
   const handleDeletePreset = async (presetId: string) => {
@@ -157,55 +138,6 @@ export function FloatingPresetPanel({
 
             {/* Content */}
             <div className="p-4 space-y-4">
-              {/* Save Section */}
-              <div className="space-y-2">
-                {!showSaveInput ? (
-                  <Button
-                    onClick={() => setShowSaveInput(true)}
-                    variant="outline"
-                    className="w-full font-mono text-xs"
-                    disabled={isLoading}
-                  >
-                    💾 Save Current as Preset
-                  </Button>
-                ) : (
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      value={presetName}
-                      onChange={(e) => setPresetName(e.target.value)}
-                      placeholder="Preset name..."
-                      className="w-full text-xs font-mono border border-border bg-background px-3 py-2 rounded"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSavePreset()
-                        if (e.key === 'Escape') setShowSaveInput(false)
-                      }}
-                      autoFocus
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSavePreset}
-                        variant="outline"
-                        className="flex-1 text-xs font-mono"
-                        disabled={!presetName.trim() || isLoading}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setShowSaveInput(false)
-                          setPresetName('')
-                        }}
-                        variant="outline"
-                        className="flex-1 text-xs font-mono"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Import Section */}
               <div className="flex gap-2">
                 <Button
@@ -218,11 +150,11 @@ export function FloatingPresetPanel({
                 </Button>
               </div>
 
-              {/* Load Presets Section */}
+              {/* Preset Library Section */}
               {presets.length > 0 && (
                 <div className="space-y-2">
                   <div className="text-xs font-mono text-muted-foreground/80 uppercase">
-                    Load Preset:
+                    Preset Library:
                   </div>
                   <div className="max-h-32 overflow-y-auto space-y-1">
                     {presets.map((preset) => (
@@ -234,15 +166,6 @@ export function FloatingPresetPanel({
                           </div>
                         </div>
                         <div className="flex gap-1 ml-2">
-                          <Button
-                            onClick={() => handleLoadPreset(preset.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
-                            disabled={isLoading || activePresetId === preset.id}
-                          >
-                            {activePresetId === preset.id ? '✓' : 'Load'}
-                          </Button>
                           <Button
                             onClick={() => handleExportPreset(preset.id)}
                             variant="outline"

@@ -2,6 +2,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from "react"
+import { Bookmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
@@ -9,6 +10,7 @@ import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-c
 import { usePresetPlacement } from "@/components/ui/preset-placement-preview"
 import { ToolbarPresetControls } from "@/components/ui/toolbar-preset-controls"
 import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
+import { SavePresetModal } from "@/components/ui/save-preset-modal"
 import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 
 export default function DesktopLayout() {
@@ -23,6 +25,7 @@ export default function DesktopLayout() {
   const [isAnimating, setIsAnimating] = useState(false) // Track animation state
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
   const [isPresetPanelOpen, setIsPresetPanelOpen] = useState(false) // Track preset panel visibility
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false) // Track save preset modal visibility
 
   // How many patterns to show at once (fits in ~20rem container)
   const patternsPerPage = 5
@@ -56,6 +59,9 @@ export default function DesktopLayout() {
     presets,
     activePresetId,
     loadPreset,
+    savePreset,
+    error: presetError,
+    clearError: clearPresetError,
     isLoading: isPresetLoading
   } = usePresetManager({
     patternId: selectedPatternId,
@@ -67,6 +73,11 @@ export default function DesktopLayout() {
     },
     patternControls: selectedPattern.controls
   })
+
+  // AIDEV-NOTE: Quick save handler - opens save modal for user to name preset
+  const handleQuickSave = () => {
+    setIsSaveModalOpen(true)
+  }
 
   // Initialize control values when pattern changes
   useEffect(() => {
@@ -337,14 +348,14 @@ export default function DesktopLayout() {
             <div className="flex items-center space-x-2">
               {/* Preset Selection Dropdown */}
               <select
-                className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs"
+                className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 value={activePresetId || ""}
                 onChange={(e) => {
                   if (e.target.value && e.target.value !== activePresetId) {
                     loadPreset(e.target.value)
                   }
                 }}
-                disabled={isPresetLoading}
+                disabled={isPresetLoading || presets.length === 0}
               >
                 <option value="">SELECT PRESET</option>
                 {presets.map(preset => (
@@ -353,6 +364,16 @@ export default function DesktopLayout() {
                   </option>
                 ))}
               </select>
+              
+              {/* Quick Save Button */}
+              <button
+                onClick={handleQuickSave}
+                disabled={isPresetLoading || !Object.keys(getCurrentControlValues()).length}
+                className="border border-border bg-accent-primary hover:bg-accent-primary-strong px-2 py-[6px] font-mono text-accent-primary-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed hidden md:inline-flex items-center justify-center"
+                title="Quick Save Current Settings"
+              >
+                <Bookmark className="w-3 h-3" />
+              </button>
               
               {/* Preset Manager Button */}
               <button
@@ -488,6 +509,18 @@ export default function DesktopLayout() {
           onClose={() => setIsPresetPanelOpen(false)}
         />
       )}
+
+      {/* Save Preset Modal */}
+      <SavePresetModal
+        isOpen={isSaveModalOpen}
+        onClose={() => {
+          setIsSaveModalOpen(false)
+          clearPresetError()
+        }}
+        onSave={savePreset}
+        isLoading={isPresetLoading}
+        error={presetError}
+      />
       
     </div>
   )
