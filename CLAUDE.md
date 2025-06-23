@@ -324,6 +324,43 @@ const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.frag
 - [ ] Never "fix Storybook" with CSS overrides - fix the underlying architecture
 - [ ] Create stories that demonstrate actual usage patterns from the app
 
+**Storybook Interactivity Best Practices:**
+
+**✅ Make These Interactive (use `render()` with `useState`):**
+- [ ] **Default/Primary stories** - Main use case that people interact with most
+- [ ] **"Interactive" or "Playground" stories** - Dedicated sandbox for testing
+- [ ] **Form/control components** - Controls users naturally expect to work
+- [ ] **Complex state demos** - Multi-step flows, state management examples
+
+**📸 Keep These Static (use `args` object):**
+- [ ] **Visual variations** - Color schemes, sizes, themes, layout demos
+- [ ] **State examples** - Loading, error, empty, disabled states
+- [ ] **Documentation stories** - "Here's what X looks like" examples
+- [ ] **Edge cases** - Error conditions, extreme values, unusual inputs
+
+**Example Pattern:**
+```typescript
+// ✅ INTERACTIVE - Primary use case
+export const Default: Story = {
+  render: () => {
+    const [value, setValue] = useState('initial')
+    return <Component value={value} onChange={setValue} />
+  }
+}
+
+// 📸 STATIC - Visual documentation
+export const Variants: Story = {
+  render: () => (
+    <div className="flex gap-4">
+      <Component variant="default" />
+      <Component variant="outlined" />
+    </div>
+  )
+}
+```
+
+**Target Ratio:** ~35% interactive, 65% static stories for optimal balance of usability and performance.
+
 **Preflight Checks (Before Commits/PRs):**
 
 - [ ] `npm run lint` - ESLint passes
