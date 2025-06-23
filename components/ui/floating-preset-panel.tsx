@@ -2,7 +2,8 @@
 "use client"
 
 import React, { useState } from 'react'
-import { TempPresetControls } from './temp-preset-controls'
+import { Button } from '@/components/ui/button'
+import { usePresetManager } from '@/lib/hooks/use-preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
 
 interface FloatingPresetPanelProps {
@@ -21,10 +22,30 @@ export function FloatingPresetPanel({
   onClose
 }: FloatingPresetPanelProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [showSaveInput, setShowSaveInput] = useState(false)
+  const [presetName, setPresetName] = useState('')
   
   // Use external onClose if provided, otherwise use internal state
   const isControlledExternally = Boolean(onClose)
   const isOpen = isControlledExternally ? true : internalIsOpen
+  
+  const {
+    presets,
+    activePresetId,
+    isLoading,
+    error,
+    savePreset,
+    loadPreset,
+    deletePreset,
+    clearError,
+    exportPreset,
+    importPreset
+  } = usePresetManager({
+    patternId,
+    controlValues,
+    onControlValuesChange,
+    patternControls
+  })
   
   const handleClose = () => {
     if (onClose) {
@@ -32,6 +53,65 @@ export function FloatingPresetPanel({
     } else {
       setInternalIsOpen(false)
     }
+  }
+
+  const handleSavePreset = async () => {
+    if (!presetName.trim()) return
+    
+    const success = await savePreset(presetName.trim())
+    if (success) {
+      setPresetName('')
+      setShowSaveInput(false)
+    }
+  }
+
+  const handleLoadPreset = async (presetId: string) => {
+    await loadPreset(presetId)
+  }
+
+  const handleDeletePreset = async (presetId: string) => {
+    if (window.confirm('Delete this preset?')) {
+      await deletePreset(presetId)
+    }
+  }
+
+  const handleExportPreset = (presetId: string) => {
+    try {
+      const preset = presets.find(p => p.id === presetId)
+      if (!preset) return
+      
+      const jsonData = exportPreset(presetId)
+      const blob = new Blob([jsonData], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `preset_${preset.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Export failed:', error)
+    }
+  }
+
+  const handleImportPreset = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      
+      try {
+        const text = await file.text()
+        await importPreset(text)
+      } catch (error) {
+        console.error('Import failed:', error)
+      }
+    }
+    input.click()
   }
 
   return (
@@ -76,13 +156,137 @@ export function FloatingPresetPanel({
             </div>
 
             {/* Content */}
-            <div className="p-4">
-              <TempPresetControls
-                patternId={patternId}
-                controlValues={controlValues}
-                onControlValuesChange={onControlValuesChange}
-                patternControls={patternControls}
-              />
+            <div className="p-4 space-y-4">
+              {/* Save Section */}
+              <div className="space-y-2">
+                {!showSaveInput ? (
+                  <Button
+                    onClick={() => setShowSaveInput(true)}
+                    variant="outline"
+                    className="w-full font-mono text-xs"
+                    disabled={isLoading}
+                  >
+                    💾 Save Current as Preset
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={presetName}
+                      onChange={(e) => setPresetName(e.target.value)}
+                      placeholder="Preset name..."
+                      className="w-full text-xs font-mono border border-border bg-background px-3 py-2 rounded"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSavePreset()
+                        if (e.key === 'Escape') setShowSaveInput(false)
+                      }}
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleSavePreset}
+                        variant="outline"
+                        className="flex-1 text-xs font-mono"
+                        disabled={!presetName.trim() || isLoading}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowSaveInput(false)
+                          setPresetName('')
+                        }}
+                        variant="outline"
+                        className="flex-1 text-xs font-mono"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Import Section */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleImportPreset}
+                  variant="outline"
+                  className="flex-1 font-mono text-xs"
+                  disabled={isLoading}
+                >
+                  Import Preset JSON
+                </Button>
+              </div>
+
+              {/* Load Presets Section */}
+              {presets.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-mono text-muted-foreground/80 uppercase">
+                    Load Preset:
+                  </div>
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {presets.map((preset) => (
+                      <div key={preset.id} className="flex items-center justify-between p-2 border border-accent-primary bg-accent-primary/10 hover:bg-muted/50">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-mono truncate">{preset.name}</div>
+                          <div className="text-xs text-muted-foreground/60">
+                            {new Date(preset.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            onClick={() => handleLoadPreset(preset.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
+                            disabled={isLoading || activePresetId === preset.id}
+                          >
+                            {activePresetId === preset.id ? '✓' : 'Load'}
+                          </Button>
+                          <Button
+                            onClick={() => handleExportPreset(preset.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
+                            disabled={isLoading}
+                          >
+                            Export
+                          </Button>
+                          <Button
+                            onClick={() => handleDeletePreset(preset.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs font-mono border-border hover:border-red-500 px-2 py-1"
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error Display */}
+              {error && (
+                <div className="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 border border-red-200 dark:border-red-800 rounded">
+                  {error}
+                  <button 
+                    onClick={clearError}
+                    className="ml-2 underline hover:no-underline"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Loading indicator */}
+              {isLoading && (
+                <div className="text-xs text-muted-foreground animate-pulse text-center">
+                  Working...
+                </div>
+              )}
             </div>
 
             {/* Footer */}
