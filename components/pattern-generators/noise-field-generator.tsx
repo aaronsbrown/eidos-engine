@@ -122,7 +122,7 @@ export default function NoiseFieldGenerator({ width, height, className = "", con
 
   return (
     <div
-      className={`overflow-hidden relative border border-gray-300 ${className}`}
+      className={`overflow-hidden relative border border-border ${className}`}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
       <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: "pixelated" }} />
