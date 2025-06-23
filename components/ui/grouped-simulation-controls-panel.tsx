@@ -9,6 +9,7 @@ import CollapsibleControlGroup from './collapsible-control-group'
 import ViewportConstrainedPanel from './viewport-constrained-panel'
 import CompactColorPicker from './compact-color-picker'
 import CustomSelect from './custom-select'
+import { TempPresetControls } from './temp-preset-controls'
 import { useMobileDetection } from '@/components/hooks/useMobileDetection'
 import type { PatternControl } from '@/components/pattern-generators/types'
 
@@ -83,13 +84,27 @@ export default function GroupedSimulationControlsPanel({
   if (!controlGroups) {
     return (
       <ViewportConstrainedPanel paddingBuffer={paddingBuffer}>
-        <div className={`grid gap-4 ${
-          isMobile ? 'grid-cols-1' : 
-          sidebarWidth > 500 ? 'grid-cols-3' : 
-          sidebarWidth > 400 ? 'grid-cols-2' : 
-          'grid-cols-1'
-        }`}>
-          {controls.map(control => renderControl(control, controlValues, onControlChange))}
+        <div className="space-y-4">
+          {/* AIDEV-NOTE: Preset controls at top for all patterns */}
+          <TempPresetControls
+            patternId={patternId}
+            controlValues={controlValues}
+            onControlValuesChange={(newValues) => {
+              Object.entries(newValues).forEach(([controlId, value]) => {
+                onControlChange(controlId, value)
+              })
+            }}
+            patternControls={controls}
+          />
+          
+          <div className={`grid gap-4 ${
+            isMobile ? 'grid-cols-1' : 
+            sidebarWidth > 500 ? 'grid-cols-3' : 
+            sidebarWidth > 400 ? 'grid-cols-2' : 
+            'grid-cols-1'
+          }`}>
+            {controls.map(control => renderControl(control, controlValues, onControlChange))}
+          </div>
         </div>
       </ViewportConstrainedPanel>
     )
@@ -105,6 +120,18 @@ export default function GroupedSimulationControlsPanel({
   return (
     <ViewportConstrainedPanel paddingBuffer={paddingBuffer}>
       <div className="space-y-4">
+        {/* AIDEV-NOTE: Preset controls at top for all patterns */}
+        <TempPresetControls
+          patternId={patternId}
+          controlValues={controlValues}
+          onControlValuesChange={(newValues) => {
+            Object.entries(newValues).forEach(([controlId, value]) => {
+              onControlChange(controlId, value)
+            })
+          }}
+          patternControls={controls}
+        />
+        
         {controlGroups.map((group) => {
           // Special handling for four-pole gradient color picker layout
           if (patternId === 'four-pole-gradient' && group.title === 'Pole Colors') {
