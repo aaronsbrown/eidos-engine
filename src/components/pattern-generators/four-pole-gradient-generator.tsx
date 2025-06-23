@@ -510,13 +510,14 @@ export default function FourPoleGradientGenerator({
         ctx.fillStyle = `rgb(${pole.color.r}, ${pole.color.g}, ${pole.color.b})`
         ctx.fill()
         
-        // Border with project's yellow accent
-        ctx.strokeStyle = isDragged || isHovered ? "#FACC15" : "#FFFFFF"
+        // Border with project's yellow accent - adapt to theme
+        const isDarkMode = document.documentElement.classList.contains('dark')
+        ctx.strokeStyle = isDragged || isHovered ? '#FACC15' : (isDarkMode ? '#FFFFFF' : '#000000')
         ctx.lineWidth = isDragged ? 3 : 2
         ctx.stroke()
         
-        // Pole number label (technical aesthetic)
-        ctx.fillStyle = "#FFFFFF"
+        // Pole number label (technical aesthetic) - adapt to theme
+        ctx.fillStyle = isDarkMode ? '#FFFFFF' : '#000000'
         ctx.font = "10px monospace"
         ctx.textAlign = "center"
         ctx.fillText(`${index + 1}`, pole.x, pole.y + 3)
@@ -543,13 +544,13 @@ export default function FourPoleGradientGenerator({
         />
         
         {/* Pattern type indicator with animation status */}
-        <div className="absolute top-2 left-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
+        <div className="absolute top-2 left-2 text-accent-primary text-xs font-mono uppercase pointer-events-none">
           4-POLE GRADIENT / CANVAS_2D {controls.animationEnabled && '/ ANIMATED'} {controls.noiseEnabled && '/ NOISE_OVERLAY'} {!controls.showPoles && '/ HIDDEN_POLES'}
         </div>
         
         {/* Animation status indicator */}
         {controls.animationEnabled && (
-          <div className="absolute top-2 right-2 text-yellow-400 text-xs font-mono uppercase pointer-events-none">
+          <div className="absolute top-2 right-2 text-accent-primary text-xs font-mono uppercase pointer-events-none">
             {controls.animationPattern.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}
           </div>
         )}

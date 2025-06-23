@@ -735,7 +735,7 @@ function CellularAutomatonNavigationGroup({
                     }}
                     variant="outline"
                     size="sm"
-                    className="font-mono text-xs border-border hover:border-accent-primary hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle"
+                    className="font-mono text-xs"
                   >
                     {prevButton.label}
                   </Button>
@@ -751,7 +751,7 @@ function CellularAutomatonNavigationGroup({
                     }}
                     variant="outline"
                     size="sm"
-                    className="font-mono text-xs border-border hover:border-accent-primary hover:bg-accent-primary-subtle dark:hover:bg-accent-primary-subtle"
+                    className="font-mono text-xs"
                   >
                     {nextButton.label}
                   </Button>

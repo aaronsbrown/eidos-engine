@@ -145,7 +145,7 @@ export default function BarcodeGenerator({ width, height, className = "", contro
 
   return (
     <div
-      className={`overflow-hidden relative border border-gray-300 ${className}`}
+      className={`overflow-hidden relative border border-border ${className}`}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
       <canvas ref={canvasRef} className="w-full h-full" />
@@ -153,7 +153,7 @@ export default function BarcodeGenerator({ width, height, className = "", contro
       {/* Dynamic scanning line effect */}
       {controls.showScanner && (
         <div
-          className="absolute top-0 w-1 h-full bg-red-500 transition-opacity duration-200"
+          className="absolute top-0 w-1 h-full bg-destructive transition-opacity duration-200"
           style={{
             left: `${scannerPosition}px`,
             opacity: controls.scannerOpacity,

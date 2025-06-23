@@ -54,6 +54,9 @@
   --color-disabled-border: var(--disabled-border);
   --color-disabled-background: var(--disabled-background);
   
+  /* Missing shadow utilities */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  
   /* AIDEV-NOTE: Mobile typography scale for enhanced accessibility and readability */
   --mobile-text-header: 18px;
   --mobile-text-pattern: 16px;

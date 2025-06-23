@@ -13,7 +13,7 @@ describe('Button Component', () => {
     it('renders with default variant and size classes', () => {
       render(<Button>Default Button</Button>)
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('bg-primary', 'text-primary-foreground', 'h-9', 'px-4')
+      expect(button).toHaveClass('bg-accent-primary', 'text-accent-primary-foreground', 'h-9', 'px-4')
     })
 
     it('applies custom className', () => {
@@ -86,13 +86,13 @@ describe('Button Component', () => {
     it('applies ghost variant classes', () => {
       render(<Button variant="ghost">Ghost</Button>)
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('hover:bg-accent', 'hover:text-accent-foreground')
+      expect(button).toHaveClass('hover:bg-accent-primary-subtle', 'hover:text-foreground')
     })
 
     it('applies link variant classes', () => {
       render(<Button variant="link">Link</Button>)
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('text-primary', 'underline-offset-4', 'hover:underline')
+      expect(button).toHaveClass('text-accent-primary', 'underline-offset-4', 'hover:underline')
     })
   })
 

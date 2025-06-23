@@ -183,9 +183,9 @@ export default function DesktopLayout() {
       <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="w-3 h-3 bg-accent-primary border border-gray-400"></div>
+            <div className="w-3 h-3 bg-accent-primary border border-border"></div>
             <h1 className="text-xl font-mono tracking-wider uppercase">Pattern Generator System</h1>
-            <div className="text-xs font-mono text-gray-500 bg-white border border-form px-2 py-1">
+            <div className="text-xs font-mono text-muted-foreground bg-background border border-border px-2 py-1">
               v1.0.0
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function DesktopLayout() {
               onClick={toggleFullscreen}
               variant="outline"
               size="sm"
-              className="font-mono text-xs border-gray-400 hover:border-accent-primary hover:bg-accent-primary-subtle"
+              className="font-mono text-xs"
             >
               {isFullscreen ? "EXIT_FULLSCREEN" : "FULLSCREEN"}
             </Button>

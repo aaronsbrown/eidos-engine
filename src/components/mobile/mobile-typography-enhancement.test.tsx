@@ -184,7 +184,7 @@ describe('Mobile Typography Enhancement', () => {
         <div>
           {/* Mock the advanced controls toggle structure directly */}
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-yellow-400"></div>
+            <div className="w-2 h-2 bg-accent-primary"></div>
             <span className="mobile-typography-label md:text-xs text-muted-foreground">
               Advanced Controls
             </span>
