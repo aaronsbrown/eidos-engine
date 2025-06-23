@@ -7,14 +7,11 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
 import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
-import { usePresetPlacement } from "@/components/ui/preset-placement-preview"
-import { ToolbarPresetControls } from "@/components/ui/toolbar-preset-controls"
 import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
 import { SavePresetModal } from "@/components/ui/save-preset-modal"
 import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 
 export default function DesktopLayout() {
-  const { placement } = usePresetPlacement()
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
   const [dimensions, setDimensions] = useState({ width: 700, height: 394 })
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -208,20 +205,6 @@ export default function DesktopLayout() {
           </div>
         </div>
       </header>
-
-      {/* AIDEV-NOTE: Toolbar preset controls - Option 1 preview */}
-      {placement === 'toolbar' && (
-        <ToolbarPresetControls
-          patternId={selectedPattern.id}
-          controlValues={getCurrentControlValues()}
-          onControlValuesChange={(newValues) => {
-            Object.entries(newValues).forEach(([controlId, value]) => {
-              handleControlChange(controlId, value)
-            })
-          }}
-          patternControls={selectedPattern.controls}
-        />
-      )}
 
       <div className="flex relative">
         {/* Left Sidebar - Pattern Selection & Specifications */}

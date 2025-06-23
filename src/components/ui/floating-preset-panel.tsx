@@ -2,6 +2,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { Edit2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePresetManager } from '@/lib/hooks/use-preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
@@ -22,6 +23,8 @@ export function FloatingPresetPanel({
   onClose
 }: FloatingPresetPanelProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [renamingPresetId, setRenamingPresetId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
   
   // Use external onClose if provided, otherwise use internal state
   const isControlledExternally = Boolean(onClose)
@@ -32,6 +35,7 @@ export function FloatingPresetPanel({
     isLoading,
     error,
     deletePreset,
+    renamePreset,
     clearError,
     exportPreset,
     importPreset
@@ -54,6 +58,26 @@ export function FloatingPresetPanel({
     if (window.confirm('Delete this preset?')) {
       await deletePreset(presetId)
     }
+  }
+
+  const handleStartRename = (presetId: string, currentName: string) => {
+    setRenamingPresetId(presetId)
+    setRenameValue(currentName)
+  }
+
+  const handleConfirmRename = async () => {
+    if (!renamingPresetId || !renameValue.trim()) return
+    
+    const success = await renamePreset(renamingPresetId, renameValue.trim())
+    if (success) {
+      setRenamingPresetId(null)
+      setRenameValue('')
+    }
+  }
+
+  const handleCancelRename = () => {
+    setRenamingPresetId(null)
+    setRenameValue('')
   }
 
   const handleExportPreset = (presetId: string) => {
@@ -112,7 +136,10 @@ export function FloatingPresetPanel({
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={(e) => {
+          onMouseDown={(e) => {
+            // Don't close modal when in rename mode
+            if (renamingPresetId) return
+            
             if (e.target === e.currentTarget) {
               handleClose()
             }
@@ -121,11 +148,13 @@ export function FloatingPresetPanel({
           <div 
             className="bg-background border border-border rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">
-                Preset Management
+                Preset Manager
               </h2>
               <button
                 onClick={handleClose}
@@ -160,30 +189,85 @@ export function FloatingPresetPanel({
                     {presets.map((preset) => (
                       <div key={preset.id} className="flex items-center justify-between p-2 border border-accent-primary bg-accent-primary/10 hover:bg-muted/50">
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs font-mono truncate">{preset.name}</div>
-                          <div className="text-xs text-muted-foreground/60">
-                            {new Date(preset.createdAt).toLocaleDateString()}
-                          </div>
+                          {renamingPresetId === preset.id ? (
+                            <div className="space-y-1">
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                className="w-full text-xs font-mono border border-border bg-background px-2 py-1 rounded"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleConfirmRename()
+                                  if (e.key === 'Escape') handleCancelRename()
+                                }}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onMouseUp={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                                autoFocus
+                              />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="text-xs font-mono truncate">{preset.name}</div>
+                              <div className="text-xs text-muted-foreground/60">
+                                {new Date(preset.createdAt).toLocaleDateString()}
+                              </div>
+                            </>
+                          )}
                         </div>
                         <div className="flex gap-1 ml-2">
-                          <Button
-                            onClick={() => handleExportPreset(preset.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
-                            disabled={isLoading}
-                          >
-                            Export
-                          </Button>
-                          <Button
-                            onClick={() => handleDeletePreset(preset.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs font-mono border-border hover:border-red-500 px-2 py-1"
-                            disabled={isLoading}
-                          >
-                            Delete
-                          </Button>
+                          {renamingPresetId === preset.id ? (
+                            <>
+                              <Button
+                                onClick={handleConfirmRename}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs font-mono border-border hover:border-green-500 px-2 py-1"
+                                disabled={!renameValue.trim() || isLoading}
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                onClick={handleCancelRename}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs font-mono border-border hover:border-red-500 px-2 py-1"
+                                disabled={isLoading}
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                onClick={() => handleStartRename(preset.id, preset.name)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
+                                disabled={isLoading}
+                              >
+                                <Edit2 className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                onClick={() => handleExportPreset(preset.id)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs font-mono border-border hover:border-accent-primary px-2 py-1"
+                                disabled={isLoading}
+                              >
+                                Export
+                              </Button>
+                              <Button
+                                onClick={() => handleDeletePreset(preset.id)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs font-mono border-border hover:border-red-500 px-2 py-1"
+                                disabled={isLoading}
+                              >
+                                Delete
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}

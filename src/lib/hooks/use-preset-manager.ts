@@ -73,6 +73,29 @@ export function usePresetManager({
     refreshPresets()
   }, [refreshPresets])
 
+  // AIDEV-NOTE: Listen for localStorage changes to sync preset updates between components
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'pattern-presets' && event.newValue !== event.oldValue) {
+        refreshPresets()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Also listen for custom events for same-window updates
+    const handleCustomEvent = () => {
+      refreshPresets()
+    }
+    
+    window.addEventListener('preset-updated', handleCustomEvent)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('preset-updated', handleCustomEvent)
+    }
+  }, [refreshPresets])
+
   // AIDEV-NOTE: Save current pattern parameters as new preset
   const savePreset = useCallback(async (name: string, description?: string): Promise<boolean> => {
     if (!name.trim()) {
@@ -92,6 +115,10 @@ export function usePresetManager({
         setPresets(prev => [...prev, preset])
         setActivePresetId(preset.id)
         PresetManager.setLastActivePreset(preset.id)
+        
+        // Notify other components about the preset update
+        window.dispatchEvent(new CustomEvent('preset-updated'))
+        
         return true
       } else {
         setError('Failed to save preset')
@@ -169,6 +196,9 @@ export function usePresetManager({
           setActivePresetId(null)
         }
         
+        // Notify other components about the preset update
+        window.dispatchEvent(new CustomEvent('preset-updated'))
+        
         return true
       } else {
         setError('Failed to delete preset')
@@ -200,6 +230,10 @@ export function usePresetManager({
         setPresets(prev => prev.map(p => 
           p.id === presetId ? { ...p, name: newName.trim() } : p
         ))
+        
+        // Notify other components about the preset update
+        window.dispatchEvent(new CustomEvent('preset-updated'))
+        
         return true
       } else {
         setError('Failed to rename preset')
