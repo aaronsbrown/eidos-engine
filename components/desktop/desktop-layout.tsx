@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
 import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
+import { usePresetPlacement } from "@/components/ui/preset-placement-preview"
+import { ToolbarPresetControls } from "@/components/ui/toolbar-preset-controls"
+import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
 
 export default function DesktopLayout() {
+  const { placement } = usePresetPlacement()
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
   const [dimensions, setDimensions] = useState({ width: 700, height: 394 })
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -17,6 +21,7 @@ export default function DesktopLayout() {
   const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
   const [isAnimating, setIsAnimating] = useState(false) // Track animation state
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
+  const [isPresetPanelOpen, setIsPresetPanelOpen] = useState(false) // Track preset panel visibility
 
   // How many patterns to show at once (fits in ~20rem container)
   const patternsPerPage = 5
@@ -175,6 +180,20 @@ export default function DesktopLayout() {
         </div>
       </header>
 
+      {/* AIDEV-NOTE: Toolbar preset controls - Option 1 preview */}
+      {placement === 'toolbar' && (
+        <ToolbarPresetControls
+          patternId={selectedPattern.id}
+          controlValues={getCurrentControlValues()}
+          onControlValuesChange={(newValues) => {
+            Object.entries(newValues).forEach(([controlId, value]) => {
+              handleControlChange(controlId, value)
+            })
+          }}
+          patternControls={selectedPattern.controls}
+        />
+      )}
+
       <div className="flex relative">
         {/* Left Sidebar - Pattern Selection & Specifications */}
         <aside className="w-64 border-r border-border bg-background/50 backdrop-blur-sm flex flex-col">
@@ -297,7 +316,24 @@ export default function DesktopLayout() {
             <div className="border border-border bg-background px-2 py-1">VIEWPORT_01</div>
           </div>
           <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
-            <div className="border border-border bg-background px-2 py-1">REAL_TIME</div>
+            <div className="flex items-center space-x-2">
+              {/* Preset Selection Dropdown */}
+              <select
+                className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs"
+                defaultValue=""
+              >
+                <option value="">SELECT PRESET</option>
+                <option value="fool_yo">fool yo</option>
+              </select>
+              
+              {/* Preset Manager Button */}
+              <button
+                onClick={() => setIsPresetPanelOpen(true)}
+                className="border border-border bg-accent-primary hover:bg-accent-primary-strong px-2 py-1 font-mono text-accent-primary-foreground transition-colors"
+              >
+                PRESET MANAGER
+              </button>
+            </div>
           </div>
 
           {/* Bottom technical annotations - positioned exactly like top ones */}
@@ -409,6 +445,22 @@ export default function DesktopLayout() {
         </aside>
 
       </div>
+
+      {/* AIDEV-NOTE: Floating preset panel - Option 3 implementation */}
+      {isPresetPanelOpen && (
+        <FloatingPresetPanel
+          patternId={selectedPattern.id}
+          controlValues={getCurrentControlValues()}
+          onControlValuesChange={(newValues) => {
+            Object.entries(newValues).forEach(([controlId, value]) => {
+              handleControlChange(controlId, value)
+            })
+          }}
+          patternControls={selectedPattern.controls}
+          onClose={() => setIsPresetPanelOpen(false)}
+        />
+      )}
+      
     </div>
   )
 }
