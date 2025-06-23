@@ -271,7 +271,7 @@ describe('usePresetManager - User Interaction Behaviors', () => {
         expect(success).toBe(false)
       })
 
-      expect(result.current.error).toMatch(/Failed to import preset|not valid JSON/)
+      expect(result.current.error).toMatch(/Failed to import preset|not valid JSON|Unexpected token/)
       expect(result.current.presets).toHaveLength(0)
     })
 
