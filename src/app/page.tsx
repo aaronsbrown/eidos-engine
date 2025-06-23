@@ -9,11 +9,14 @@ export default function PatternGeneratorShowcase() {
   // AIDEV-NOTE: Mobile responsive layout integration - Issue #1
   const { isMobile, isTablet } = useMobileDetection()
   
-  // If mobile or tablet, use new responsive layout
-  if (isMobile || isTablet) {
-    return <MobileLayoutWrapper />
-  }
-  
-  // Otherwise use desktop layout
-  return <DesktopLayout />
+  return (
+    <>
+      {/* If mobile or tablet, use new responsive layout */}
+      {(isMobile || isTablet) ? (
+        <MobileLayoutWrapper />
+      ) : (
+        <DesktopLayout />
+      )}
+    </>
+  )
 }

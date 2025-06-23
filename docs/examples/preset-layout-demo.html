@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preset Layout Options - Quick Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: monospace; background: #f5f5f5; }
+        
+        .demo-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+        .option { margin-bottom: 40px; border: 2px solid #333; background: white; }
+        .option-title { background: #333; color: white; padding: 10px; font-weight: bold; }
+        
+        /* Mock UI elements */
+        .header { background: #e0e0e0; padding: 10px; border-bottom: 1px solid #ccc; }
+        .sidebar { background: #f8f8f8; width: 300px; padding: 15px; border-right: 1px solid #ccc; }
+        .canvas { background: #fff; border: 2px solid #ddd; flex: 1; height: 300px; display: flex; align-items: center; justify-content: center; color: #666; }
+        .controls { background: #f0f0f0; padding: 10px; }
+        
+        /* Preset controls styling */
+        .preset-controls { background: #fffacd; border: 2px solid #ffd700; padding: 8px; margin: 5px 0; }
+        .preset-toolbar { background: #e6f3ff; border: 1px solid #0066cc; padding: 8px; display: flex; gap: 10px; align-items: center; }
+        .preset-floating { position: absolute; top: 20px; right: 20px; background: #ff6b6b; color: white; padding: 15px; border-radius: 50%; cursor: pointer; font-size: 20px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 100; font-weight: bold; }
+        
+        /* Layout helpers */
+        .flex { display: flex; }
+        .column { flex-direction: column; }
+        .layout { min-height: 400px; }
+        
+        .btn { background: #007bff; color: white; border: none; padding: 5px 10px; margin: 2px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Preset Controls - 3 Placement Options</h1>
+        <p>Quick visual comparison of preset control placement options:</p>
+        
+        <!-- CURRENT OPTION -->
+        <div class="option">
+            <div class="option-title">CURRENT: In Sidebar (Top of Controls)</div>
+            <div class="layout flex">
+                <div class="sidebar">
+                    <div style="padding: 5px 0; font-size: 12px; color: #666;">PATTERN CONTROLS</div>
+                    
+                    <div class="preset-controls">
+                        <strong>📋 PRESETS (3 saved)</strong><br>
+                        <button class="btn">💾 Save</button>
+                        <button class="btn">📁 Load</button>
+                        <button class="btn">⬇ Import</button>
+                        <button class="btn">⬆ Export</button>
+                    </div>
+                    
+                    <div class="controls">
+                        <div style="margin: 8px 0;">▼ Animation Settings</div>
+                        <div style="margin: 8px 0;">▼ Visual Properties</div>
+                        <div style="margin: 8px 0;">▼ Appearance</div>
+                    </div>
+                </div>
+                <div class="canvas">
+                    Pattern Visualization Canvas<br>
+                    <small>(Current approach - presets compete with pattern controls)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPTION 1: TOOLBAR -->
+        <div class="option">
+            <div class="option-title">OPTION 1: Toolbar Above Canvas</div>
+            <div class="layout flex column">
+                <div class="header">Pattern Generator System</div>
+                
+                <div class="preset-toolbar">
+                    <strong>Presets:</strong>
+                    <button class="btn">💾 Save</button>
+                    <button class="btn">📁 Load (3)</button>
+                    <button class="btn">⬇ Import</button>
+                    <button class="btn">⬆ Export</button>
+                    <span style="margin-left: auto; font-size: 11px; color: #666;">Always visible • Quick access</span>
+                </div>
+                
+                <div class="flex">
+                    <div class="sidebar">
+                        <div style="padding: 5px 0; font-size: 12px; color: #666;">PATTERN CONTROLS</div>
+                        <div class="controls">
+                            <div style="margin: 8px 0;">▼ Animation Settings</div>
+                            <div style="margin: 8px 0;">▼ Visual Properties</div>
+                            <div style="margin: 8px 0;">▼ Appearance</div>
+                        </div>
+                    </div>
+                    <div class="canvas">
+                        Pattern Visualization Canvas<br>
+                        <small>(Toolbar approach - dedicated space, no sidebar competition)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPTION 2: FLOATING -->
+        <div class="option">
+            <div class="option-title">OPTION 2: Floating Panel (Integrated Button)</div>
+            <div class="layout flex column" style="position: relative;">
+                <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Pattern Generator System</span>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="font-size: 10px; color: #666; border: 1px solid #ccc; padding: 3px 6px;">VIEWPORT_01</div>
+                        <button onclick="alert('Opens preset panel overlay')" style="font-size: 10px; color: black; background: #FACC15; border: 1px solid #E5B614; padding: 3px 8px; cursor: pointer; font-family: monospace; font-weight: bold;">PRESETS</button>
+                    </div>
+                </div>
+                <div class="flex">
+                    <div class="sidebar">
+                        <div style="padding: 5px 0; font-size: 12px; color: #666;">PATTERN CONTROLS</div>
+                        <div class="controls">
+                            <div style="margin: 8px 0;">▼ Animation Settings</div>
+                            <div style="margin: 8px 0;">▼ Visual Properties</div>
+                            <div style="margin: 8px 0;">▼ Appearance</div>
+                            <div style="margin: 8px 0;">▼ More Controls...</div>
+                        </div>
+                    </div>
+                    <div class="canvas">
+                        Pattern Visualization Canvas<br>
+                        <small>(Integrated floating - replaces decorative "REAL_TIME" with functional preset button)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-left: 4px solid #0066cc;">
+            <h3>Quick Comparison:</h3>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.6;">
+                <li><strong>Current:</strong> Presets compete with pattern controls for sidebar space</li>
+                <li><strong>Toolbar:</strong> Always visible, dedicated space, horizontal layout</li>
+                <li><strong>Floating:</strong> On-demand access, maximum space for pattern controls</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

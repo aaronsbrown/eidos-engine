@@ -1,8 +1,8 @@
 import type { Preview } from '@storybook/nextjs'
 import React from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
-import '../app/globals.css'
-import { ThemeProvider } from '../lib/theme-context'
+import '../src/app/globals.css'
+import { ThemeProvider } from '../src/lib/theme-context'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -83,13 +83,16 @@ export default function GroupedSimulationControlsPanel({
   if (!controlGroups) {
     return (
       <ViewportConstrainedPanel paddingBuffer={paddingBuffer}>
-        <div className={`grid gap-4 ${
-          isMobile ? 'grid-cols-1' : 
-          sidebarWidth > 500 ? 'grid-cols-3' : 
-          sidebarWidth > 400 ? 'grid-cols-2' : 
-          'grid-cols-1'
-        }`}>
-          {controls.map(control => renderControl(control, controlValues, onControlChange))}
+        <div className="space-y-4">
+          
+          <div className={`grid gap-4 ${
+            isMobile ? 'grid-cols-1' : 
+            sidebarWidth > 500 ? 'grid-cols-3' : 
+            sidebarWidth > 400 ? 'grid-cols-2' : 
+            'grid-cols-1'
+          }`}>
+            {controls.map(control => renderControl(control, controlValues, onControlChange))}
+          </div>
         </div>
       </ViewportConstrainedPanel>
     )
@@ -105,6 +108,7 @@ export default function GroupedSimulationControlsPanel({
   return (
     <ViewportConstrainedPanel paddingBuffer={paddingBuffer}>
       <div className="space-y-4">
+        
         {controlGroups.map((group) => {
           // Special handling for four-pole gradient color picker layout
           if (patternId === 'four-pole-gradient' && group.title === 'Pole Colors') {
