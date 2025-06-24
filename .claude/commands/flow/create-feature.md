@@ -30,8 +30,6 @@ Follow these steps precisely:
 1. **Repository Analysis**
    - Examine the provided `repo_url`.
    - Look for:
-     - `CONTRIBUTING.md`
-     - `.github/ISSUE_TEMPLATE/*`
      - Project board labels/milestones.
    - Capture relevant conventions (e.g., issue formatting, accepted labels, required metadata).
 
