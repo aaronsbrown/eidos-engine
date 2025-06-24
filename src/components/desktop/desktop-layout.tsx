@@ -96,6 +96,23 @@ export default function DesktopLayout() {
     }))
   }
 
+  // AIDEV-NOTE: Calculate cumulative height accounting for category dividers - fix for issue #49
+  const calculateTransformOffset = (startIndex: number) => {
+    let totalHeight = 0
+    for (let i = 0; i < startIndex; i++) {
+      const pattern = patternGenerators[i]
+      const prevPattern = i > 0 ? patternGenerators[i - 1] : null
+      
+      // Add category divider height if needed
+      if (i === 0 || (prevPattern && prevPattern.category !== pattern.category)) {
+        totalHeight += 28 // Category divider height (my-2 = 8px*2 + text height + borders)
+      }
+      
+      totalHeight += 69 // Pattern button height (p-3 padding + content + border + space-y-1)
+    }
+    return totalHeight
+  }
+
   // AIDEV-NOTE: Enhanced navigation with category-aware smart paging
   const handlePreviousPattern = () => {
     const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
@@ -237,22 +254,23 @@ export default function DesktopLayout() {
           {/* Pattern List - Animated Pagination */}
           <div
             className="px-6 overflow-hidden"
-            style={{ height: `${patternsPerPage * 70 + 20}px` }}
+            style={{ height: `${patternsPerPage * 70 + 40}px` }} // AIDEV-NOTE: Adjusted height to fit patterns with category dividers properly
           >
             {/* AIDEV-NOTE: Fixed height container to show exactly 5 patterns + padding */}
             <div
               className="space-y-1 pt-1 pb-4 transition-transform duration-300 ease-in-out"
               style={{
-                transform: `translateY(${-visiblePatternStart * 60}px)` //
+                transform: `translateY(${-calculateTransformOffset(visiblePatternStart)}px)` // AIDEV-NOTE: Fixed to account for category dividers
               }}
             >
               {patternGenerators.map((pattern, index) => {
                 const isVisible = index >= visiblePatternStart && index < visiblePatternStart + patternsPerPage
                 const prevPattern = index > 0 ? patternGenerators[index - 1] : null
-                // Show divider if: first visible pattern OR category changes from previous visible pattern
+                
+                // AIDEV-NOTE: Show category divider when category changes from previous pattern
                 const showCategoryDivider = isVisible && (
                   index === visiblePatternStart || // First visible pattern
-                  (prevPattern && prevPattern.category !== pattern.category) // Category change
+                  (prevPattern && prevPattern.category !== pattern.category) // Category boundary
                 )
                 
                 return (
