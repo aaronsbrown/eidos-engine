@@ -146,7 +146,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     return (
       <div data-testid="tablet-layout" className={`${responsiveClasses.container} ${className}`}>
         <MobileHeader
-          title="PATTERN GENERATOR SYSTEM"
+          title="EIDOS ENGINE"
           patternCount={{
             current: patternGenerators.findIndex(p => p.id === selectedPatternId) + 1,
             total: patternGenerators.length
@@ -199,7 +199,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     <div data-testid="mobile-layout" className={`${responsiveClasses.container} ${className}`}>
       {/* Mobile Header */}
       <MobileHeader
-        title="PATTERN GENERATOR SYSTEM"
+        title="EIDOS ENGINE"
         patternCount={{
           current: patternGenerators.findIndex(p => p.id === selectedPatternId) + 1,
           total: patternGenerators.length

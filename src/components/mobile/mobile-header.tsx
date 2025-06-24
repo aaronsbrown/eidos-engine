@@ -33,7 +33,7 @@ const MobileHeader = memo(function MobileHeader({
       {/* Left side - Title */}
       <div className="flex-1 flex items-center justify-start px-2">
         <h1 className="font-mono text-sm md:text-base uppercase tracking-wider text-foreground truncate">
-          {title || 'PATTERN GENERATOR'}
+          {title || 'EIDOS ENGINE'}
         </h1>
       </div>
 

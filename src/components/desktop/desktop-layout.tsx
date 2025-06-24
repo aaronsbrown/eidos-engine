@@ -184,7 +184,7 @@ export default function DesktopLayout() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <div className="w-3 h-3 bg-accent-primary border border-border"></div>
-            <h1 className="text-xl font-mono tracking-wider uppercase">Pattern Generator System</h1>
+            <h1 className="text-xl font-mono tracking-wider uppercase">Eidos Engine</h1>
             <div className="text-xs font-mono text-muted-foreground bg-background border border-border px-2 py-1">
               v1.0.0
             </div>
@@ -393,7 +393,7 @@ export default function DesktopLayout() {
 
           {/* Bottom technical annotations - positioned exactly like top ones */}
           <div className="absolute bottom-4 left-4 text-xs font-mono text-muted-foreground">
-            <div className="border border-border bg-background px-2 py-1">PATTERN_GENERATOR_SYSTEM_v1.0</div>
+            <div className="border border-border bg-background px-2 py-1">EIDOS_ENGINE_v1.0</div>
           </div>
           <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground">
             <div className="border border-border bg-background px-2 py-1">
