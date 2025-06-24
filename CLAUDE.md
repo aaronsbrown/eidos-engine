@@ -155,8 +155,41 @@ interface PatternControl {
 1. Create component in `components/pattern-generators/`
 2. Implement `PatternGeneratorProps` interface
 3. Add to exports in `components/pattern-generators/index.ts`
-4. Follow existing patterns for control panel implementation
-5. For WebGL generators, use external shader loading system
+4. **Assign appropriate category** (see Pattern Categorization below)
+5. Follow existing patterns for control panel implementation
+6. For WebGL generators, use external shader loading system
+
+### 🏷️ Pattern Categorization System
+
+**Categories** (required field in PatternGenerator interface):
+- **`'Noise'`**: Perlin noise, random fields, stochastic patterns (Noise Field, Pixelated Noise, Brownian Motion)
+- **`'Geometric'`**: Mathematical shapes, gradients, geometric patterns (Trigonometric Circle, Four-Pole Gradient)
+- **`'Simulation'`**: Physics-based, cellular automata, particle systems (Particle System, Cellular Automaton) 
+- **`'Data Visualization'`**: Charts, spectrums, data-driven visuals (Frequency Spectrum, Barcode Scanner)
+
+**Desktop UX Features:**
+- **Category Jump Buttons**: 2x2 grid above pattern list for quick navigation
+- **Visual Grouping**: Category dividers appear in 5-pattern window when category changes
+- **Smart Paging**: Previous/Next buttons can skip to category boundaries
+- **Current Category Indicator**: Specifications panel shows pattern's category
+
+**Implementation:**
+```typescript
+// In components/pattern-generators/index.ts
+{
+  id: "new-pattern",
+  name: "New Pattern",
+  component: NewPatternGenerator,
+  technology: 'CANVAS_2D',
+  category: 'Noise', // Required: choose appropriate category
+  controls: [...]
+}
+```
+
+**Category Management Utility:**
+- Use `PatternCategoryManager` from `@/lib/pattern-category-manager`
+- Provides filtering, grouping, and navigation utilities
+- Handles category boundaries for desktop paging navigation
 
 ### 🎨 Shader Loading System
 

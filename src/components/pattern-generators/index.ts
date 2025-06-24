@@ -15,6 +15,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Barcode Scanner",
     component: BarcodeGenerator,
     technology: 'CANVAS_2D',
+    category: 'Data Visualization',
     controls: [
       {
         id: "scrollSpeed",
@@ -78,6 +79,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Frequency Spectrum",
     component: FrequencySpectrumGenerator,
     technology: 'CANVAS_2D',
+    category: 'Data Visualization',
     controls: [
       {
         id: "barWidth",
@@ -141,6 +143,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Noise Field",
     component: NoiseFieldGenerator,
     technology: 'CANVAS_2D',
+    category: 'Noise',
     controls: [
       {
         id: "noiseScale",
@@ -198,6 +201,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Pixelated Noise",
     component: PixelatedNoiseGenerator,
     technology: 'CANVAS_2D',
+    category: 'Noise',
     controls: [
       {
         id: "pixelSize",
@@ -254,6 +258,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Brownian Motion",
     component: BrownianMotionGenerator,
     technology: 'WEBGL_2.0',
+    category: 'Noise',
     controls: [
       {
         id: "particleCount",
@@ -307,6 +312,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Trigonometric Circle",
     component: TrigonometricCircleGenerator,
     technology: 'CANVAS_2D',
+    category: 'Geometric',
     controls: [
       {
         id: "speed",
@@ -324,6 +330,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "Advanced Particle System",
     component: ParticleSystemGenerator,
     technology: 'WEBGL_2.0',
+    category: 'Simulation',
     controls: [
       {
         id: "particleCount",
@@ -458,6 +465,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "1D CELLULAR AUTOMATA",
     component: CellularAutomatonGenerator,
     technology: 'CANVAS_2D',
+    category: 'Simulation',
     controls: [
       {
         id: "rulePrev",
@@ -513,6 +521,7 @@ export const patternGenerators: PatternGenerator[] = [
     name: "4-Pole Gradient",
     component: FourPoleGradientGenerator,
     technology: 'CANVAS_2D',
+    category: 'Geometric',
     controls: [
       {
         id: "pole1Color",

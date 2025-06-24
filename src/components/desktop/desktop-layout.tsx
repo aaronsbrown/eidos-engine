@@ -96,7 +96,7 @@ export default function DesktopLayout() {
     }))
   }
 
-  // Handle pattern navigation (previous/next pattern selection)
+  // AIDEV-NOTE: Enhanced navigation with category-aware smart paging
   const handlePreviousPattern = () => {
     const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
     if (currentIndex > 0) {
@@ -248,24 +248,43 @@ export default function DesktopLayout() {
             >
               {patternGenerators.map((pattern, index) => {
                 const isVisible = index >= visiblePatternStart && index < visiblePatternStart + patternsPerPage
+                const prevPattern = index > 0 ? patternGenerators[index - 1] : null
+                // Show divider if: first visible pattern OR category changes from previous visible pattern
+                const showCategoryDivider = isVisible && (
+                  index === visiblePatternStart || // First visible pattern
+                  (prevPattern && prevPattern.category !== pattern.category) // Category change
+                )
+                
                 return (
-                  <button
-                    key={pattern.id}
-                    onClick={() => setSelectedPatternId(pattern.id)}
-                    className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
-                      ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
-                      : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
-                      }`}
-                    style={{
-                      pointerEvents: isVisible ? 'auto' : 'none'
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="uppercase tracking-wider">{pattern.name}</span>
-                      <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
-                    </div>
-                    <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
-                  </button>
+                  <div key={pattern.id}>
+                    {/* AIDEV-NOTE: Category divider when category changes - accessible colors */}
+                    {showCategoryDivider && (
+                      <div className="flex items-center my-2 px-1">
+                        <div className="flex-1 h-px bg-border"></div>
+                        <div className="px-2 text-xs font-mono text-foreground bg-background border border-border uppercase tracking-wider">
+                          {pattern.category}
+                        </div>
+                        <div className="flex-1 h-px bg-border"></div>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={() => setSelectedPatternId(pattern.id)}
+                      className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
+                        ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
+                        : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
+                        }`}
+                      style={{
+                        pointerEvents: isVisible ? 'auto' : 'none'
+                      }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="uppercase tracking-wider">{pattern.name}</span>
+                        <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                      </div>
+                      <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
+                    </button>
+                  </div>
                 )
               })}
             </div>
@@ -298,6 +317,10 @@ export default function DesktopLayout() {
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">TYPE:</span>
                 <span className="text-foreground uppercase">{selectedPattern.id}</span>
+              </div>
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-muted-foreground">CATEGORY:</span>
+                <span className="text-foreground uppercase">{selectedPattern.category}</span>
               </div>
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-muted-foreground">SIZE:</span>

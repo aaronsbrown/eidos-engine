@@ -19,6 +19,7 @@ jest.mock('@/components/pattern-generators', () => ({
       name: 'Test Pattern 1', 
       component: () => <div data-testid="pattern-1">Pattern 1</div>,
       technology: 'CANVAS_2D',
+      category: 'Geometric',
       controls: [
         { id: 'speed', label: 'Speed', type: 'range', min: 0, max: 10, step: 1, defaultValue: 5 },
         { id: 'color', label: 'Color', type: 'color', defaultValue: '#ff0000' },
@@ -29,6 +30,7 @@ jest.mock('@/components/pattern-generators', () => ({
       name: 'Test Pattern 2',
       component: () => <div data-testid="pattern-2">Pattern 2</div>,
       technology: 'WEBGL_2.0',
+      category: 'Simulation',
       controls: [
         { id: 'particles', label: 'Particles', type: 'range', min: 1, max: 100, step: 1, defaultValue: 50 },
         { id: 'brightness', label: 'Brightness', type: 'range', min: 0, max: 5, step: 0.1, defaultValue: 2.0 },
@@ -131,7 +133,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
-      // User can see available patterns
+      // User can see Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         expect(screen.getByText('Test Pattern 2')).toBeInTheDocument()
       })
@@ -155,6 +157,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
+      // User selects Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })
@@ -175,6 +178,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
+      // User selects Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })

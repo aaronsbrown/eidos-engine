@@ -26,4 +26,5 @@ export interface PatternGenerator {
   component: React.ComponentType<PatternGeneratorProps>
   controls?: PatternControl[]
   technology: 'WEBGL_2.0' | 'CANVAS_2D'
+  category: 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization'
 }
