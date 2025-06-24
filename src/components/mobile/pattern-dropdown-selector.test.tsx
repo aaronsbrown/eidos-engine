@@ -165,6 +165,7 @@ describe('PatternDropdownSelector - User Behavior', () => {
       expect(screen.queryByRole('button', { name: /simulation category/i })).not.toBeInTheDocument()
     })
 
+
     it('shows helpful message when no patterns match search', async () => {
       const user = userEvent.setup()
       render(<PatternDropdownSelector {...defaultProps} searchable={true} />)
