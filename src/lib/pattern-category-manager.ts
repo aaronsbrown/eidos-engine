@@ -29,11 +29,14 @@ export class PatternCategoryManager {
    */
   getCategoryGroups(): CategoryGroup[] {
     const categories = this.getCategories()
-    return categories.map(category => ({
-      category,
-      patterns: this.patterns.filter(p => p.category === category),
-      count: this.patterns.filter(p => p.category === category).length
-    }))
+    return categories.map(category => {
+      const patterns = this.patterns.filter(p => p.category === category)
+      return {
+        category,
+        patterns,
+        count: patterns.length
+      }
+    })
   }
 
   /**

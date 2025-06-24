@@ -112,7 +112,6 @@ export default function DesktopLayout() {
     }
   }
 
-
   const handleNextPattern = () => {
     const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
     if (currentIndex < totalPatterns - 1) {

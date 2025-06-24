@@ -72,20 +72,15 @@ describe('PatternDropdownSelector - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       await user.click(dropdown)
       
-      // User can see patterns in expanded categories and category headers
+      // User can see patterns in all expanded categories by default
       expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument() // Same category as selected
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument() // Different category, also visible
       
-      // Category headers might be uppercase due to CSS, check both cases
+      // Category headers should be visible
       const dataVizHeader = screen.getByText(/data visualization/i)
       const noiseHeader = screen.getByText(/noise/i)
-      expect(dataVizHeader).toBeInTheDocument() // Category header
-      expect(noiseHeader).toBeInTheDocument() // Collapsed category header
-      
-      // User expands the Noise category to see Brownian Motion
-      await user.click(noiseHeader)
-      
-      // Now user can see the pattern in the expanded category
-      expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
+      expect(dataVizHeader).toBeInTheDocument()
+      expect(noiseHeader).toBeInTheDocument()
       
       // User selects a different pattern
       await user.click(screen.getByText('Frequency Spectrum'))
@@ -190,13 +185,9 @@ describe('PatternDropdownSelector - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       await user.click(dropdown)
       
-      // User can see technology for visible patterns (in expanded category)
-      expect(screen.getAllByText('CANVAS_2D')).toHaveLength(2) // Two patterns use CANVAS_2D in expanded category
-      
-      // User expands Noise category to see WEBGL_2.0 pattern
-      const noiseHeader = screen.getByText(/noise/i)
-      await user.click(noiseHeader)
-      expect(screen.getByText('WEBGL_2.0')).toBeInTheDocument()
+      // User can see technology for all visible patterns (all categories expanded by default)
+      expect(screen.getAllByText('CANVAS_2D')).toHaveLength(2) // Two patterns use CANVAS_2D
+      expect(screen.getByText('WEBGL_2.0')).toBeInTheDocument() // Noise category is expanded by default
     })
   })
 

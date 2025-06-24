@@ -133,13 +133,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
-      // User expands Simulation category to see Test Pattern 2
-      await waitFor(() => {
-        const simulationHeader = screen.getByText(/simulation/i)
-        fireEvent.click(simulationHeader)
-      })
-      
-      // User can now see Test Pattern 2
+      // User can see Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         expect(screen.getByText('Test Pattern 2')).toBeInTheDocument()
       })
@@ -163,13 +157,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
-      // User expands Simulation category first
-      await waitFor(() => {
-        const simulationHeader = screen.getByText(/simulation/i)
-        fireEvent.click(simulationHeader)
-      })
-      
-      // User selects Test Pattern 2
+      // User selects Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })
@@ -190,13 +178,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
-      // User expands Simulation category to see Test Pattern 2
-      await waitFor(() => {
-        const simulationHeader = screen.getByText(/simulation/i)
-        fireEvent.click(simulationHeader)
-      })
-      
-      // User selects Test Pattern 2
+      // User selects Test Pattern 2 (all categories expanded by default)
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })

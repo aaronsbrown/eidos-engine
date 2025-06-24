@@ -40,12 +40,13 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
   // Initialize category manager
   const categoryManager = useMemo(() => new PatternCategoryManager(patterns), [patterns])
   
-  // Initialize category expansion - expand category of selected pattern by default (only once)
+  // Initialize category expansion - expand all categories by default on mobile for discoverability
   useEffect(() => {
-    if (selectedPattern && expandedCategories.size === 0) {
-      setExpandedCategories(new Set([selectedPattern.category]))
+    if (expandedCategories.size === 0) {
+      const allCategories = categoryManager.getCategories()
+      setExpandedCategories(new Set(allCategories))
     }
-  }, [selectedPattern, expandedCategories.size]) // Include expandedCategories.size dependency
+  }, [categoryManager, expandedCategories.size])
 
   // Get categorized and filtered patterns
   const { categoryGroups, searchResults } = useMemo(() => {
@@ -266,19 +267,23 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                   No patterns found
                 </div>
               ) : (
-                searchResults.map((pattern, index) => (
-                  <button
-                    key={pattern.id}
-                    ref={(el) => {
-                      if (el) optionsRef.current[index] = el
-                    }}
-                    type="button"
-                    onClick={() => handleSelect(pattern.id)}
-                    className={`w-full px-4 py-3 text-left hover:bg-muted focus:bg-muted focus:outline-none transition-colors ${
-                      pattern.id === selectedId ? 'bg-accent-primary-subtle dark:bg-accent-primary-subtle' : ''
-                    } ${
-                      index === highlightedIndex ? 'bg-muted' : ''
-                    }`}
+                searchResults.map((pattern, index) => {
+                  const isLastResult = index === searchResults.length - 1
+                  return (
+                    <button
+                      key={pattern.id}
+                      ref={(el) => {
+                        if (el) optionsRef.current[index] = el
+                      }}
+                      type="button"
+                      onClick={() => handleSelect(pattern.id)}
+                      className={`w-full px-4 py-3 text-left hover:bg-muted focus:bg-muted focus:outline-none transition-colors ${
+                        !isLastResult ? 'border-b border-border' : ''
+                      } ${
+                        pattern.id === selectedId ? 'bg-accent-primary-subtle dark:bg-accent-primary-subtle' : ''
+                      } ${
+                        index === highlightedIndex ? 'bg-muted' : ''
+                      }`}
                     role="option"
                     aria-selected={pattern.id === selectedId}
                     data-selected={pattern.id === selectedId}
@@ -298,8 +303,9 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                         </span>
                       </div>
                     </div>
-                  </button>
-                ))
+                    </button>
+                  )
+                })
               )
             ) : (
               // Category groups - show collapsible sections
@@ -309,7 +315,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                 </div>
               ) : (
                 <div>
-                  {categoryGroups.map((group) => {
+                  {categoryGroups.map((group, groupIndex) => {
                     const isExpanded = expandedCategories.has(group.category)
                     let patternIndex = 0
                     // Calculate running index for keyboard navigation
@@ -320,13 +326,17 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                       }
                     }
 
+                    const isFirstCategory = groupIndex === 0
+                    
                     return (
                       <div key={group.category}>
                         {/* Category Header */}
                         <button
                           type="button"
                           onClick={() => toggleCategory(group.category)}
-                          className="w-full px-4 py-3 text-left bg-muted/30 hover:bg-muted/50 border-b border-border focus:outline-none focus:bg-muted transition-colors"
+                          className={`w-full px-4 py-3 text-left bg-muted hover:bg-muted/70 border-b border-border focus:outline-none focus:bg-muted/70 transition-colors ${
+                            !isFirstCategory ? 'border-t border-border' : ''
+                          }`}
                           aria-expanded={isExpanded}
                           aria-label={`${group.category} category, ${group.count} patterns`}
                         >
@@ -352,6 +362,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                           <div>
                             {group.patterns.map((pattern, index) => {
                               const globalIndex = patternIndex + index
+                              const isLastInCategory = index === group.patterns.length - 1
                               return (
                                 <button
                                   key={pattern.id}
@@ -360,8 +371,10 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
                                   }}
                                   type="button"
                                   onClick={() => handleSelect(pattern.id)}
-                                  className={`w-full px-8 py-3 text-left hover:bg-muted focus:bg-muted focus:outline-none transition-colors border-l-2 border-transparent ${
-                                    pattern.id === selectedId ? 'bg-accent-primary-subtle dark:bg-accent-primary-subtle border-l-accent-primary' : ''
+                                  className={`w-full px-8 py-3 text-left hover:bg-muted focus:bg-muted focus:outline-none transition-colors ${
+                                    !isLastInCategory ? 'border-b border-border' : ''
+                                  } ${
+                                    pattern.id === selectedId ? 'bg-accent-primary-subtle dark:bg-accent-primary-subtle border-l-2 border-l-accent-primary-strong dark:border-l-accent-primary' : 'border-l-2 border-l-transparent'
                                   } ${
                                     globalIndex === highlightedIndex ? 'bg-muted' : ''
                                   }`}
