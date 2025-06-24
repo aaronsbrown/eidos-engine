@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import PatternDropdownSelector from '@/components/mobile/pattern-dropdown-selector'
-import type { PatternGenerator } from '@/components/pattern-generators/types'
+import type { MixedPatternGenerator } from '@/components/pattern-generators/types'
 
 // Mock pattern data for stories
-const mockPatterns: PatternGenerator[] = [
+const mockPatterns: MixedPatternGenerator[] = [
   {
     id: 'cellular-automaton',
     name: 'Cellular Automaton',

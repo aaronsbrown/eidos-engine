@@ -4,11 +4,11 @@
 
 import React, { useState, useRef, useEffect, memo, useMemo } from 'react'
 import { ChevronDown, ChevronRight, Search } from 'lucide-react'
-import type { PatternGenerator } from '@/components/pattern-generators/types'
+import type { MixedPatternGenerator } from '@/components/pattern-generators/types'
 import { PatternCategoryManager, type PatternCategory } from '@/lib/pattern-category-manager'
 
 export interface PatternDropdownSelectorProps {
-  patterns: PatternGenerator[]
+  patterns: MixedPatternGenerator[]
   selectedId: string
   onSelect: (patternId: string) => void
   searchable?: boolean
@@ -68,7 +68,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
     }
 
     // Flatten visible patterns from expanded categories
-    return categoryGroups.reduce<PatternGenerator[]>((acc, group) => {
+    return categoryGroups.reduce<MixedPatternGenerator[]>((acc, group) => {
       if (expandedCategories.has(group.category)) {
         acc.push(...group.patterns)
       }
