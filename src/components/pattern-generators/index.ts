@@ -248,8 +248,8 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     description: "Particles following random walk patterns with glowing trails, simulating molecular motion.",
     longDescription: "Simulates the random motion of particles suspended in a fluid, creating organic, unpredictable paths. Named after botanist Robert Brown's observations of pollen grains.",
     semantics: {
-      primaryAlgorithmFamily: "NoiseFunction",
-      secondaryAlgorithmFamilies: ["PhysicsSimulation"],
+      primaryAlgorithmFamily: "PhysicsSimulation",
+      secondaryAlgorithmFamilies: ["NoiseFunction"],
       keyMathematicalConcepts: ["Probability", "ChaosTheory", "Calculus"],
       visualCharacteristics: ["Organic", "Flowing", "Jittery", "Luminous"],
       dimensionality: "2D",
