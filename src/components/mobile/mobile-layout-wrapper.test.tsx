@@ -70,7 +70,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       render(<MobileLayoutWrapper />, { wrapper: TestWrapper })
       
       // User should see mobile-specific layout
-      expect(screen.getByText('PATTERN GENERATOR SYSTEM')).toBeInTheDocument() // Header
+      expect(screen.getByText('EIDOS ENGINE')).toBeInTheDocument() // Header
       expect(screen.getByRole('combobox')).toBeInTheDocument() // Pattern selector
       expect(screen.getByTestId('pattern-1')).toBeInTheDocument() // Pattern visualization
     })
@@ -101,7 +101,7 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       render(<MobileLayoutWrapper />, { wrapper: TestWrapper })
       
       // User should see tablet-specific layout
-      expect(screen.getByText('PATTERN GENERATOR SYSTEM')).toBeInTheDocument()
+      expect(screen.getByText('EIDOS ENGINE')).toBeInTheDocument()
       // Tablet layout would have side panel
     })
   })
