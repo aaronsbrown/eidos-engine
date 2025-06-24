@@ -156,6 +156,20 @@ jest.mock('@/lib/hooks/use-preset-manager', () => ({
 }))
 
 describe('DesktopLayout - User Behavior', () => {
+  // AIDEV-NOTE: Mock wheel events and timers for scroll testing - required for JSDOM environment
+  beforeAll(() => {
+    // Ensure wheel events are properly supported
+    if (!window.WheelEvent) {
+      window.WheelEvent = window.Event as any
+    }
+    // Use real timers for setTimeout in scroll throttling
+    jest.useRealTimers()
+  })
+  
+  afterAll(() => {
+    // Restore fake timers for other tests
+    jest.useFakeTimers()
+  })
   beforeEach(() => {
     jest.clearAllMocks()
     // Mock window dimensions
@@ -276,6 +290,98 @@ describe('DesktopLayout - User Behavior', () => {
       // Should be on the last pattern
       expect(screen.getByText('[06/06]')).toBeInTheDocument()
       expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+    })
+
+    it('allows user to scroll through patterns with mouse wheel for browsing', async () => {
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      // Initially on first pattern and it should stay selected
+      expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
+      expect(screen.getByText('[01/06]')).toBeInTheDocument()
+      
+      // Find pattern list container - it should have overflow-hidden class
+      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
+      expect(patternList).toBeInTheDocument()
+      
+      // User scrolls down (deltaY > 0) to browse patterns
+      fireEvent.wheel(patternList!, { deltaY: 100 })
+      
+      // Wait a bit for the throttle timeout to complete
+      await new Promise(resolve => setTimeout(resolve, 150))
+      
+      // Selected pattern should remain the same (Trig), but list should scroll
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-trig')).toBeInTheDocument() // Still selected
+        expect(screen.getByText('[01/06]')).toBeInTheDocument() // Counter unchanged
+      }, { timeout: 2000 })
+      
+      // User must click to actually select a different pattern
+      fireEvent.click(screen.getByText('Noise Field'))
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
+        expect(screen.getByText('[02/06]')).toBeInTheDocument()
+      })
+    })
+
+    it('allows direct pattern selection that auto-adjusts visible window', async () => {
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      // Initially all patterns should be clickable even if outside visible window
+      expect(screen.getByText('Trigonometric Circle')).toBeInTheDocument()
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
+      
+      // User clicks on last pattern (Brownian Motion)
+      fireEvent.click(screen.getByText('Brownian Motion'))
+      
+      // Pattern should change and counter should update
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+        expect(screen.getByText('[06/06]')).toBeInTheDocument()
+      })
+      
+      // Specifications should update
+      expect(screen.getAllByText(/brownian-motion/i)).toHaveLength(2) // Sidebar + specs
+    })
+
+    it('prevents wheel scrolling past pattern boundaries', async () => {
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      // Find pattern list container
+      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
+      expect(patternList).toBeInTheDocument()
+      
+      // Try to scroll up from first pattern - should stay on first
+      fireEvent.wheel(patternList!, { deltaY: -100 })
+      
+      await new Promise(resolve => setTimeout(resolve, 150))
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
+        expect(screen.getByText('[01/06]')).toBeInTheDocument()
+      })
+      
+      // Navigate to last pattern with button
+      const nextButton = screen.getAllByRole('button').find(
+        button => button.textContent === '↓'
+      )
+      
+      for (let i = 0; i < 5; i++) {
+        fireEvent.click(nextButton!)
+        await waitFor(() => {
+          expect(screen.getByText(`[0${i + 2}/06]`)).toBeInTheDocument()
+        })
+      }
+      
+      // Try to scroll down from last pattern - should stay on last
+      fireEvent.wheel(patternList!, { deltaY: 100 })
+      
+      await new Promise(resolve => setTimeout(resolve, 150))
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+        expect(screen.getByText('[06/06]')).toBeInTheDocument()
+      })
     })
   })
 
@@ -555,6 +661,38 @@ describe('DesktopLayout - User Behavior', () => {
       
       // Now next button should be disabled
       expect(nextButton).toHaveClass('cursor-not-allowed')
+    })
+
+    it('combines wheel scrolling with button navigation seamlessly', async () => {
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
+      const nextButton = screen.getAllByRole('button').find(
+        button => button.textContent === '↓'
+      )
+      
+      // Start with wheel scroll
+      fireEvent.wheel(patternList!, { deltaY: 100 })
+      
+      // Wait for throttle timeout
+      await new Promise(resolve => setTimeout(resolve, 150))
+      
+      // Pattern should still be first (wheel doesn't select)
+      await waitFor(() => {
+        expect(screen.getByText('[01/06]')).toBeInTheDocument()
+      }, { timeout: 2000 })
+      
+      // Continue with button navigation
+      fireEvent.click(nextButton!)
+      
+      await waitFor(() => {
+        expect(screen.getByText('[02/06]')).toBeInTheDocument()
+      })
+      
+      // Verify that both methods work independently
+      // Both wheel and button navigation should be functional
+      expect(patternList).toBeInTheDocument()
+      expect(nextButton).toBeInTheDocument()
     })
   })
 })

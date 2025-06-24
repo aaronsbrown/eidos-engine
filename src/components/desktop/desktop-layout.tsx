@@ -19,7 +19,6 @@ export default function DesktopLayout() {
   const [sidebarWidth, setSidebarWidth] = useState(380) // Default sidebar width
   const [isResizing, setIsResizing] = useState(false)
   const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
-  const [isAnimating, setIsAnimating] = useState(false) // Track animation state
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
   const [isPresetPanelOpen, setIsPresetPanelOpen] = useState(false) // Track preset panel visibility
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false) // Track save preset modal visibility
@@ -28,8 +27,9 @@ export default function DesktopLayout() {
   const patternsPerPage = 5
   const totalPatterns = patternGenerators.length
   const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
-  const canGoToPrevious = currentIndex > 0 && !isAnimating
-  const canGoToNext = currentIndex < totalPatterns - 1 && !isAnimating
+  // AIDEV-NOTE: Don't disable buttons during scroll animation to prevent oscillation
+  const canGoToPrevious = currentIndex > 0
+  const canGoToNext = currentIndex < totalPatterns - 1
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
@@ -122,10 +122,68 @@ export default function DesktopLayout() {
 
       // Adjust visible window if needed to show the selected pattern
       if (currentIndex - 1 < visiblePatternStart) {
-        setIsAnimating(true)
         setVisiblePatternStart(currentIndex - 1)
-        setTimeout(() => setIsAnimating(false), 300)
       }
+    }
+  }
+
+  // AIDEV-NOTE: Handle mouse wheel scrolling through patterns - using ref for proper event handling
+  const patternListRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const handlePatternScroll = useCallback((e: WheelEvent) => {
+    e.preventDefault() // Stop default page scrolling
+    
+    // Throttle scroll events to prevent excessive updates
+    if (scrollTimeoutRef.current) return
+    
+    const scrollingDown = e.deltaY > 0
+    const maxStart = Math.max(0, totalPatterns - patternsPerPage)
+    
+    if (scrollingDown && visiblePatternStart < maxStart) {
+      // Scroll down - show next patterns for browsing
+      setVisiblePatternStart(Math.min(visiblePatternStart + 1, maxStart))
+    } else if (!scrollingDown && visiblePatternStart > 0) {
+      // Scroll up - show previous patterns for browsing
+      setVisiblePatternStart(Math.max(visiblePatternStart - 1, 0))
+    }
+    
+    // Throttle subsequent scroll events
+    scrollTimeoutRef.current = setTimeout(() => {
+      scrollTimeoutRef.current = null
+    }, 100) // Short throttle for smooth scrolling
+  }, [visiblePatternStart, totalPatterns, patternsPerPage])
+  
+  // AIDEV-NOTE: Set up wheel event listener with proper passive: false
+  useEffect(() => {
+    const element = patternListRef.current
+    if (!element) return
+    
+    element.addEventListener('wheel', handlePatternScroll, { passive: false })
+    
+    return () => {
+      element.removeEventListener('wheel', handlePatternScroll)
+      // Clean up any pending timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = null
+      }
+    }
+  }, [handlePatternScroll])
+
+  // AIDEV-NOTE: Enhanced pattern selection that auto-adjusts visible window
+  const handlePatternSelect = (patternId: string) => {
+    const patternIndex = patternGenerators.findIndex(p => p.id === patternId)
+    setSelectedPatternId(patternId)
+    
+    // Auto-adjust visible window if selected pattern is not visible
+    if (patternIndex < visiblePatternStart) {
+      // Pattern is above visible window - scroll up to show it
+      setVisiblePatternStart(patternIndex)
+    } else if (patternIndex >= visiblePatternStart + patternsPerPage) {
+      // Pattern is below visible window - scroll down to show it
+      const maxStart = Math.max(0, totalPatterns - patternsPerPage)
+      setVisiblePatternStart(Math.min(patternIndex - patternsPerPage + 1, maxStart))
     }
   }
 
@@ -137,11 +195,9 @@ export default function DesktopLayout() {
 
       // Adjust visible window if needed to show the selected pattern
       if (currentIndex + 1 >= visiblePatternStart + patternsPerPage) {
-        setIsAnimating(true)
         // Ensure we don't scroll past the last possible position
         const maxStart = Math.max(0, totalPatterns - patternsPerPage)
         setVisiblePatternStart(Math.min(currentIndex + 1 - patternsPerPage + 1, maxStart))
-        setTimeout(() => setIsAnimating(false), 300)
       }
     }
   }
@@ -253,12 +309,13 @@ export default function DesktopLayout() {
 
           {/* Pattern List - Animated Pagination */}
           <div
+            ref={patternListRef}
             className="px-6 overflow-hidden"
             style={{ height: `${patternsPerPage * 70 + 40}px` }} // AIDEV-NOTE: Adjusted height to fit patterns with category dividers properly
           >
             {/* AIDEV-NOTE: Fixed height container to show exactly 5 patterns + padding */}
             <div
-              className="space-y-1 pt-1 pb-4 transition-transform duration-300 ease-in-out"
+              className="space-y-1 pt-1 pb-4 transition-transform duration-200 ease-out"
               style={{
                 transform: `translateY(${-calculateTransformOffset(visiblePatternStart)}px)` // AIDEV-NOTE: Fixed to account for category dividers
               }}
@@ -287,14 +344,11 @@ export default function DesktopLayout() {
                     )}
                     
                     <button
-                      onClick={() => setSelectedPatternId(pattern.id)}
+                      onClick={() => handlePatternSelect(pattern.id)}
                       className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
                         ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
                         : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
                         }`}
-                      style={{
-                        pointerEvents: isVisible ? 'auto' : 'none'
-                      }}
                     >
                       <div className="flex justify-between items-center">
                         <span className="uppercase tracking-wider">{pattern.name}</span>
