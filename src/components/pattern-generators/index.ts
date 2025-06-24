@@ -8,7 +8,8 @@ import FourPoleGradientGenerator from "./four-pole-gradient-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
-export const patternGenerators: RichPatternGeneratorDefinition[] = [
+// AIDEV-NOTE: Patterns are sorted by category for proper grouping in the UI
+const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
   {
     id: "noise",
     name: "Noise Field",
@@ -242,7 +243,7 @@ export const patternGenerators: RichPatternGeneratorDefinition[] = [
     name: "Brownian Motion",
     component: BrownianMotionGenerator,
     technology: 'WEBGL_2.0',
-    category: 'Noise',
+    category: 'Simulation',
     schemaVersion: "1.0",
     description: "Particles following random walk patterns with glowing trails, simulating molecular motion.",
     longDescription: "Simulates the random motion of particles suspended in a fluid, creating organic, unpredictable paths. Named after botanist Robert Brown's observations of pollen grains.",
@@ -1011,6 +1012,23 @@ export const patternGenerators: RichPatternGeneratorDefinition[] = [
     ],
   },
 ]
+
+// AIDEV-NOTE: Sort patterns by category to group them properly in the UI
+// Category order: Noise, Geometric, Simulation, Data Visualization
+const categoryOrder = ['Noise', 'Geometric', 'Simulation', 'Data Visualization']
+
+export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
+  const aIndex = categoryOrder.indexOf(a.category)
+  const bIndex = categoryOrder.indexOf(b.category)
+  
+  // Sort by category order first
+  if (aIndex !== bIndex) {
+    return aIndex - bIndex
+  }
+  
+  // Within same category, maintain original order (stable sort)
+  return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
+})
 
 export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
