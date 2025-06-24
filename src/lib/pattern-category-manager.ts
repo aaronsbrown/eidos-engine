@@ -1,18 +1,18 @@
-import type { PatternGenerator } from '@/components/pattern-generators/types'
+import type { MixedPatternGenerator } from '@/components/pattern-generators/types'
 
 export type PatternCategory = 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization'
 
 export interface CategoryGroup {
   category: PatternCategory
-  patterns: PatternGenerator[]
+  patterns: MixedPatternGenerator[]
   count: number
 }
 
 // AIDEV-NOTE: Manages pattern categorization and filtering for desktop/mobile UI navigation
 export class PatternCategoryManager {
-  private patterns: PatternGenerator[]
+  private patterns: MixedPatternGenerator[]
 
-  constructor(patterns: PatternGenerator[]) {
+  constructor(patterns: MixedPatternGenerator[]) {
     this.patterns = patterns
   }
 
@@ -42,7 +42,7 @@ export class PatternCategoryManager {
   /**
    * Get patterns for a specific category
    */
-  getPatternsByCategory(category: PatternCategory): PatternGenerator[] {
+  getPatternsByCategory(category: PatternCategory): MixedPatternGenerator[] {
     return this.patterns.filter(p => p.category === category)
   }
 
@@ -113,7 +113,7 @@ export class PatternCategoryManager {
   /**
    * Filter patterns by search term (name or category)
    */
-  searchPatterns(searchTerm: string): PatternGenerator[] {
+  searchPatterns(searchTerm: string): MixedPatternGenerator[] {
     const term = searchTerm.toLowerCase()
     return this.patterns.filter(pattern => 
       pattern.name.toLowerCase().includes(term) ||
