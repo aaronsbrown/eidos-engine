@@ -188,6 +188,36 @@ export const ResponsiveDemo: Story = {
   ),
 }
 
+// Category showcase demo
+export const CategoryShowcase: Story = {
+  render: () => (
+    <div className="grid gap-6 max-w-2xl mx-auto">
+      <div className="text-center mb-4">
+        <h3 className="text-lg font-semibold">Pattern Categories</h3>
+        <p className="text-sm text-muted-foreground">Patterns organized into collapsible categories with search across all groups</p>
+      </div>
+      
+      <div className="max-w-sm mx-auto">
+        <PatternDropdownSelector
+          patterns={mockPatterns}
+          selectedId="cellular-automaton"
+          searchable={true}
+          loading={false}
+          onSelect={(patternId: string) => console.log('Category Selected:', patternId)}
+        />
+      </div>
+      
+      <div className="text-xs text-muted-foreground text-center space-y-1">
+        <p>• <strong>Collapsible Categories:</strong> Noise, Geometric, Simulation, Data Visualization</p>
+        <p>• <strong>Smart Expansion:</strong> Selected pattern's category expands automatically</p>
+        <p>• <strong>Search Integration:</strong> Search across all patterns with category context</p>
+        <p>• <strong>Clean Information:</strong> Pattern name + category (in search) or just name (when grouped)</p>
+        <p>• <strong>Visual Hierarchy:</strong> Category headers with pattern counts and indented lists</p>
+      </div>
+    </div>
+  ),
+}
+
 // Technology filter demo
 export const TechnologyShowcase: Story = {
   render: () => (
@@ -219,6 +249,36 @@ export const TechnologyShowcase: Story = {
             onSelect={(patternId: string) => console.log('WebGL Selected:', patternId)}
           />
         </div>
+      </div>
+    </div>
+  ),
+}
+
+// Search functionality demo
+export const SearchDemo: Story = {
+  render: () => (
+    <div className="space-y-6 max-w-lg mx-auto">
+      <div className="text-center">
+        <h3 className="text-lg font-semibold mb-2">Search Functionality</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Search across pattern names, IDs, and categories
+        </p>
+      </div>
+      
+      <PatternDropdownSelector
+        patterns={mockPatterns}
+        selectedId=""
+        searchable={true}
+        loading={false}
+        onSelect={(patternId: string) => console.log('Search Selected:', patternId)}
+      />
+      
+      <div className="text-xs text-muted-foreground space-y-1">
+        <p><strong>Search features:</strong></p>
+        <p>• Search by pattern name, category, or technology</p>
+        <p>• Category context shown under each result</p>
+        <p>• Clean flat list when searching across categories</p>
+        <p>• Try: "simulation", "noise", "barcode", or "webgl"</p>
       </div>
     </div>
   ),

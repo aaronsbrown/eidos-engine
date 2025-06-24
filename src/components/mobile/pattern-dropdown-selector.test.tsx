@@ -9,21 +9,24 @@ const mockPatterns = [
     id: 'barcode',
     name: 'Barcode Scanner',
     component: () => <div>Barcode</div>,
-    technology: 'CANVAS_2D',
+    technology: 'CANVAS_2D' as const,
+    category: 'Data Visualization' as const,
     controls: []
   },
   {
     id: 'frequency',
     name: 'Frequency Spectrum',
     component: () => <div>Frequency</div>,
-    technology: 'CANVAS_2D',
+    technology: 'CANVAS_2D' as const,
+    category: 'Data Visualization' as const,
     controls: []
   },
   {
     id: 'brownian-motion',
     name: 'Brownian Motion',
     component: () => <div>Brownian</div>,
-    technology: 'WEBGL_2.0',
+    technology: 'WEBGL_2.0' as const,
+    category: 'Noise' as const,
     controls: []
   }
 ]
@@ -69,8 +72,19 @@ describe('PatternDropdownSelector - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       await user.click(dropdown)
       
-      // User can see all available patterns
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      // User can see patterns in expanded categories and category headers
+      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument() // Same category as selected
+      
+      // Category headers might be uppercase due to CSS, check both cases
+      const dataVizHeader = screen.getByText(/data visualization/i)
+      const noiseHeader = screen.getByText(/noise/i)
+      expect(dataVizHeader).toBeInTheDocument() // Category header
+      expect(noiseHeader).toBeInTheDocument() // Collapsed category header
+      
+      // User expands the Noise category to see Brownian Motion
+      await user.click(noiseHeader)
+      
+      // Now user can see the pattern in the expanded category
       expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
       
       // User selects a different pattern
@@ -122,6 +136,39 @@ describe('PatternDropdownSelector - User Behavior', () => {
       expect(dropdownOptions).not.toHaveTextContent('Barcode Scanner')
     })
 
+    it('shows contextual category information in search vs grouped view', async () => {
+      const user = userEvent.setup()
+      render(<PatternDropdownSelector {...defaultProps} searchable={true} />)
+      
+      // User opens dropdown
+      const dropdown = screen.getByRole('combobox')
+      await user.click(dropdown)
+      
+      // In grouped view, category appears in headers but not under individual patterns
+      const dataVizHeader = screen.getByText(/data visualization/i)
+      expect(dataVizHeader).toBeInTheDocument()
+      
+      // Frequency Spectrum should appear without category label (it's already grouped under header)
+      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      // Category should NOT appear redundantly under the pattern in grouped view
+      const dropdownOptions = screen.getByRole('listbox')
+      const frequencyPattern = screen.getByText('Frequency Spectrum').closest('button')
+      expect(frequencyPattern).not.toHaveTextContent('Data Visualization')
+      
+      // User starts searching
+      const searchInput = screen.getByPlaceholderText('Search patterns...')
+      await user.type(searchInput, 'freq')
+      
+      // In search results, category context appears under pattern name (since headers are gone)
+      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      const searchResult = screen.getByText('Frequency Spectrum').closest('button')
+      expect(searchResult).toHaveTextContent('Data Visualization') // Category context now appears
+      
+      // Category headers should be gone in search mode (but category text under pattern should remain)
+      // Check that the collapsible category header button is gone
+      expect(screen.queryByRole('button', { name: /data visualization category/i })).not.toBeInTheDocument()
+    })
+
     it('shows helpful message when no patterns match search', async () => {
       const user = userEvent.setup()
       render(<PatternDropdownSelector {...defaultProps} searchable={true} />)
@@ -144,8 +191,12 @@ describe('PatternDropdownSelector - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       await user.click(dropdown)
       
-      // User can see what technology each pattern uses (there will be duplicates, that's expected)
-      expect(screen.getAllByText('CANVAS_2D')).toHaveLength(2) // Two patterns use CANVAS_2D
+      // User can see technology for visible patterns (in expanded category)
+      expect(screen.getAllByText('CANVAS_2D')).toHaveLength(2) // Two patterns use CANVAS_2D in expanded category
+      
+      // User expands Noise category to see WEBGL_2.0 pattern
+      const noiseHeader = screen.getByText(/noise/i)
+      await user.click(noiseHeader)
       expect(screen.getByText('WEBGL_2.0')).toBeInTheDocument()
     })
   })

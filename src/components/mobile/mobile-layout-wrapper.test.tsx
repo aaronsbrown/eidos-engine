@@ -1,5 +1,6 @@
 // AIDEV-NOTE: Behavioral tests per G-8 - focus on user actions, not implementation details
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { act } from 'react'
 import { ThemeProvider } from '@/lib/theme-context'
 import MobileLayoutWrapper from './mobile-layout-wrapper'
@@ -19,6 +20,7 @@ jest.mock('@/components/pattern-generators', () => ({
       name: 'Test Pattern 1', 
       component: () => <div data-testid="pattern-1">Pattern 1</div>,
       technology: 'CANVAS_2D',
+      category: 'Geometric',
       controls: [
         { id: 'speed', label: 'Speed', type: 'range', min: 0, max: 10, step: 1, defaultValue: 5 },
         { id: 'color', label: 'Color', type: 'color', defaultValue: '#ff0000' },
@@ -29,6 +31,7 @@ jest.mock('@/components/pattern-generators', () => ({
       name: 'Test Pattern 2',
       component: () => <div data-testid="pattern-2">Pattern 2</div>,
       technology: 'WEBGL_2.0',
+      category: 'Simulation',
       controls: [
         { id: 'particles', label: 'Particles', type: 'range', min: 1, max: 100, step: 1, defaultValue: 50 },
         { id: 'brightness', label: 'Brightness', type: 'range', min: 0, max: 5, step: 0.1, defaultValue: 2.0 },
@@ -125,13 +128,20 @@ describe('MobileLayoutWrapper - User Behavior', () => {
 
   describe('User can change patterns', () => {
     it('allows user to select different pattern via dropdown', async () => {
+      const user = userEvent.setup()
       render(<MobileLayoutWrapper />, { wrapper: TestWrapper })
       
       // User opens pattern selector
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
-      // User can see available patterns
+      // User expands Simulation category to see Test Pattern 2
+      await waitFor(() => {
+        const simulationHeader = screen.getByText(/simulation/i)
+        fireEvent.click(simulationHeader)
+      })
+      
+      // User can now see Test Pattern 2
       await waitFor(() => {
         expect(screen.getByText('Test Pattern 2')).toBeInTheDocument()
       })
@@ -155,6 +165,13 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
+      // User expands Simulation category first
+      await waitFor(() => {
+        const simulationHeader = screen.getByText(/simulation/i)
+        fireEvent.click(simulationHeader)
+      })
+      
+      // User selects Test Pattern 2
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })
@@ -175,6 +192,13 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       const dropdown = screen.getByRole('combobox')
       fireEvent.click(dropdown)
       
+      // User expands Simulation category to see Test Pattern 2
+      await waitFor(() => {
+        const simulationHeader = screen.getByText(/simulation/i)
+        fireEvent.click(simulationHeader)
+      })
+      
+      // User selects Test Pattern 2
       await waitFor(() => {
         fireEvent.click(screen.getByText('Test Pattern 2'))
       })
