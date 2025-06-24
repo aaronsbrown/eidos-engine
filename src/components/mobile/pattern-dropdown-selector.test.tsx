@@ -6,19 +6,11 @@ import PatternDropdownSelector from './pattern-dropdown-selector'
 // Mock pattern generators for testing
 const mockPatterns = [
   {
-    id: 'barcode',
-    name: 'Barcode Scanner',
-    component: () => <div>Barcode</div>,
+    id: 'noise',
+    name: 'Noise Field',
+    component: () => <div>Noise</div>,
     technology: 'CANVAS_2D' as const,
-    category: 'Data Visualization' as const,
-    controls: []
-  },
-  {
-    id: 'frequency',
-    name: 'Frequency Spectrum',
-    component: () => <div>Frequency</div>,
-    technology: 'CANVAS_2D' as const,
-    category: 'Data Visualization' as const,
+    category: 'Noise' as const,
     controls: []
   },
   {
@@ -28,13 +20,21 @@ const mockPatterns = [
     technology: 'WEBGL_2.0' as const,
     category: 'Noise' as const,
     controls: []
+  },
+  {
+    id: 'particle-system',
+    name: 'Particle System',
+    component: () => <div>Particle</div>,
+    technology: 'WEBGL_2.0' as const,
+    category: 'Simulation' as const,
+    controls: []
   }
 ]
 
 describe('PatternDropdownSelector - User Behavior', () => {
   const defaultProps = {
     patterns: mockPatterns,
-    selectedId: 'barcode',
+    selectedId: 'noise',
     onSelect: jest.fn(),
     searchable: true
   }
@@ -48,18 +48,18 @@ describe('PatternDropdownSelector - User Behavior', () => {
       render(<PatternDropdownSelector {...defaultProps} />)
       
       // User should see which pattern is currently selected
-      expect(screen.getByText('Barcode Scanner')).toBeInTheDocument()
+      expect(screen.getByText('Noise Field')).toBeInTheDocument()
     })
 
     it('updates display when selection changes', () => {
       const { rerender } = render(<PatternDropdownSelector {...defaultProps} />)
       
       // Initially shows first pattern
-      expect(screen.getByText('Barcode Scanner')).toBeInTheDocument()
+      expect(screen.getByText('Noise Field')).toBeInTheDocument()
       
       // When selection changes, user sees new pattern
-      rerender(<PatternDropdownSelector {...defaultProps} selectedId="frequency" />)
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      rerender(<PatternDropdownSelector {...defaultProps} selectedId="brownian-motion" />)
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
     })
   })
 
@@ -73,20 +73,22 @@ describe('PatternDropdownSelector - User Behavior', () => {
       await user.click(dropdown)
       
       // User can see patterns in all expanded categories by default
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument() // Same category as selected
-      expect(screen.getByText('Brownian Motion')).toBeInTheDocument() // Different category, also visible
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument() // Same category as selected
+      expect(screen.getByText('Particle System')).toBeInTheDocument() // Different category, also visible
       
       // Category headers should be visible
-      const dataVizHeader = screen.getByText(/data visualization/i)
-      const noiseHeader = screen.getByText(/noise/i)
-      expect(dataVizHeader).toBeInTheDocument()
+      const simulationHeader = screen.getByText(/simulation/i)
+      const noiseHeader = screen.getAllByText(/noise/i).find(el => 
+        el.textContent === 'Noise' || el.textContent?.includes('NOISE')
+      )
+      expect(simulationHeader).toBeInTheDocument()
       expect(noiseHeader).toBeInTheDocument()
       
       // User selects a different pattern
-      await user.click(screen.getByText('Frequency Spectrum'))
+      await user.click(screen.getByText('Brownian Motion'))
       
       // Selection callback is triggered
-      expect(defaultProps.onSelect).toHaveBeenCalledWith('frequency')
+      expect(defaultProps.onSelect).toHaveBeenCalledWith('brownian-motion')
     })
 
     it('supports keyboard navigation', async () => {
@@ -125,10 +127,10 @@ describe('PatternDropdownSelector - User Behavior', () => {
       // User sees filtered results in the dropdown options
       expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
       
-      // Barcode Scanner should not appear in the filtered dropdown options
+      // Noise Field should not appear in the filtered dropdown options
       // (Note: it may still appear as the selected value in the button, which is correct behavior)
       const dropdownOptions = screen.getByRole('listbox')
-      expect(dropdownOptions).not.toHaveTextContent('Barcode Scanner')
+      expect(dropdownOptions).not.toHaveTextContent('Noise Field')
     })
 
     it('shows contextual category information in search vs grouped view', async () => {
@@ -140,28 +142,29 @@ describe('PatternDropdownSelector - User Behavior', () => {
       await user.click(dropdown)
       
       // In grouped view, category appears in headers but not under individual patterns
-      const dataVizHeader = screen.getByText(/data visualization/i)
-      expect(dataVizHeader).toBeInTheDocument()
+      const simulationHeader = screen.getByText(/simulation/i)
+      expect(simulationHeader).toBeInTheDocument()
       
-      // Frequency Spectrum should appear without category label (it's already grouped under header)
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      // Particle System should appear without category label (it's already grouped under header)
+      expect(screen.getByText('Particle System')).toBeInTheDocument()
       // Category should NOT appear redundantly under the pattern in grouped view
-      const frequencyPattern = screen.getByText('Frequency Spectrum').closest('button')
-      expect(frequencyPattern).not.toHaveTextContent('Data Visualization')
+      const particlePattern = screen.getByText('Particle System').closest('button')
+      expect(particlePattern).not.toHaveTextContent('Simulation')
       
       // User starts searching
       const searchInput = screen.getByPlaceholderText('Search patterns...')
-      await user.type(searchInput, 'freq')
+      await user.type(searchInput, 'particle')
       
       // In search results, category context appears under pattern name (since headers are gone)
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
-      const searchResult = screen.getByText('Frequency Spectrum').closest('button')
-      expect(searchResult).toHaveTextContent('Data Visualization') // Category context now appears
+      expect(screen.getByText('Particle System')).toBeInTheDocument()
+      const searchResult = screen.getByText('Particle System').closest('button')
+      expect(searchResult).toHaveTextContent('Simulation') // Category context now appears
       
       // Category headers should be gone in search mode (but category text under pattern should remain)
       // Check that the collapsible category header button is gone
-      expect(screen.queryByRole('button', { name: /data visualization category/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /simulation category/i })).not.toBeInTheDocument()
     })
+
 
     it('shows helpful message when no patterns match search', async () => {
       const user = userEvent.setup()
@@ -186,8 +189,8 @@ describe('PatternDropdownSelector - User Behavior', () => {
       await user.click(dropdown)
       
       // User can see technology for all visible patterns (all categories expanded by default)
-      expect(screen.getAllByText('CANVAS_2D')).toHaveLength(2) // Two patterns use CANVAS_2D
-      expect(screen.getByText('WEBGL_2.0')).toBeInTheDocument() // Noise category is expanded by default
+      expect(screen.getByText('CANVAS_2D')).toBeInTheDocument() // One pattern uses CANVAS_2D
+      expect(screen.getAllByText('WEBGL_2.0')).toHaveLength(2) // Two patterns use WEBGL_2.0
     })
   })
 
@@ -222,14 +225,14 @@ describe('PatternDropdownSelector - User Behavior', () => {
       await user.click(dropdown)
       
       // Dropdown is open
-      expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
       
       // User clicks outside
       await user.click(document.body)
       
       // Dropdown closes
       await waitFor(() => {
-        expect(screen.queryByText('Frequency Spectrum')).not.toBeInTheDocument()
+        expect(screen.queryByText('Brownian Motion')).not.toBeInTheDocument()
       })
     })
 
@@ -244,7 +247,7 @@ describe('PatternDropdownSelector - User Behavior', () => {
       fireEvent.keyDown(dropdown, { key: 'Escape' })
       
       await waitFor(() => {
-        expect(screen.queryByText('Frequency Spectrum')).not.toBeInTheDocument()
+        expect(screen.queryByText('Brownian Motion')).not.toBeInTheDocument()
       })
     })
   })

@@ -60,11 +60,6 @@ export default function GroupedSimulationControlsPanel({
       case 'cellular-automaton':
         return groupCellularAutomatonControls(controls)
       
-      case 'barcode':
-        return groupBarcodeControls(controls)
-      
-      case 'frequency':
-        return groupFrequencySpectrumControls(controls)
       
       default:
         // For unknown patterns, try generic grouping
@@ -317,89 +312,6 @@ function groupCellularAutomatonControls(controls: PatternControl[]): ControlGrou
   return groups
 }
 
-function groupBarcodeControls(controls: PatternControl[]): ControlGroup[] {
-  const groups: ControlGroup[] = []
-
-  // Animation Settings
-  const animControls = controls.filter(c => 
-    c.id.includes('Speed') || c.id.includes('speed')
-  )
-  if (animControls.length > 0) {
-    groups.push({
-      title: 'Animation Settings',
-      controls: animControls,
-      defaultCollapsed: false
-    })
-  }
-
-  // Visual Properties
-  const visualControls = controls.filter(c => 
-    c.id.includes('Density') || c.id.includes('Opacity')
-  )
-  if (visualControls.length > 0) {
-    groups.push({
-      title: 'Visual Properties',
-      controls: visualControls,
-      defaultCollapsed: false
-    })
-  }
-
-  // Appearance
-  const appearanceControls = controls.filter(c => 
-    c.id.includes('color') || c.id.includes('show') || c.id.includes('Show')
-  )
-  if (appearanceControls.length > 0) {
-    groups.push({
-      title: 'Appearance',
-      controls: appearanceControls,
-      defaultCollapsed: false
-    })
-  }
-
-  return groups
-}
-
-function groupFrequencySpectrumControls(controls: PatternControl[]): ControlGroup[] {
-  const groups: ControlGroup[] = []
-
-  // Visual Properties
-  const visualControls = controls.filter(c => 
-    c.id.includes('bar') || c.id.includes('intensity') || c.id.includes('bass')
-  )
-  if (visualControls.length > 0) {
-    groups.push({
-      title: 'Visual Properties',
-      controls: visualControls,
-      defaultCollapsed: false
-    })
-  }
-
-  // Animation Settings
-  const animControls = controls.filter(c => 
-    c.id.includes('update') || c.id.includes('speed')
-  )
-  if (animControls.length > 0) {
-    groups.push({
-      title: 'Animation Settings',
-      controls: animControls,
-      defaultCollapsed: false
-    })
-  }
-
-  // Appearance
-  const appearanceControls = controls.filter(c => 
-    c.id.includes('color') || c.id.includes('glow')
-  )
-  if (appearanceControls.length > 0) {
-    groups.push({
-      title: 'Appearance',
-      controls: appearanceControls,
-      defaultCollapsed: false
-    })
-  }
-
-  return groups
-}
 
 function tryGenericGrouping(controls: PatternControl[]): ControlGroup[] | null {
   // For unknown patterns, try to create logical groups based on common patterns

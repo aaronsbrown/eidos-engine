@@ -1,5 +1,3 @@
-import BarcodeGenerator from "./barcode-generator"
-import FrequencySpectrumGenerator from "./frequency-spectrum-generator"
 import NoiseFieldGenerator from "./noise-field-generator"
 import PixelatedNoiseGenerator from "./pixelated-noise-generator"
 import BrownianMotionGenerator from "./brownian-motion-generator"
@@ -10,134 +8,6 @@ import FourPoleGradientGenerator from "./four-pole-gradient-generator"
 import type { PatternGenerator } from "./types"
 
 export const patternGenerators: PatternGenerator[] = [
-  {
-    id: "barcode",
-    name: "Barcode Scanner",
-    component: BarcodeGenerator,
-    technology: 'CANVAS_2D',
-    category: 'Data Visualization',
-    controls: [
-      {
-        id: "scrollSpeed",
-        label: "Scroll Speed",
-        type: "range",
-        min: 0.5,
-        max: 8.0,
-        step: 0.5,
-        defaultValue: 2,
-      },
-      {
-        id: "barDensity",
-        label: "Bar Density",
-        type: "range",
-        min: 0.2,
-        max: 0.9,
-        step: 0.1,
-        defaultValue: 0.6,
-      },
-      {
-        id: "scannerSpeed",
-        label: "Scanner Speed",
-        type: "range",
-        min: 0.5,
-        max: 5.0,
-        step: 0.5,
-        defaultValue: 2,
-      },
-      {
-        id: "scannerOpacity",
-        label: "Scanner Opacity",
-        type: "range",
-        min: 0.1,
-        max: 1.0,
-        step: 0.1,
-        defaultValue: 0.6,
-      },
-      {
-        id: "colorScheme",
-        label: "Color Scheme",
-        type: "select",
-        defaultValue: "classic",
-        options: [
-          { value: "classic", label: "CLASSIC" },
-          { value: "inverted", label: "INVERTED" },
-          { value: "blue", label: "BLUE_TONE" },
-          { value: "green", label: "GREEN_TONE" },
-          { value: "amber", label: "AMBER_TONE" },
-        ],
-      },
-      {
-        id: "showScanner",
-        label: "Show Scanner",
-        type: "checkbox",
-        defaultValue: true,
-      },
-    ],
-  },
-  {
-    id: "frequency",
-    name: "Frequency Spectrum",
-    component: FrequencySpectrumGenerator,
-    technology: 'CANVAS_2D',
-    category: 'Data Visualization',
-    controls: [
-      {
-        id: "barWidth",
-        label: "Bar Width",
-        type: "range",
-        min: 1,
-        max: 8,
-        step: 1,
-        defaultValue: 3,
-      },
-      {
-        id: "updateSpeed",
-        label: "Update Speed",
-        type: "range",
-        min: 10,
-        max: 200,
-        step: 10,
-        defaultValue: 50,
-      },
-      {
-        id: "intensity",
-        label: "Intensity",
-        type: "range",
-        min: 0.2,
-        max: 2.0,
-        step: 0.1,
-        defaultValue: 1.0,
-      },
-      {
-        id: "bassBoost",
-        label: "Bass Boost",
-        type: "range",
-        min: 0.1,
-        max: 1.0,
-        step: 0.1,
-        defaultValue: 0.7,
-      },
-      {
-        id: "colorScheme",
-        label: "Color Scheme",
-        type: "select",
-        defaultValue: "green",
-        options: [
-          { value: "green", label: "GREEN_SPECTRUM" },
-          { value: "blue", label: "BLUE_SPECTRUM" },
-          { value: "purple", label: "PURPLE_SPECTRUM" },
-          { value: "rainbow", label: "RAINBOW_SPECTRUM" },
-          { value: "amber", label: "AMBER_SPECTRUM" },
-        ],
-      },
-      {
-        id: "glow",
-        label: "Glow Effects",
-        type: "checkbox",
-        defaultValue: true,
-      },
-    ],
-  },
   {
     id: "noise",
     name: "Noise Field",
@@ -629,5 +499,5 @@ export const patternGenerators: PatternGenerator[] = [
   },
 ]
 
-export { BarcodeGenerator, FrequencySpectrumGenerator, NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"

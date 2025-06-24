@@ -16,8 +16,6 @@ export function getEssentialControls(
 
   // Pattern-specific essential control mapping
   const essentialControlIds: Record<string, string[]> = {
-    'barcode': ['scrollSpeed', 'barDensity', 'scannerSpeed'],
-    'frequency': ['updateSpeed', 'intensity', 'colorScheme'],
     'noise': ['noiseScale', 'animationSpeed', 'colorMode'],
     'pixelated-noise': ['pixelSize', 'noiseScale', 'animationSpeed'],
     'brownian-motion': ['particleCount', 'speed', 'brightness'],
