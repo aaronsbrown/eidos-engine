@@ -5,13 +5,6 @@ import type { PatternGenerator } from '@/components/pattern-generators/types'
 // Mock pattern data for stories
 const mockPatterns: PatternGenerator[] = [
   {
-    id: 'barcode-generator',
-    name: 'Barcode Generator',
-    component: {} as any,
-    technology: 'CANVAS_2D',
-    category: 'Data Visualization'
-  },
-  {
     id: 'cellular-automaton',
     name: 'Cellular Automaton',
     component: {} as any,
@@ -40,11 +33,18 @@ const mockPatterns: PatternGenerator[] = [
     category: 'Noise'
   },
   {
-    id: 'frequency-spectrum',
-    name: 'Frequency Spectrum',
+    id: 'brownian-motion',
+    name: 'Brownian Motion',
+    component: {} as any,
+    technology: 'WEBGL_2.0',
+    category: 'Noise'
+  },
+  {
+    id: 'trigonometric-circle',
+    name: 'Trigonometric Circle',
     component: {} as any,
     technology: 'CANVAS_2D',
-    category: 'Data Visualization'
+    category: 'Geometric'
   }
 ]
 
@@ -106,7 +106,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     patterns: mockPatterns,
-    selectedId: 'barcode-generator',
+    selectedId: 'cellular-automaton',
     searchable: true,
     loading: false,
     onSelect: (patternId: string) => console.log('Selected:', patternId),
@@ -232,7 +232,7 @@ export const TechnologyShowcase: Story = {
           <h4 className="text-sm font-medium mb-2">Canvas 2D Patterns</h4>
           <PatternDropdownSelector
             patterns={mockPatterns.filter(p => p.technology === 'CANVAS_2D')}
-            selectedId="barcode-generator"
+            selectedId="cellular-automaton"
             searchable={true}
             loading={false}
             onSelect={(patternId: string) => console.log('Canvas 2D Selected:', patternId)}
@@ -278,7 +278,7 @@ export const SearchDemo: Story = {
         <p>• Search by pattern name, category, or technology</p>
         <p>• Category context shown under each result</p>
         <p>• Clean flat list when searching across categories</p>
-        <p>• Try: "simulation", "noise", "barcode", or "webgl"</p>
+        <p>• Try: "simulation", "noise", "cellular", or "webgl"</p>
       </div>
     </div>
   ),
