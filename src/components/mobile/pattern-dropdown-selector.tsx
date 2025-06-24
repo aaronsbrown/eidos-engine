@@ -45,7 +45,7 @@ const PatternDropdownSelector = memo(function PatternDropdownSelector({
     if (selectedPattern && expandedCategories.size === 0) {
       setExpandedCategories(new Set([selectedPattern.category]))
     }
-  }, [selectedPattern]) // Remove expandedCategories dependency to prevent re-expansion
+  }, [selectedPattern, expandedCategories.size]) // Include expandedCategories.size dependency
 
   // Get categorized and filtered patterns
   const { categoryGroups, searchResults } = useMemo(() => {

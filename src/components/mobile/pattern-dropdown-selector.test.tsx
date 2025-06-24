@@ -151,7 +151,6 @@ describe('PatternDropdownSelector - User Behavior', () => {
       // Frequency Spectrum should appear without category label (it's already grouped under header)
       expect(screen.getByText('Frequency Spectrum')).toBeInTheDocument()
       // Category should NOT appear redundantly under the pattern in grouped view
-      const dropdownOptions = screen.getByRole('listbox')
       const frequencyPattern = screen.getByText('Frequency Spectrum').closest('button')
       expect(frequencyPattern).not.toHaveTextContent('Data Visualization')
       

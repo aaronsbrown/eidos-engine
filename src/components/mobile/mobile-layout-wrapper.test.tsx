@@ -1,6 +1,5 @@
 // AIDEV-NOTE: Behavioral tests per G-8 - focus on user actions, not implementation details
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { act } from 'react'
 import { ThemeProvider } from '@/lib/theme-context'
 import MobileLayoutWrapper from './mobile-layout-wrapper'
@@ -128,7 +127,6 @@ describe('MobileLayoutWrapper - User Behavior', () => {
 
   describe('User can change patterns', () => {
     it('allows user to select different pattern via dropdown', async () => {
-      const user = userEvent.setup()
       render(<MobileLayoutWrapper />, { wrapper: TestWrapper })
       
       // User opens pattern selector
