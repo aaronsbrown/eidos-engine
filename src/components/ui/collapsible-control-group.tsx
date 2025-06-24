@@ -41,7 +41,8 @@ export default function CollapsibleControlGroup({
               <label htmlFor={control.id} className="mobile-typography-label md:text-xs text-muted-foreground">
                 {control.label}
               </label>
-              <span className="mobile-typography-value md:text-xs text-accent-primary-strong">
+              {/* AIDEV-NOTE: Issue #51 - Changed from text-accent-primary-strong to text-foreground for WCAG 2.1 AA compliance */}
+              <span className="mobile-typography-value md:text-xs text-foreground">
                 {typeof value === 'number' ? value.toFixed(2) : value}
               </span>
             </div>

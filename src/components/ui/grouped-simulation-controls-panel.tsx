@@ -398,7 +398,8 @@ function renderControl(
             <label htmlFor={control.id} className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
               {control.label}
             </label>
-            <span className="font-mono text-xs text-accent-primary-strong">
+            {/* AIDEV-NOTE: Issue #51 - Changed from text-accent-primary-strong to text-foreground for WCAG 2.1 AA compliance */}
+            <span className="font-mono text-xs text-foreground">
               {typeof value === 'number' ? value.toFixed(2) : value}
             </span>
           </div>
