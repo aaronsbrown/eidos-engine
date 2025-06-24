@@ -158,6 +158,7 @@ interface PatternControl {
 4. **Assign appropriate category** (see Pattern Categorization below)
 5. Follow existing patterns for control panel implementation
 6. For WebGL generators, use external shader loading system
+7. **Add semantic metadata** (see Semantic Layer below)
 
 ### 🏷️ Pattern Categorization System
 
@@ -210,6 +211,81 @@ const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.frag
 ```
 
 **Benefits:** GLSL syntax highlighting, maintainability, TouchDesigner imports, hot reload
+
+### 🧠 Semantic Layer System
+
+**Rich Metadata for Pattern Generators:**
+
+The semantic layer enhances pattern definitions with machine-readable metadata about algorithms, mathematical concepts, visual characteristics, and performance profiles. This enables intelligent features like platform-specific defaults, performance recommendations, and educational resource discovery.
+
+**Core Semantic Types:**
+
+```typescript
+import type { RichPatternGeneratorDefinition, RichPatternControlDefinition } from '@/lib/semantic-types'
+
+// Pattern must include these semantic fields:
+- schemaVersion: "1.0"
+- description: Brief user-facing description
+- semantics: Algorithm family, math concepts, visual characteristics
+- performance: Computational complexity, frame rate targets
+- version: Semantic version (e.g., "1.0.0")
+- author: Creator attribution
+- dateAdded/lastModified: ISO dates
+- status: "Development" | "Experimental" | "Production"
+```
+
+**Control Semantic Metadata:**
+
+```typescript
+// Controls must include:
+- description: What the control does
+- role: ControlRole type (e.g., "VisualAesthetic", "PerformanceTuning")
+- impactsPerformance: "Negligible" | "Minor" | "Moderate" | "Significant"
+- defaultRecommendations?: Platform and performance-based defaults
+```
+
+**Platform-Aware Defaults:**
+
+```typescript
+// Example: Particle trails disabled on mobile for performance
+defaultRecommendations: {
+  platformSpecific: {
+    mobile: false,    // Disabled on mobile
+    desktop: true,    // Enabled on desktop
+    rationale: "Trails significantly impact mobile GPU performance"
+  }
+}
+```
+
+**Semantic Utility Functions:**
+
+```typescript
+import { 
+  getPlatformDefaultValue,
+  getPerformanceImpactingControls,
+  isMobileFriendly,
+  findPatternsByMathConcept
+} from '@/lib/semantic-utils'
+
+// Get appropriate defaults for current platform
+const defaultValue = getPlatformDefaultValue(control, 'mobile')
+
+// Find performance-critical controls
+const criticalControls = getPerformanceImpactingControls(pattern)
+
+// Check mobile compatibility
+const mobileReady = isMobileFriendly(pattern)
+```
+
+**Adding Semantic Metadata to New Patterns:**
+
+1. Use `RichPatternGeneratorDefinition` type
+2. Fill all required semantic fields
+3. Add platform recommendations for performance-impacting controls
+4. Include educational links when relevant
+5. Specify related patterns for discovery
+6. Group controls semantically
+7. Run semantic validation tests
 
 ---
 
@@ -341,6 +417,9 @@ const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.frag
 - [ ] Add to exports in `index.ts`
 - [ ] Use external shader loading for WebGL
 - [ ] Follow control panel patterns
+- [ ] Add complete semantic metadata using `RichPatternGeneratorDefinition`
+- [ ] Include platform-specific default recommendations
+- [ ] Run semantic validation tests
 
 **UI Refactoring:**
 
