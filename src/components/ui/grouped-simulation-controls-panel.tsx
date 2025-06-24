@@ -469,7 +469,7 @@ function renderControl(
         <button
           key={control.id}
           onClick={() => onControlChange(control.id, true)}
-          className="w-full font-mono text-xs uppercase tracking-wide bg-accent-primary-strong text-accent-primary-foreground hover:bg-accent-primary px-3 py-2 rounded transition-colors"
+          className="w-full font-mono text-xs uppercase tracking-wide bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong px-3 py-2 rounded transition-colors"
         >
           {control.label}
         </button>
