@@ -493,12 +493,20 @@ export const Variants: Story = {
 ### File Structure
 
 ```
-components/pattern-generators/  # Pattern implementations
-components/ui/                  # UI components (shadcn/ui + custom)
-lib/                           # Utilities (shader-loader, etc.)
-shaders/                       # External shader files
-app/                          # Next.js app router
+src/                           # Source code root
+├── app/                       # Next.js app router
+├── components/                # React components
+│   ├── pattern-generators/    # Pattern implementations
+│   ├── ui/                    # UI components (shadcn/ui + custom)
+│   ├── desktop/               # Desktop-specific components
+│   └── mobile/                # Mobile-specific components
+├── lib/                       # Utilities (shader-loader, semantic-types, etc.)
+└── test-utils/                # Test utilities and mocks
+public/shaders/                # External shader files
+├── fragment/                  # Fragment shaders
+└── vertex/                    # Vertex shaders
 docs/implementation_notes/     # Implementation documentation
+stories/                       # Storybook stories
 ```
 
 ### Development Memories
