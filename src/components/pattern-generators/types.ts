@@ -1,5 +1,7 @@
 import type React from "react"
+import type { RichPatternControlDefinition, RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
+// AIDEV-NOTE: Basic types maintained for backward compatibility during migration
 export interface PatternControl {
   id: string
   label: string
@@ -20,6 +22,7 @@ export interface PatternGeneratorProps {
   onControlChange?: (controlId: string, value: number | string | boolean) => void
 }
 
+// AIDEV-NOTE: Extended to support semantic metadata while maintaining compatibility
 export interface PatternGenerator {
   id: string
   name: string
@@ -28,3 +31,10 @@ export interface PatternGenerator {
   technology: 'WEBGL_2.0' | 'CANVAS_2D'
   category: 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization'
 }
+
+// Export semantic types for patterns that have been migrated
+export type SemanticPatternGenerator = RichPatternGeneratorDefinition
+export type SemanticPatternControl = RichPatternControlDefinition
+
+// Helper type for gradual migration
+export type MixedPatternGenerator = PatternGenerator | SemanticPatternGenerator
