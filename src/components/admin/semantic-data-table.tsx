@@ -1,7 +1,7 @@
 // AIDEV-NOTE: Data table component for displaying semantic metadata - Issue #44 Phase 5
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { RichPatternGeneratorDefinition } from '@/lib/semantic-types'
 import { ChevronDown, ChevronRight, ExternalLink, Download } from 'lucide-react'
 
@@ -131,7 +131,7 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
               const isMobileFriendly = pattern.performance.computationalComplexity !== 'VeryHigh' && !hasMobileIssues
 
               return (
-                <tbody key={pattern.id}>
+                <React.Fragment key={pattern.id}>
                   <tr className="border-b border-border/50 hover:bg-background/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-medium">{pattern.name}</div>
@@ -290,7 +290,7 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
                       </td>
                     </tr>
                   )}
-                </tbody>
+                </React.Fragment>
               )
             })}
           </tbody>
