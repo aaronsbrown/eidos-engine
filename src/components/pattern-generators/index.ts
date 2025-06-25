@@ -5,6 +5,7 @@ import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
 import CellularAutomatonGenerator from "./cellular-automaton-generator"
 import FourPoleGradientGenerator from "./four-pole-gradient-generator"
+import GeometricTilingsGenerator from "./geometric-tilings-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
@@ -1011,6 +1012,181 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
       },
     ],
   },
+  {
+    id: "geometric-tilings",
+    name: "Geometric Tilings",
+    component: GeometricTilingsGenerator,
+    technology: 'CANVAS_2D',
+    category: 'Geometric',
+    schemaVersion: "1.0",
+    description: "Geometric tessellations and tilings including squares, hexagons, Penrose patterns, and Islamic star designs.",
+    longDescription: "Creates beautiful geometric tilings and tessellations that cover the plane without gaps or overlaps. Includes regular tilings (squares, hexagons), complex patterns (Islamic stars), and aperiodic tilings (Penrose-style).",
+    semantics: {
+      primaryAlgorithmFamily: "GeometricTiling",
+      keyMathematicalConcepts: ["ComputationalGeometry", "DiscreteMathematics", "NumberTheory"],
+      visualCharacteristics: ["Geometric", "Ordered", "Symmetrical", "Discrete", "Complex"],
+      dimensionality: "2D",
+      interactionStyle: "ParameterTuning",
+      keywords: ["tessellation", "tiling", "penrose", "islamic", "hexagonal", "geometric patterns"]
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance depends on tiling complexity and scale - Islamic stars are more intensive than square grids"
+    },
+    educationalLinks: [
+      {
+        title: "Tessellation",
+        url: "https://en.wikipedia.org/wiki/Tessellation",
+        type: "Reference"
+      },
+      {
+        title: "Penrose Tiling",
+        url: "https://en.wikipedia.org/wiki/Penrose_tiling",
+        type: "Reference"
+      },
+      {
+        title: "Islamic Geometric Patterns",
+        url: "https://en.wikipedia.org/wiki/Islamic_geometric_patterns",
+        type: "Reference"
+      }
+    ],
+    version: "1.0.0",
+    author: "Aaron Brown & Claude",
+    dateAdded: "2024-06-24",
+    lastModified: "2024-06-24",
+    relatedPatterns: ["four-pole-gradient", "trigonometric-circle"],
+    isInteractive: false,
+    isAnimatedByDefault: false,
+    status: "Production",
+    controls: [
+      {
+        id: "tilingType",
+        label: "Tiling Type",
+        type: "select",
+        defaultValue: "square",
+        options: [
+          { value: "square", label: "SQUARE_GRID" },
+          { value: "hexagonal", label: "HEXAGONAL_HONEY" },
+          { value: "penrose", label: "PENROSE_APERIODIC" },
+          { value: "islamic-star", label: "ISLAMIC_STAR" },
+        ],
+        description: "Type of geometric tiling pattern - from simple grids to complex aperiodic patterns.",
+        role: "PrimaryAlgorithmParameter",
+        impactsPerformance: "Moderate",
+        group: "Pattern Type"
+      },
+      {
+        id: "scale",
+        label: "Tile Scale",
+        type: "range",
+        min: 10,
+        max: 100,
+        step: 5,
+        defaultValue: 40,
+        description: "Size of individual tiles or pattern elements - affects pattern density and detail.",
+        role: "StructuralParameter",
+        unit: "px",
+        impactsPerformance: "Moderate",
+        typicalRangeForInterestingResults: [20, 80],
+        defaultRecommendations: {
+          platformSpecific: {
+            mobile: 50,
+            desktop: 40,
+            rationale: "Larger tiles reduce computation on mobile while maintaining visual clarity"
+          }
+        },
+        group: "Pattern Settings"
+      },
+      {
+        id: "colorScheme",
+        label: "Color Scheme",
+        type: "select",
+        defaultValue: "monochrome",
+        options: [
+          { value: "monochrome", label: "MONOCHROME" },
+          { value: "warm", label: "WARM_PALETTE" },
+          { value: "cool", label: "COOL_PALETTE" },
+          { value: "rainbow", label: "RAINBOW_SPECTRUM" },
+          { value: "gold-blue", label: "GOLD_BLUE" },
+        ],
+        description: "Color palette for the tiling pattern - affects the overall mood and visual impact.",
+        role: "VisualAesthetic",
+        impactsPerformance: "Negligible",
+        group: "Visual Style"
+      },
+      {
+        id: "showFill",
+        label: "Show Fill",
+        type: "checkbox",
+        defaultValue: true,
+        description: "Toggle filled shapes - when disabled, shows only outlines.",
+        role: "VisualAesthetic",
+        impactsPerformance: "Minor",
+        relatedControls: ["showStroke"],
+        group: "Visual Style"
+      },
+      {
+        id: "showStroke",
+        label: "Show Stroke",
+        type: "checkbox",
+        defaultValue: true,
+        description: "Toggle shape outlines - helps define individual tiles and pattern structure.",
+        role: "VisualAesthetic",
+        impactsPerformance: "Minor",
+        relatedControls: ["showFill", "lineWidth"],
+        group: "Visual Style"
+      },
+      {
+        id: "lineWidth",
+        label: "Line Width",
+        type: "range",
+        min: 0.5,
+        max: 5,
+        step: 0.5,
+        defaultValue: 1,
+        description: "Thickness of shape outlines - affects pattern definition and visual weight.",
+        role: "VisualAesthetic",
+        unit: "px",
+        impactsPerformance: "Negligible",
+        relatedControls: ["showStroke"],
+        group: "Visual Style"
+      },
+      {
+        id: "animationEnabled",
+        label: "Animation Enabled",
+        type: "checkbox",
+        defaultValue: false,
+        description: "Enables rotation animation of the entire tiling pattern.",
+        role: "AnimationBehavior",
+        impactsPerformance: "Minor",
+        relatedControls: ["animationSpeed"],
+        group: "Animation",
+        defaultRecommendations: {
+          performanceConsideration: {
+            lowPerformance: false,
+            highPerformance: true,
+            rationale: "Animation requires continuous redrawing which impacts performance"
+          }
+        }
+      },
+      {
+        id: "animationSpeed",
+        label: "Animation Speed",
+        type: "range",
+        min: 0.1,
+        max: 3.0,
+        step: 0.1,
+        defaultValue: 1.0,
+        description: "Speed of pattern rotation animation - controls how fast the tiling rotates.",
+        role: "AnimationBehavior",
+        unit: "x (multiplier)",
+        impactsPerformance: "Negligible",
+        relatedControls: ["animationEnabled"],
+        group: "Animation"
+      },
+    ],
+  },
 ]
 
 // AIDEV-NOTE: Sort patterns by category to group them properly in the UI
@@ -1030,5 +1206,5 @@ export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
 })
 
-export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, GeometricTilingsGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
