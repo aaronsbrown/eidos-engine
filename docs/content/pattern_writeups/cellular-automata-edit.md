@@ -99,6 +99,8 @@ const applyRule = (cells: number[], ruleLookup: boolean[]): number[] => {
 }
 ```
 
+Semantic Metadata Admin
+
 **Rendering and Architecture Notes:**
 
 * **Canvas 2D** is used for efficient raster-style rendering

@@ -10,6 +10,8 @@ import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-c
 import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
 import { SavePresetModal } from "@/components/ui/save-preset-modal"
 import { usePresetManager } from "@/lib/hooks/use-preset-manager"
+import { EducationalOverlay } from "@/components/ui/educational-overlay"
+import { cellularAutomataContent } from "@/lib/educational-content-parser"
 
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -22,6 +24,7 @@ export default function DesktopLayout() {
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
   const [isPresetPanelOpen, setIsPresetPanelOpen] = useState(false) // Track preset panel visibility
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false) // Track save preset modal visibility
+  const [isEducationalVisible, setIsEducationalVisible] = useState(false) // Track educational overlay visibility
 
   // How many patterns to show at once (fits in ~20rem container)
   const patternsPerPage = 5
@@ -418,9 +421,22 @@ export default function DesktopLayout() {
 
         {/* Center - Pattern Display */}
         <main className="flex-1 p-6 relative">
-          {/* Technical annotation boxes */}
-          <div className="absolute top-4 left-4 text-xs font-mono text-muted-foreground space-y-1">
-            <div className="border border-border bg-background px-2 py-1">VIEWPORT_01</div>
+          {/* Educational Content Button - Upper Left */}
+          <div className="absolute top-4 left-4 text-xs font-mono space-y-1">
+            {selectedPatternId === 'cellular-automaton' ? (
+              <button
+                onClick={() => setIsEducationalVisible(!isEducationalVisible)}
+                className={`border border-border px-2 py-1 font-mono transition-colors ${
+                  isEducationalVisible 
+                    ? "bg-background text-foreground hover:bg-muted" 
+                    : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
+                }`}
+              >
+                {isEducationalVisible ? '📚 HIDE LEARNING' : '🎓 LET\'S LEARN!'}
+              </button>
+            ) : (
+              <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>
+            )}
           </div>
           <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
             <div className="flex items-center space-x-2">
@@ -501,6 +517,18 @@ export default function DesktopLayout() {
                 />
               </div>
             </div>
+
+            {/* Educational Overlay - Desktop Accordion */}
+            {selectedPatternId === 'cellular-automaton' && (
+              <div className="mt-8 mb-16 max-w-4xl">
+                <EducationalOverlay
+                  type="accordion"
+                  content={cellularAutomataContent}
+                  isVisible={isEducationalVisible}
+                  onClose={() => setIsEducationalVisible(false)}
+                />
+              </div>
+            )}
 
           </div>
 
