@@ -11,7 +11,7 @@ import ProgressiveDisclosurePanel from './progressive-disclosure-panel'
 import { patternGenerators } from '@/components/pattern-generators'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { EducationalOverlay } from '@/components/ui/educational-overlay'
-import { cellularAutomataContent } from '@/lib/educational-content-parser'
+import { useEducationalContent } from '@/lib/hooks/use-educational-content'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -44,6 +44,9 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0],
     [selectedPatternId]
   )
+
+  // AIDEV-NOTE: Load educational content for current pattern
+  const { content: educationalContent } = useEducationalContent(selectedPatternId)
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
@@ -311,7 +314,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       {selectedPatternId === 'cellular-automaton' && (
         <EducationalOverlay
           type="sidebar"
-          content={cellularAutomataContent}
+          content={educationalContent}
           isVisible={isEducationalVisible}
           onClose={() => setIsEducationalVisible(false)}
         />

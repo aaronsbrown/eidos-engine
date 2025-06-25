@@ -19,6 +19,12 @@ const customJestConfig = {
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
     '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@/app/(.*)$': '<rootDir>/src/app/$1',
+    // AIDEV-NOTE: Mock markdown dependencies for testing since they're ESM-only
+    '^react-markdown$': '<rootDir>/src/__mocks__/react-markdown.tsx',
+    '^remark-gfm$': '<rootDir>/src/__mocks__/remark-gfm.js',
+    '^rehype-highlight$': '<rootDir>/src/__mocks__/rehype-highlight.js',
+    // Mock highlight.js CSS import
+    '^highlight\\.js/styles/github-dark\\.css$': '<rootDir>/src/__mocks__/empty-css.js',
   },
   collectCoverageFrom: [
     'src/components/**/*.{js,jsx,ts,tsx}',

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import { EducationalOverlay, type OverlayType } from '@/components/ui/educational-overlay'
-import { cellularAutomataContent } from '@/lib/educational-content-parser'
+import { getEducationalContentSync } from '@/lib/educational-content-loader'
 import { Button } from '@/components/ui/button'
 import CellularAutomatonGenerator from '@/components/pattern-generators/cellular-automaton-generator'
 
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>
 // AIDEV-NOTE: Interactive prototype playground for comparing overlay approaches
 export const PrototypePlayground: Story = {
   render: () => {
-    const [overlayType, setOverlayType] = useState<OverlayType>('modal')
+    const [overlayType, setOverlayType] = useState<OverlayType>('accordion')
     const [isVisible, setIsVisible] = useState(false)
 
     return (
@@ -46,12 +46,6 @@ export const PrototypePlayground: Story = {
           <h3 className="text-yellow-400 font-mono mb-4">EDUCATIONAL OVERLAY PROTOTYPES</h3>
           
           <div className="flex gap-4 mb-4">
-            <Button
-              variant={overlayType === 'modal' ? 'default' : 'outline'}
-              onClick={() => setOverlayType('modal')}
-            >
-              Modal Overlay
-            </Button>
             <Button
               variant={overlayType === 'accordion' ? 'default' : 'outline'}
               onClick={() => setOverlayType('accordion')}
@@ -75,7 +69,6 @@ export const PrototypePlayground: Story = {
           </Button>
           
           <div className="mt-2 text-sm text-gray-400">
-            {overlayType === 'modal' && "✨ Modal: Tabbed levels + preference saving"}
             {overlayType === 'accordion' && "✨ Accordion: Expands beneath pattern + horizontal tabs"}
             {overlayType === 'sidebar' && "✨ Sidebar: Vertical stacked levels + mobile responsive"}
           </div>
@@ -89,7 +82,7 @@ export const PrototypePlayground: Story = {
         {/* Educational overlay */}
         <EducationalOverlay
           type={overlayType}
-          content={cellularAutomataContent}
+          content={getEducationalContentSync('cellular-automata')}
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
@@ -98,27 +91,6 @@ export const PrototypePlayground: Story = {
   }
 }
 
-// Individual overlay type stories
-export const ModalOnly: Story = {
-  render: () => {
-    const [isVisible, setIsVisible] = useState(false)
-
-    return (
-      <div className="min-h-screen bg-gray-950 p-4">
-        <div className="text-center mb-8">
-          <Button onClick={() => setIsVisible(true)}>Show Modal Educational Overlay</Button>
-        </div>
-        
-        <EducationalOverlay
-          type="modal"
-          content={cellularAutomataContent}
-          isVisible={isVisible}
-          onClose={() => setIsVisible(false)}
-        />
-      </div>
-    )
-  }
-}
 
 export const AccordionOnly: Story = {
   render: () => {
@@ -161,7 +133,7 @@ export const AccordionOnly: Story = {
         
         <EducationalOverlay
           type="accordion"
-          content={cellularAutomataContent}
+          content={getEducationalContentSync('cellular-automata')}
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
@@ -219,7 +191,7 @@ export const SidebarOnly: Story = {
         
         <EducationalOverlay
           type="sidebar"
-          content={cellularAutomataContent}
+          content={getEducationalContentSync('cellular-automata')}
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
@@ -403,7 +375,7 @@ export const LivePatternPlayground: Story = {
         {/* Responsive Educational Overlay */}
         <EducationalOverlay
           type={overlayType}
-          content={cellularAutomataContent}
+          content={getEducationalContentSync('cellular-automata')}
           isVisible={isEducationalVisible}
           onClose={() => setIsEducationalVisible(false)}
         />

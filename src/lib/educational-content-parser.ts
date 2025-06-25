@@ -39,7 +39,7 @@ export function parseEducationalContent(markdownContent: string): EducationalCon
   }
 }
 
-// Sample cellular automata content for prototyping
+// AIDEV-NOTE: Keep hard-coded content as fallback for educational content loader
 export const cellularAutomataContent: EducationalContent = {
   title: "Cellular Automata: Patterns from First Principles",
   layers: {

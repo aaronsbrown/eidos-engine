@@ -43,9 +43,10 @@ jest.mock('@/components/pattern-generators', () => ({
   ]
 }))
 
-// Mock the educational content
-jest.mock('@/lib/educational-content-parser', () => ({
-  cellularAutomataContent: {
+// Mock the educational content loader
+jest.mock('@/lib/hooks/use-educational-content', () => ({
+  useEducationalContent: () => ({
+    content: {
     title: 'Test Educational Content',
     layers: {
       intuitive: {
@@ -61,7 +62,10 @@ jest.mock('@/lib/educational-content-parser', () => ({
         content: 'This is technical content for testing'
       }
     }
-  }
+    },
+    isLoading: false,
+    error: null
+  })
 }))
 
 // Mock the preset manager hook

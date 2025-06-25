@@ -11,7 +11,7 @@ import { FloatingPresetPanel } from "@/components/ui/floating-preset-panel"
 import { SavePresetModal } from "@/components/ui/save-preset-modal"
 import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 import { EducationalOverlay } from "@/components/ui/educational-overlay"
-import { cellularAutomataContent } from "@/lib/educational-content-parser"
+import { useEducationalContent } from "@/lib/hooks/use-educational-content"
 
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -36,6 +36,9 @@ export default function DesktopLayout() {
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
+
+  // AIDEV-NOTE: Load educational content for current pattern
+  const { content: educationalContent } = useEducationalContent(selectedPatternId)
 
   // Initialize default control values for patterns that have controls
   const initializeControlValues = (patternId: string) => {
@@ -523,7 +526,7 @@ export default function DesktopLayout() {
               <div className="mt-8 mb-16 max-w-4xl">
                 <EducationalOverlay
                   type="accordion"
-                  content={cellularAutomataContent}
+                  content={educationalContent}
                   isVisible={isEducationalVisible}
                   onClose={() => setIsEducationalVisible(false)}
                 />
