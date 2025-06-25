@@ -329,11 +329,11 @@ const mobileReady = isMobileFriendly(pattern)
 
 **Process:**
 
-1. Create design documents in `docs/implementation_notes/`
+1. Create design documents in `docs/tech/architecture_notes/implementation_notes/`
 2. Follow TDD or documented approaches
 3. Create `ISSUE_N_IMPLEMENTATION_SUMMARY.md` upon completion
 
-**Location:** `docs/implementation_notes/ISSUE_N_IMPLEMENTATION_SUMMARY.md`
+**Location:** `docs/tech/architecture_notes/implementation_notes/ISSUE_N_IMPLEMENTATION_SUMMARY.md`
 
 ---
 
@@ -505,7 +505,14 @@ src/                           # Source code root
 public/shaders/                # External shader files
 ├── fragment/                  # Fragment shaders
 └── vertex/                    # Vertex shaders
-docs/implementation_notes/     # Implementation documentation
+docs/                          # Documentation root
+├── content/                   # Content documentation
+│   └── pattern_writeups/      # Pattern-specific documentation
+├── process/                   # Process documentation
+│   └── retrospectives/        # Development retrospectives
+└── tech/                      # Technical documentation
+    └── architecture_notes/    # Architecture and implementation notes
+        └── implementation_notes/ # Detailed implementation summaries
 stories/                       # Storybook stories
 ```
 
