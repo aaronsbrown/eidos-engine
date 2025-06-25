@@ -83,7 +83,7 @@ jest.mock('@/lib/mobile-utils', () => ({
 
 // Mock mobile components
 jest.mock('../mobile-header', () => {
-  return function MockMobileHeader({ title, onMenuToggle }: any) {
+  return function MockMobileHeader({ title, onMenuToggle }: { title: string; onMenuToggle: () => void }) {
     return (
       <div data-testid="mobile-header">
         <span>{title}</span>
@@ -94,7 +94,11 @@ jest.mock('../mobile-header', () => {
 })
 
 jest.mock('../pattern-dropdown-selector', () => {
-  return function MockPatternDropdownSelector({ selectedId, onSelect, className }: any) {
+  return function MockPatternDropdownSelector({ selectedId, onSelect, className }: { 
+    selectedId: string; 
+    onSelect: (id: string) => void; 
+    className?: string 
+  }) {
     return (
       <div data-testid="pattern-dropdown" className={className}>
         <select 

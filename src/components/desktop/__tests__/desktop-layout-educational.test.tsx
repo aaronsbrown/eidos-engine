@@ -3,7 +3,7 @@
  */
 
 import React from 'react'
-import { screen, fireEvent } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-providers'
 import userEvent from '@testing-library/user-event'
 import DesktopLayout from '../desktop-layout'

@@ -3,7 +3,7 @@
  */
 
 import React from 'react'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { render } from '@/test-utils/test-providers'
 import userEvent from '@testing-library/user-event'
 import { EducationalOverlay } from '../educational-overlay'
@@ -278,9 +278,7 @@ describe('EducationalOverlay - User Behavior', () => {
   })
 
   describe('Accessibility and User Experience', () => {
-    it('provides accessible navigation between educational levels', async () => {
-      const user = userEvent.setup()
-      
+    it('provides accessible navigation between educational levels', () => {
       render(
         <EducationalOverlay
           type="modal"
@@ -315,9 +313,7 @@ describe('EducationalOverlay - User Behavior', () => {
       expect(screen.getByText('Advanced')).toBeInTheDocument()
     })
 
-    it('maintains preference state across overlay types', async () => {
-      const user = userEvent.setup()
-      
+    it('maintains preference state across overlay types', () => {
       // Mock localStorage to simulate saved technical preference
       window.localStorage.getItem = jest.fn().mockReturnValue('technical')
       
