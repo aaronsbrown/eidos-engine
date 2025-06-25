@@ -46,7 +46,7 @@ export default function AdminPage() {
           return false
         })
         const isMobileFriendly = pattern.performance.computationalComplexity !== 'VeryHigh' && !hasMobileIssues
-        
+
         if (filters.mobileFriendly === 'yes' && !isMobileFriendly) return false
         if (filters.mobileFriendly === 'no' && isMobileFriendly) return false
       }
@@ -60,7 +60,7 @@ export default function AdminPage() {
       <div className="border-b border-border bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-2xl font-mono font-bold uppercase tracking-wider text-accent-primary-strong">
-            Semantic Metadata Admin
+            Semantic Metadata
           </h1>
           <p className="mt-2 text-sm text-muted-foreground font-mono">
             Internal view of pattern generator semantic data
@@ -99,8 +99,8 @@ export default function AdminPage() {
           <div className="border border-border rounded-lg p-4 bg-background/50">
             <div className="text-2xl font-mono font-bold text-accent-primary-strong">
               {semanticPatterns.filter(p => {
-                const hasMobileIssues = p.controls?.some(c => 
-                  'defaultRecommendations' in c && 
+                const hasMobileIssues = p.controls?.some(c =>
+                  'defaultRecommendations' in c &&
                   c.defaultRecommendations?.platformSpecific?.mobile === false
                 )
                 return p.performance.computationalComplexity !== 'VeryHigh' && !hasMobileIssues
@@ -113,7 +113,7 @@ export default function AdminPage() {
         </div>
 
         {/* Filters */}
-        <SemanticFilters 
+        <SemanticFilters
           filters={filters}
           onFilterChange={setFilters}
           patterns={semanticPatterns}

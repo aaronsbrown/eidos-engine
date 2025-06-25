@@ -1,16 +1,95 @@
 // AIDEV-NOTE: Data table component for displaying semantic metadata - Issue #44 Phase 5
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import type { RichPatternGeneratorDefinition } from '@/lib/semantic-types'
-import { ChevronDown, ChevronRight, ExternalLink, Download } from 'lucide-react'
+import { ChevronDown, ChevronRight, ExternalLink, Download, ChevronUp } from 'lucide-react'
 
 interface SemanticDataTableProps {
   patterns: RichPatternGeneratorDefinition[]
 }
 
+type SortField = 'name' | 'category' | 'algorithm' | 'complexity' | 'status' | 'technology' | 'mobile'
+type SortDirection = 'asc' | 'desc'
+
 export default function SemanticDataTable({ patterns }: SemanticDataTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [sortField, setSortField] = useState<SortField>('name')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle between asc and desc
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const sortedPatterns = useMemo(() => {
+
+    return [...patterns].sort((a, b) => {
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case 'category':
+          aValue = a.category.toLowerCase()
+          bValue = b.category.toLowerCase()
+          break
+        case 'algorithm':
+          aValue = a.semantics.primaryAlgorithmFamily.toLowerCase()
+          bValue = b.semantics.primaryAlgorithmFamily.toLowerCase()
+          break
+        case 'complexity':
+          // Order complexity levels properly
+          const complexityOrder = { 'Low': 1, 'Medium': 2, 'High': 3, 'VeryHigh': 4 }
+          aValue = complexityOrder[a.performance.computationalComplexity as keyof typeof complexityOrder] || 0
+          bValue = complexityOrder[b.performance.computationalComplexity as keyof typeof complexityOrder] || 0
+          break
+        case 'status':
+          // Order status properly
+          const statusOrder = { 'Development': 1, 'Experimental': 2, 'Production': 3 }
+          aValue = statusOrder[a.status as keyof typeof statusOrder] || 0
+          bValue = statusOrder[b.status as keyof typeof statusOrder] || 0
+          break
+        case 'technology':
+          aValue = a.technology.toLowerCase()
+          bValue = b.technology.toLowerCase()
+          break
+        case 'mobile':
+          // Calculate mobile friendliness
+          const getMobileFriendliness = (pattern: RichPatternGeneratorDefinition) => {
+            const hasMobileIssues = pattern.controls?.some(c => 
+              'defaultRecommendations' in c && 
+              c.defaultRecommendations?.platformSpecific?.mobile === false
+            )
+            const isMobileFriendly = pattern.performance.computationalComplexity !== 'VeryHigh' && !hasMobileIssues
+            return isMobileFriendly ? 1 : 0
+          }
+          aValue = getMobileFriendliness(a)
+          bValue = getMobileFriendliness(b)
+          break
+        default:
+          return 0
+      }
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      } else {
+        return sortDirection === 'asc' 
+          ? (aValue as number) - (bValue as number)
+          : (bValue as number) - (aValue as number)
+      }
+    })
+  }, [patterns, sortField, sortDirection])
 
   const toggleRow = (patternId: string) => {
     const newExpanded = new Set(expandedRows)
@@ -22,8 +101,34 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
     setExpandedRows(newExpanded)
   }
 
+  const renderSortIcon = (field: SortField) => {
+    return sortField === field ? (
+      sortDirection === 'asc' 
+        ? <ChevronDown className="w-3 h-3" />
+        : <ChevronUp className="w-3 h-3" />
+    ) : (
+      <div className="w-3 h-3" /> // Invisible spacer to maintain width
+    )
+  }
+
+  const SortableHeader = ({ field, children, className = '' }: { 
+    field: SortField
+    children: React.ReactNode
+    className?: string 
+  }) => (
+    <th 
+      className={`px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors select-none ${className}`}
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center gap-1">
+        {children}
+        {renderSortIcon(field)}
+      </div>
+    </th>
+  )
+
   const exportData = () => {
-    const data = patterns.map(pattern => ({
+    const data = sortedPatterns.map(pattern => ({
       id: pattern.id,
       name: pattern.name,
       category: pattern.category,
@@ -81,7 +186,7 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-border bg-background/70 flex justify-between items-center">
         <h2 className="text-lg font-mono font-semibold uppercase tracking-wider text-accent-primary-strong">
-          Pattern Data ({patterns.length} results)
+          Pattern Data ({sortedPatterns.length} results)
         </h2>
         <button
           onClick={exportData}
@@ -97,32 +202,32 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
         <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-background/30">
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              <SortableHeader field="name">
                 Pattern
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="category">
                 Category
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="algorithm">
                 Algorithm
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="complexity">
                 Complexity
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="status">
                 Status
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="technology">
                 Tech
-              </th>
-              <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-wide text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader field="mobile" className="text-center">
                 Mobile
-              </th>
+              </SortableHeader>
               <th className="w-8"></th>
             </tr>
           </thead>
           <tbody>
-            {patterns.map((pattern) => {
+            {sortedPatterns.map((pattern) => {
               const isExpanded = expandedRows.has(pattern.id)
               const hasMobileIssues = pattern.controls?.some(c => 
                 'defaultRecommendations' in c && 
@@ -298,7 +403,7 @@ export default function SemanticDataTable({ patterns }: SemanticDataTableProps) 
       </div>
 
       {/* Empty State */}
-      {patterns.length === 0 && (
+      {sortedPatterns.length === 0 && (
         <div className="px-6 py-12 text-center">
           <p className="text-muted-foreground font-mono">No patterns match the current filters</p>
         </div>
