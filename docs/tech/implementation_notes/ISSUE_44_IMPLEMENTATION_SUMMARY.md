@@ -184,10 +184,10 @@ For adding semantic metadata to new patterns:
 ### Phase 5: Admin UI (✅ Complete)
 
 **Created:**
-- `src/app/admin/page.tsx` - Admin page with filtering and statistics
-- `src/app/admin/layout.tsx` - Layout wrapper for admin routes
-- `src/components/admin/semantic-filters.tsx` - Filter controls component
-- `src/components/admin/semantic-data-table.tsx` - Expandable data table
+- `src/app/meta-data/page.tsx` - Admin page with filtering and statistics
+- `src/app/meta-data/layout.tsx` - Layout wrapper for admin routes
+- `src/components/meta-data/semantic-filters.tsx` - Filter controls component
+- `src/components/meta-data/semantic-data-table.tsx` - Expandable data table
 
 **Features Implemented:**
 - Read-only table view of all patterns with semantic data
@@ -198,7 +198,7 @@ For adding semantic metadata to new patterns:
 - Statistics overview (total patterns, filtered results, production-ready, mobile-friendly)
 - Technical blueprint aesthetic matching project design
 
-**Admin Page Access:** Navigate to `/admin` to view the semantic metadata dashboard
+**Admin Page Access:** Navigate to `/meta-data` to view the semantic metadata dashboard
 
 ## Phase 6: Future Expansion Opportunities
 

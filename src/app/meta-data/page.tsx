@@ -5,8 +5,8 @@ import { useState, useMemo } from 'react'
 import { patternGenerators } from '@/components/pattern-generators'
 import { hasSemanticMetadata } from '@/lib/semantic-types'
 import type { RichPatternGeneratorDefinition } from '@/lib/semantic-types'
-import SemanticDataTable from '@/components/admin/semantic-data-table'
-import SemanticFilters from '@/components/admin/semantic-filters'
+import SemanticDataTable from '@/components/meta-data/semantic-data-table'
+import SemanticFilters from '@/components/meta-data/semantic-filters'
 
 export default function AdminPage() {
   const [filters, setFilters] = useState({
