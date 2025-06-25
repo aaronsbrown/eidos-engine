@@ -140,7 +140,7 @@ function ModalOverlay({ content, onClose }: { content: EducationalContent; onClo
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-border">
           <h2 className="text-xl font-mono text-foreground uppercase">{content.title}</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close educational overlay">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -257,7 +257,7 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
           <span className="text-foreground text-lg">🎓</span>
           <h3 className="text-foreground font-mono uppercase text-lg">{content.title}</h3>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Close educational overlay">
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -388,6 +388,7 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
     <>
       {/* Backdrop overlay for mobile */}
       <div 
+        data-testid="sidebar-backdrop"
         className={`fixed inset-0 bg-black/20 backdrop-blur-sm md:hidden z-40 transition-opacity duration-300 ${
           isExiting ? 'opacity-0' : isEntering ? 'opacity-0' : 'opacity-100'
         }`}
@@ -406,7 +407,7 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
               {content.title}
             </h3>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleClose} className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="icon" onClick={handleClose} className="text-muted-foreground hover:text-foreground" aria-label="Close educational overlay">
             <X className="h-4 w-4" />
           </Button>
         </div>
