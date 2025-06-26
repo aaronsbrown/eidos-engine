@@ -524,21 +524,6 @@ describe('DesktopLayout - User Behavior', () => {
       })
     })
 
-    it('provides fullscreen toggle functionality', async () => {
-      render(<DesktopLayout />, { wrapper: TestWrapper })
-      
-      const fullscreenButton = screen.getByText('FULLSCREEN')
-      fireEvent.click(fullscreenButton)
-      
-      // Button text changes
-      await waitFor(() => {
-        expect(screen.getByText('EXIT_FULLSCREEN')).toBeInTheDocument()
-      })
-      
-      // Dimensions should change (mocked window dimensions)
-      expect(screen.getByText('984px')).toBeInTheDocument() // window.innerWidth - 40
-      expect(screen.getByText('648px')).toBeInTheDocument() // window.innerHeight - 120
-    })
   })
 
   describe('User can manage presets', () => {

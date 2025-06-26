@@ -472,25 +472,6 @@ describe('Pattern Generator Components - Basic Tests', () => {
       expect(canvas).toHaveAttribute('height', '600')
     })
 
-    it('handles fullscreen dimensions', () => {
-      // Mock fullscreen dimensions
-      Object.defineProperty(window, 'innerWidth', { value: 1920, writable: true })
-      Object.defineProperty(window, 'innerHeight', { value: 1080, writable: true })
-      
-      render(
-        <MockCanvasPattern 
-          width={window.innerWidth - 40} 
-          height={window.innerHeight - 120} 
-          controlValues={{}} 
-          onControlChange={jest.fn()} 
-        />,
-        { wrapper: TestWrapper }
-      )
-      
-      const canvas = screen.getByTestId('pattern-canvas')
-      expect(canvas).toHaveAttribute('width', '1880')
-      expect(canvas).toHaveAttribute('height', '960')
-    })
   })
 
   describe('Performance Considerations', () => {

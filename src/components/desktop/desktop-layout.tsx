@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react"
 import { Bookmark } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
 import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
@@ -17,7 +16,6 @@ import { getAllPatternIds } from "@/lib/educational-content-loader"
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
   const [dimensions, setDimensions] = useState({ width: 700, height: 394 })
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
   const [sidebarWidth, setSidebarWidth] = useState(380) // Default sidebar width
   const [isResizing, setIsResizing] = useState(false)
@@ -242,14 +240,6 @@ export default function DesktopLayout() {
     }
   }, [isResizing, handleMouseMove, handleMouseUp])
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-    if (!isFullscreen) {
-      setDimensions({ width: window.innerWidth - 40, height: window.innerHeight - 120 })
-    } else {
-      setDimensions({ width: 700, height: 394 })
-    }
-  }
 
 
   return (
@@ -278,14 +268,6 @@ export default function DesktopLayout() {
             <div className="text-xs font-mono text-muted-foreground border border-border px-2 py-1 bg-background">
               [{String(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).padStart(2, '0')}/{String(patternGenerators.length).padStart(2, '0')}]
             </div>
-            <Button
-              onClick={toggleFullscreen}
-              variant="outline"
-              size="sm"
-              className="font-mono text-xs"
-            >
-              {isFullscreen ? "EXIT_FULLSCREEN" : "FULLSCREEN"}
-            </Button>
           </div>
         </div>
       </header>
