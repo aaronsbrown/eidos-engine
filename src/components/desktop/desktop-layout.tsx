@@ -12,6 +12,7 @@ import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 import { EducationalOverlay } from "@/components/ui/educational-overlay"
 import { useEducationalContent } from "@/lib/hooks/use-educational-content"
 import { getAllPatternIds } from "@/lib/educational-content-loader"
+import { getPlatformDefaultValue } from "@/lib/semantic-utils"
 
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -44,13 +45,15 @@ export default function DesktopLayout() {
   const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
 
   // Initialize default control values for patterns that have controls
+  // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile/desktop experience
   const initializeControlValues = (patternId: string) => {
     const pattern = patternGenerators.find(p => p.id === patternId)
     if (!pattern?.controls) return {}
 
     const defaults: Record<string, number | string | boolean> = {}
     pattern.controls.forEach(control => {
-      defaults[control.id] = control.defaultValue
+      // Use platform-aware defaults for desktop (assumes desktop since this is desktop layout)
+      defaults[control.id] = getPlatformDefaultValue(control, 'desktop')
     })
     return defaults
   }

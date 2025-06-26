@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { EducationalOverlay } from '@/components/ui/educational-overlay'
 import { useEducationalContent } from '@/lib/hooks/use-educational-content'
 import { getAllPatternIds } from '@/lib/educational-content-loader'
+import { getPlatformDefaultValue } from '@/lib/semantic-utils'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -89,13 +90,15 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   }, [isTablet, isDesktop, viewport])
 
   // Initialize control values for pattern
+  // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile experience
   const initializeControlValues = useCallback((patternId: string) => {
     const pattern = patternGenerators.find(p => p.id === patternId)
     if (!pattern?.controls) return {}
 
     const defaults: Record<string, number | string | boolean> = {}
     pattern.controls.forEach(control => {
-      defaults[control.id] = control.defaultValue
+      // Use platform-aware defaults for mobile
+      defaults[control.id] = getPlatformDefaultValue(control, 'mobile')
     })
     return defaults
   }, [])
