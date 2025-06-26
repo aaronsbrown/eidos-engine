@@ -1,7 +1,6 @@
 precision mediump float;
 
 uniform float u_time;
-uniform vec3 u_cameraPosition;
 uniform float u_pointBrightness;
 
 // Simple distance-based coloring and alpha

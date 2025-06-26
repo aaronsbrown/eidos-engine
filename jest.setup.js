@@ -1,6 +1,24 @@
 // AIDEV-NOTE: Global Jest setup file for React Testing Library and DOM mocking
 import '@testing-library/jest-dom'
 
+// Add custom Jest matchers for numerical testing
+expect.extend({
+  toBeFinite(received) {
+    const pass = Number.isFinite(received)
+    if (pass) {
+      return {
+        message: () => `expected ${received} not to be finite`,
+        pass: true,
+      }
+    } else {
+      return {
+        message: () => `expected ${received} to be finite`,
+        pass: false,
+      }
+    }
+  },
+})
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),

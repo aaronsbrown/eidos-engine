@@ -37,14 +37,14 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
     particleCount: (controlValues?.particleCount as number) ?? 1000
   }), [controlValues])
 
-  // Initialize particles with random starting positions
+  // Initialize particles with random starting positions in Lorenz attractor range
   useEffect(() => {
     particlesRef.current = []
     for (let i = 0; i < controls.particleCount; i++) {
       particlesRef.current.push({
-        x: Math.random() * 2 - 1,
-        y: Math.random() * 2 - 1,
-        z: Math.random() * 20 + 10,
+        x: Math.random() * 20 - 10,  // Lorenz x range is roughly -20 to 20
+        y: Math.random() * 20 - 10,  // Lorenz y range is roughly -20 to 20
+        z: Math.random() * 30 + 5,   // Lorenz z range is roughly 0 to 50
       })
     }
   }, [controls.particleCount])
@@ -75,6 +75,7 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
     const initShaders = async () => {
       try {
         const shaderProgram = await loadShader('lorenz-attractor', 'lorenz-attractor')
+        
         const program = createShaderProgram(gl, shaderProgram.vertex, shaderProgram.fragment)
         
         if (!program) {
@@ -95,46 +96,11 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
         const uniformLocations = {
           u_mvpMatrix: gl.getUniformLocation(program, "u_mvpMatrix"),
           u_time: gl.getUniformLocation(program, "u_time"),
-          u_cameraPosition: gl.getUniformLocation(program, "u_cameraPosition"),
           u_pointSize: gl.getUniformLocation(program, "u_pointSize"),
           u_pointBrightness: gl.getUniformLocation(program, "u_pointBrightness")
         }
 
         gl.useProgram(program)
-
-        // Basic perspective projection matrix
-        const createPerspectiveMatrix = (fov: number, aspect: number, near: number, far: number) => {
-          const f = Math.tan(Math.PI * 0.5 - 0.5 * fov)
-          const rangeInv = 1.0 / (near - far)
-          
-          return new Float32Array([
-            f / aspect, 0, 0, 0,
-            0, f, 0, 0,
-            0, 0, (near + far) * rangeInv, -1,
-            0, 0, near * far * rangeInv * 2, 0
-          ])
-        }
-
-        // Basic view matrix (looking at origin from distance)
-        const createViewMatrix = (distance: number, angleY: number) => {
-          const x = Math.sin(angleY) * distance
-          const z = Math.cos(angleY) * distance
-          const y = 0
-          
-          // Simple look-at matrix calculation
-          const zAxis = [x, y, z]
-          const magnitude = Math.sqrt(zAxis[0] * zAxis[0] + zAxis[1] * zAxis[1] + zAxis[2] * zAxis[2])
-          zAxis[0] /= magnitude
-          zAxis[1] /= magnitude
-          zAxis[2] /= magnitude
-          
-          return new Float32Array([
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            -x, -y, -z, 1
-          ])
-        }
 
         // Animation loop
         const animate = () => {
@@ -151,7 +117,7 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
             p.z = newZ
           })
 
-          // Update position buffer with new particle positions
+          // Update position buffer with Lorenz coordinates (keep original scale for 3D)
           gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
           const positions = new Float32Array(particlesRef.current.length * 3)
           particlesRef.current.forEach((p, i) => {
@@ -162,22 +128,29 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
           gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW)
           gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0)
 
-          // Set up matrices
-          const projectionMatrix = createPerspectiveMatrix(Math.PI / 3, width / height, 0.1, 1000)
-          const viewMatrix = createViewMatrix(80, timeRef.current * 0.3) // Slow rotation
-          
-          // Simple matrix multiplication for MVP
-          const mvpMatrix = new Float32Array(16)
-          for (let i = 0; i < 16; i++) {
-            mvpMatrix[i] = projectionMatrix[i] * viewMatrix[i] // Simplified - should be proper matrix mult
-          }
+          // TEMP: Go back to simple scaling that worked
+          // Scale Lorenz coordinates to visible range again
+          particlesRef.current.forEach((p, i) => {
+            // Scale to fit in visible range like before
+            positions[i * 3] = p.x / 25.0      // x: -20..20 -> -0.8..0.8
+            positions[i * 3 + 1] = p.y / 25.0  // y: -20..20 -> -0.8..0.8  
+            positions[i * 3 + 2] = (p.z - 25) / 25.0  // z: 5..45 -> -0.8..0.8
+          })
+          gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW)
+
+          // Use identity matrix to get back to working state
+          const identityMatrix = new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+          ])
 
           gl.useProgram(program)
-          gl.uniformMatrix4fv(uniformLocations.u_mvpMatrix, false, mvpMatrix)
+          gl.uniformMatrix4fv(uniformLocations.u_mvpMatrix, false, identityMatrix)
           gl.uniform1f(uniformLocations.u_time, timeRef.current)
-          gl.uniform3f(uniformLocations.u_cameraPosition, 0, 0, 80)
-          gl.uniform1f(uniformLocations.u_pointSize, 3.0)
-          gl.uniform1f(uniformLocations.u_pointBrightness, 1.0)
+          gl.uniform1f(uniformLocations.u_pointSize, 4.0)
+          gl.uniform1f(uniformLocations.u_pointBrightness, 1.2)
           
           gl.clearColor(0, 0, 0, 1)
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
