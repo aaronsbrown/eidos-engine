@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run copy-educational-content && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "copy-educational-content": "mkdir -p public/educational-content && cp docs/education/*.md public/educational-content/ && rm -f public/educational-content/TEMPLATE.md"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",

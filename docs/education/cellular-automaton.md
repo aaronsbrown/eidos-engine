@@ -1,6 +1,6 @@
 # Cellular Automata: Patterns from First Principles
 
-## Layer 1: “What am I looking at?” (Intuitive / Experiential)
+## Layer 1: “What is this?” (Intuitive/Experiential)
 
 A single yellow pixel. Then another. Then a thousand more—marching downward row by row, like ink dripping from logic itself.
 
@@ -26,7 +26,7 @@ It’s proof that from nothing but **local decisions**, global intelligence can 
 
 ---
 
-## Layer 2: “How does this work?” (Conceptual / Mechanical)
+## Layer 2: “How does this work?” (Conceptual/Mechanical)
 
 At heart, it’s just this:
 
@@ -67,7 +67,7 @@ You’re not seeing animation. You’re seeing **accumulation**. Each row encode
 
 ---
 
-## Layer 3: “Show me the code” (Technical / Formal)
+## Layer 3: “Show me the code” (Technical/Formal)
 
 **Rule Lookup Table**:
 This converts a rule number (0–255) into an array of 8 booleans that describe how to respond to each neighborhood configuration.

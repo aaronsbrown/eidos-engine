@@ -12,6 +12,7 @@ import { SavePresetModal } from "@/components/ui/save-preset-modal"
 import { usePresetManager } from "@/lib/hooks/use-preset-manager"
 import { EducationalOverlay } from "@/components/ui/educational-overlay"
 import { useEducationalContent } from "@/lib/hooks/use-educational-content"
+import { getAllPatternIds } from "@/lib/educational-content-loader"
 
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
@@ -39,6 +40,10 @@ export default function DesktopLayout() {
 
   // AIDEV-NOTE: Load educational content for current pattern
   const { content: educationalContent } = useEducationalContent(selectedPatternId)
+  
+  // Check if educational content is available for current pattern
+  const availableEducationalPatterns = getAllPatternIds()
+  const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
 
   // Initialize default control values for patterns that have controls
   const initializeControlValues = (patternId: string) => {
@@ -426,7 +431,7 @@ export default function DesktopLayout() {
         <main className="flex-1 p-6 relative">
           {/* Educational Content Button - Upper Left */}
           <div className="absolute top-4 left-4 text-xs font-mono space-y-1">
-            {selectedPatternId === 'cellular-automaton' ? (
+            {hasEducationalContent ? (
               <button
                 onClick={() => setIsEducationalVisible(!isEducationalVisible)}
                 className={`border border-border px-2 py-1 font-mono transition-colors ${
@@ -522,7 +527,7 @@ export default function DesktopLayout() {
             </div>
 
             {/* Educational Overlay - Desktop Accordion */}
-            {selectedPatternId === 'cellular-automaton' && (
+            {hasEducationalContent && (
               <div className="mt-8 mb-16 max-w-4xl">
                 <EducationalOverlay
                   type="accordion"

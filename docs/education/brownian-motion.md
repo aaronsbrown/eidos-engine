@@ -1,6 +1,6 @@
 # Brownian Motion Educational Documentation
 
-## Layer 1: "What am I looking at?" (Experiential)
+## Layer 1: "What is this?" (Intuitive/Experiential)
 
 You're watching particles wander.
 
@@ -25,7 +25,7 @@ What seems chaotic has structure. What seems meaningless, pattern.
 
 And underneath it all, the quiet thrum of probability.
 
-## Layer 2: "How does this work?" (Conceptual)
+## Layer 2: "How does this work?" (Conceptual/Mechanical)
 
 At its core, Brownian motion is a **random walk**. Each particle takes a small, random step. Then another. Then another. Over time, this produces diffusion: the spread of particles from areas of high concentration to low.
 
@@ -50,7 +50,7 @@ The result is both familiar and strange. Particles wander, but never quite repea
 
 This is what emergence looks like.
 
-## Layer 3: "Show me the code" (Technical)
+## Layer 3: "Show me the code" (Technical/Formal)
 
 The Brownian simulation runs on the GPU using GLSL (a shading language), ensuring smooth performance even with many particles.
 

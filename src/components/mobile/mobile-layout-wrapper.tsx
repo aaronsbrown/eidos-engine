@@ -12,6 +12,7 @@ import { patternGenerators } from '@/components/pattern-generators'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { EducationalOverlay } from '@/components/ui/educational-overlay'
 import { useEducationalContent } from '@/lib/hooks/use-educational-content'
+import { getAllPatternIds } from '@/lib/educational-content-loader'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -47,6 +48,10 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
   // AIDEV-NOTE: Load educational content for current pattern
   const { content: educationalContent } = useEducationalContent(selectedPatternId)
+  
+  // Check if educational content is available for current pattern
+  const availableEducationalPatterns = getAllPatternIds()
+  const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
@@ -225,7 +230,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           />
           
           {/* Educational Content Button - Mobile */}
-          {selectedPatternId === 'cellular-automaton' && (
+          {hasEducationalContent && (
             <button
               onClick={() => setIsEducationalVisible(!isEducationalVisible)}
               className={`border border-border px-3 py-2 font-mono text-sm transition-colors ${
@@ -311,7 +316,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       </div>
 
       {/* Educational Overlay - Mobile Sidebar */}
-      {selectedPatternId === 'cellular-automaton' && (
+      {hasEducationalContent && (
         <EducationalOverlay
           type="sidebar"
           content={educationalContent}
