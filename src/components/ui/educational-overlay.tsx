@@ -98,6 +98,14 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
   })
 
   const [savePreference, setSavePreference] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+
+  // AIDEV-NOTE: Reset scroll position when tab changes
+  React.useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0
+    }
+  }, [currentLevel])
 
   const switchLevel = (level: EducationalLevel) => {
     setCurrentLevel(level)
@@ -171,7 +179,7 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
       </div>
 
       {/* Content area - horizontal layout optimized */}
-      <div className="p-6 bg-background min-h-[300px] max-h-[400px] overflow-auto">
+      <div ref={contentRef} className="p-6 bg-background min-h-[300px] max-h-[400px] overflow-auto">
         <div className="max-w-4xl">
           <h4 className="text-foreground font-mono text-xl mb-4 border-b border-border pb-2">
             {currentContent.title}
@@ -266,6 +274,14 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
   })
 
   const [savePreference, setSavePreference] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+
+  // AIDEV-NOTE: Reset scroll position when tab changes
+  React.useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0
+    }
+  }, [currentLevel])
 
   const switchLevel = (level: EducationalLevel) => {
     setCurrentLevel(level)
@@ -359,7 +375,7 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
         </div>
 
         {/* Content area - scrollable */}
-        <div className="flex-1 p-4 overflow-auto">
+        <div ref={contentRef} className="flex-1 p-4 overflow-auto">
           <div>
             <h4 className="text-foreground font-mono text-lg mb-3 border-b border-border pb-2">
               {currentContent.title}
