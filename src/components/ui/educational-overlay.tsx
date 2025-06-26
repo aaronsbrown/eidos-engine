@@ -208,8 +208,9 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
                     {children}
                   </pre>
                 ),
-                ul: ({ children }) => <ul className="text-foreground mb-4 pl-6 space-y-2">{children}</ul>,
-                li: ({ children }) => <li className="text-foreground list-disc">{children}</li>,
+                ul: ({ children }) => <ul className="text-foreground mb-4 pl-6 space-y-2 list-disc">{children}</ul>,
+                ol: ({ children }) => <ol className="text-foreground mb-4 pl-6 space-y-2 list-decimal">{children}</ol>,
+                li: ({ children }) => <li className="text-foreground">{children}</li>,
                 blockquote: ({ children }) => (
                   <blockquote className="border-l-4 border-muted-foreground pl-4 italic text-muted-foreground mb-4">
                     {children}
@@ -404,8 +405,9 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
                       {children}
                     </pre>
                   ),
-                  ul: ({ children }) => <ul className="text-foreground mb-3 pl-4 space-y-1">{children}</ul>,
-                  li: ({ children }) => <li className="text-foreground list-disc">{children}</li>,
+                  ul: ({ children }) => <ul className="text-foreground mb-3 pl-4 space-y-1 list-disc">{children}</ul>,
+                  ol: ({ children }) => <ol className="text-foreground mb-3 pl-4 space-y-1 list-decimal">{children}</ol>,
+                  li: ({ children }) => <li className="text-foreground">{children}</li>,
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-muted-foreground pl-3 italic text-muted-foreground mb-3">
                       {children}
