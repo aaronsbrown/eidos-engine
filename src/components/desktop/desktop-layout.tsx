@@ -429,22 +429,9 @@ export default function DesktopLayout() {
 
         {/* Center - Pattern Display */}
         <main className="flex-1 p-6 relative">
-          {/* Educational Content Button - Upper Left */}
+          {/* Technical indicator - Upper Left */}
           <div className="absolute top-4 left-4 text-xs font-mono space-y-1">
-            {hasEducationalContent ? (
-              <button
-                onClick={() => setIsEducationalVisible(!isEducationalVisible)}
-                className={`border border-border px-2 py-1 font-mono transition-colors ${
-                  isEducationalVisible 
-                    ? "bg-background text-foreground hover:bg-muted" 
-                    : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
-                }`}
-              >
-                {isEducationalVisible ? '📚 HIDE LEARNING' : '🎓 LET\'S LEARN!'}
-              </button>
-            ) : (
-              <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>
-            )}
+            <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>
           </div>
           <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
             <div className="flex items-center space-x-2">
@@ -588,6 +575,26 @@ export default function DesktopLayout() {
               </div>
             </div>
           </div>
+
+          {/* Educational Content Controls */}
+          {hasEducationalContent && (
+            <div className="border-t border-border pt-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <div className="w-2 h-2 bg-accent-primary"></div>
+                <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Educational</h3>
+              </div>
+              <button
+                onClick={() => setIsEducationalVisible(!isEducationalVisible)}
+                className={`w-full border border-border px-3 py-2 font-mono text-xs transition-colors ${
+                  isEducationalVisible 
+                    ? "bg-background text-foreground hover:bg-muted" 
+                    : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
+                }`}
+              >
+                {isEducationalVisible ? '📚 HIDE LEARNING' : '🎓 LEARN'}
+              </button>
+            </div>
+          )}
 
           {/* Simulation Parameters - AIDEV-NOTE: Refactored into dedicated component for maintainability */}
           <div className="border-t border-border pt-4">
