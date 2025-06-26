@@ -4,7 +4,7 @@ Complete preflight checks and commit process:
 
 ## Step 1: Preflight Validation
 
-1. **Run `/preflight` command first**
+1. **Run `/preflight` command first** (includes `npm run storybook -- --no-open`)
 2. **STOP if any preflight check fails** - Do not proceed to commit
 3. **Only continue if all preflight checks pass**
 
