@@ -5,6 +5,7 @@ import TrigonometricCircleGenerator from "./trigonometric-circle-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
 import CellularAutomatonGenerator from "./cellular-automaton-generator"
 import FourPoleGradientGenerator from "./four-pole-gradient-generator"
+import LorenzAttractorGenerator from "./lorenz-attractor-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
@@ -802,6 +803,96 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     ],
   },
   {
+    id: "lorenz-attractor",
+    name: "Lorenz Attractor",
+    component: LorenzAttractorGenerator,
+    technology: 'CANVAS_2D',
+    category: 'Simulation',
+    schemaVersion: "1.0",
+    description: "A classic strange attractor that exhibits chaotic behavior, often visualized as a butterfly shape.",
+    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This visualization projects the 3D path of particles onto a 2D plane.",
+    semantics: {
+      primaryAlgorithmFamily: "StrangeAttractor",
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex"],
+      dimensionality: "3D_Projected",
+      interactionStyle: "ParameterTuning",
+      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos"]
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance is dependent on the number of particles. Mobile devices may struggle with high particle counts."
+    },
+    version: "1.0.0",
+    author: "Aaron Brown & Gemini",
+    dateAdded: "2025-06-25",
+    lastModified: "2025-06-25",
+    status: "Production",
+    isInteractive: false,
+    isAnimatedByDefault: true,
+    controls: [
+        {
+            id: "sigma",
+            label: "Sigma",
+            type: "range",
+            min: 1,
+            max: 20,
+            step: 0.1,
+            defaultValue: 10,
+            description: "The Prandtl number, affecting the shape and stability of the attractor.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Lorenz Parameters"
+        },
+        {
+            id: "rho",
+            label: "Rho",
+            type: "range",
+            min: 1,
+            max: 50,
+            step: 0.1,
+            defaultValue: 28,
+            description: "The Rayleigh number, a key parameter for inducing chaotic behavior.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Lorenz Parameters"
+        },
+        {
+            id: "beta",
+            label: "Beta",
+            type: "range",
+            min: 1,
+            max: 5,
+            step: 0.1,
+            defaultValue: 8 / 3,
+            description: "A geometric parameter of the system.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Lorenz Parameters"
+        },
+        {
+            id: "particleCount",
+            label: "Particle Count",
+            type: "range",
+            min: 100,
+            max: 5000,
+            step: 100,
+            defaultValue: 1000,
+            description: "Number of particles to trace the attractor's path.",
+            role: "PerformanceTuning",
+            impactsPerformance: "Significant",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: 500,
+                    desktop: 1500,
+                    rationale: "High particle counts significantly impact performance on mobile devices."
+                }
+            }
+        }
+    ]
+  },
+  {
     id: "four-pole-gradient",
     name: "4-Pole Gradient",
     component: FourPoleGradientGenerator,
@@ -1030,5 +1121,5 @@ export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
 })
 
-export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
