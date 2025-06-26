@@ -17,6 +17,10 @@ export interface ProgressiveDisclosurePanelProps {
   isExpanded?: boolean
   onToggleExpanded?: () => void
   className?: string
+  // Educational content props
+  hasEducationalContent?: boolean
+  isEducationalVisible?: boolean
+  onEducationalToggle?: () => void
 }
 
 const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
@@ -26,7 +30,10 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
   onControlChange,
   isExpanded = false,
   onToggleExpanded,
-  className = ''
+  className = '',
+  hasEducationalContent = false,
+  isEducationalVisible = false,
+  onEducationalToggle
 }: ProgressiveDisclosurePanelProps) {
   const [internalExpanded, setInternalExpanded] = useState(false)
   const { viewport } = useMobileDetection()
@@ -65,11 +72,27 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
     >
       {/* Essential Controls - Always Visible */}
       <div data-testid="essential-controls-area">
-        <div className="flex items-center space-x-2 mb-5">
-          <div className="w-2 h-2 bg-accent-primary"></div>
-          <h3 className="mobile-typography-label md:text-sm text-muted-foreground">
-            Quick Controls
-          </h3>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-accent-primary"></div>
+            <h3 className="mobile-typography-label md:text-sm text-muted-foreground">
+              Quick Controls
+            </h3>
+          </div>
+          
+          {/* Educational Content Button - Mobile */}
+          {hasEducationalContent && onEducationalToggle && (
+            <button
+              onClick={onEducationalToggle}
+              className={`border border-border px-3 py-2 font-mono text-xs transition-colors ${
+                isEducationalVisible 
+                  ? "bg-background text-foreground hover:bg-muted" 
+                  : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
+              }`}
+            >
+              {isEducationalVisible ? '📚 HIDE' : '🎓 LEARN'}
+            </button>
+          )}
         </div>
         
         {mobileLayout.essentialControls.length > 0 ? (

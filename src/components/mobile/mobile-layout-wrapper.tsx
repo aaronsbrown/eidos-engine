@@ -182,6 +182,9 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
               onControlChange={handleControlChange}
               isExpanded={isAdvancedExpanded}
               onToggleExpanded={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
+              hasEducationalContent={hasEducationalContent}
+              isEducationalVisible={isEducationalVisible}
+              onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
             />
           </aside>
           
@@ -221,28 +224,12 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
       {/* Pattern Selector */}
       <div className="flex-shrink-0 p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <PatternDropdownSelector
-            patterns={patternGenerators}
-            selectedId={selectedPatternId}
-            onSelect={handlePatternSelect}
-            className="flex-1 mr-4"
-          />
-          
-          {/* Educational Content Button - Mobile */}
-          {hasEducationalContent && (
-            <button
-              onClick={() => setIsEducationalVisible(!isEducationalVisible)}
-              className={`border border-border px-3 py-2 font-mono text-sm transition-colors ${
-                isEducationalVisible 
-                  ? "bg-background text-foreground hover:bg-muted" 
-                  : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
-              }`}
-            >
-              {isEducationalVisible ? '📚 HIDE' : '🎓 LEARN'}
-            </button>
-          )}
-        </div>
+        <PatternDropdownSelector
+          patterns={patternGenerators}
+          selectedId={selectedPatternId}
+          onSelect={handlePatternSelect}
+          className="w-full"
+        />
       </div>
 
       {/* Visualization Area */}
@@ -276,6 +263,9 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           onControlChange={handleControlChange}
           isExpanded={isAdvancedExpanded}
           onToggleExpanded={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
+          hasEducationalContent={hasEducationalContent}
+          isEducationalVisible={isEducationalVisible}
+          onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
         />
       </div>
 
