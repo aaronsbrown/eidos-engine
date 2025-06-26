@@ -125,8 +125,21 @@ jest.mock('../pattern-dropdown-selector', () => {
 })
 
 jest.mock('../progressive-disclosure-panel', () => {
-  return function MockProgressiveDisclosurePanel() {
-    return <div data-testid="progressive-disclosure-panel">Controls Panel</div>
+  return function MockProgressiveDisclosurePanel({ hasEducationalContent, onEducationalToggle, isEducationalVisible }: {
+    hasEducationalContent?: boolean
+    onEducationalToggle?: () => void
+    isEducationalVisible?: boolean
+  }) {
+    return (
+      <div data-testid="progressive-disclosure-panel">
+        Controls Panel
+        {hasEducationalContent && onEducationalToggle && (
+          <button onClick={onEducationalToggle}>
+            {isEducationalVisible ? '📚 HIDE' : '🎓 LEARN'}
+          </button>
+        )}
+      </div>
+    )
   }
 })
 
@@ -147,11 +160,13 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     jest.clearAllMocks()
   })
 
-  it('shows educational button when cellular automaton pattern is selected', () => {
+  it('shows educational button when cellular automaton pattern is selected', async () => {
     render(<MobileLayoutWrapper />)
 
-    // User should see the compact "LEARN" button for cellular automaton
-    expect(screen.getByRole('button', { name: /learn/i })).toBeInTheDocument()
+    // Wait for the component to fully render and check for the educational button
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /🎓 LEARN/i })).toBeInTheDocument()
+    })
   })
 
   it('hides educational button when non-educational pattern is selected', async () => {
@@ -171,7 +186,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User clicks the educational button
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // User should see the educational overlay content
@@ -184,12 +199,12 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens the educational overlay
-    const learnButton = screen.getByRole('button', { name: /^🎓 learn$/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // Button text should change to "HIDE"
-    expect(screen.getByRole('button', { name: /hide/i })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^🎓 learn$/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /📚 HIDE/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /🎓 LEARN/i })).not.toBeInTheDocument()
   })
 
   it('uses sidebar overlay type for mobile', async () => {
@@ -197,7 +212,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // Should see vertical level navigation with icons (sidebar style)
@@ -215,7 +230,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // Verify overlay is open
@@ -236,7 +251,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // User clicks backdrop
@@ -254,14 +269,14 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
 
     // Pattern selector and educational button should be in the same row
     const patternDropdown = screen.getByTestId('pattern-dropdown')
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
 
     // Both should be present in the UI
     expect(patternDropdown).toBeInTheDocument()
     expect(learnButton).toBeInTheDocument()
 
-    // Pattern dropdown should have flex-1 class (taking remaining space)
-    expect(patternDropdown).toHaveClass('flex-1')
+    // Pattern dropdown should have w-full class (taking full width)
+    expect(patternDropdown).toHaveClass('w-full')
   })
 
   it('maintains pattern visualization while sidebar is open', async () => {
@@ -269,7 +284,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
     await user.click(learnButton)
 
     // Both pattern and educational content should be visible
@@ -296,13 +311,13 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     const user = userEvent.setup()
     render(<MobileLayoutWrapper />)
 
-    const learnButton = screen.getByRole('button', { name: /learn/i })
+    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
 
     // User rapidly toggles the overlay
     await user.click(learnButton)
     expect(screen.getByText('Mobile Educational Content')).toBeInTheDocument()
 
-    const hideButton = screen.getByRole('button', { name: /hide/i })
+    const hideButton = screen.getByRole('button', { name: /📚 HIDE/i })
     await user.click(hideButton)
 
     // Should handle rapid state changes gracefully
