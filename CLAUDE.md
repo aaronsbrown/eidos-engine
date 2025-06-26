@@ -159,6 +159,32 @@ interface PatternControl {
 5. Follow existing patterns for control panel implementation
 6. For WebGL generators, use external shader loading system
 7. **Add semantic metadata** (see Semantic Layer below)
+8. **Create educational content** using `/create_explainer` flow (see Educational Content Convention below)
+
+### 📚 Educational Content Convention
+
+**Naming Convention:**
+- Educational content files must use the exact pattern ID as the filename
+- Pattern with `id: "noise"` → `docs/education/noise.md`
+- Content is automatically copied to `public/educational-content/` during build
+
+**Content Structure:**
+Follow the three-layer educational approach defined in `.claude/commands/flow/create_explainer.md`:
+- **Layer 1**: "What is this?" (Intuitive/Experiential) - Visual description and real-world connections
+- **Layer 2**: "How does this work?" (Conceptual/Mechanical) - Algorithm explanation and principles  
+- **Layer 3**: "Show me the code" (Technical/Formal) - Implementation details with code references
+
+**Template Standard:**
+All educational content MUST follow the exact format specified in `docs/education/TEMPLATE.md`:
+- **Header Format**: `## Layer N: "Title" (Audience/Type)` with exact spacing and parentheses
+- **Section Spacing**: Double newlines between major sections
+- **Consistent Structure**: All files must use identical section headers and organization
+- **Code Blocks**: Use TypeScript syntax highlighting for code examples
+
+**File Location:**
+- **Canonical source**: `docs/education/{patternId}.md`
+- **Runtime location**: `public/educational-content/{patternId}.md` (generated during build)
+- **Build command**: `npm run copy-educational-content` (integrated into main build)
 
 ### 🏷️ Pattern Categorization System
 

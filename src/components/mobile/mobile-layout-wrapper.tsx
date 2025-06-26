@@ -10,6 +10,9 @@ import PatternDropdownSelector from './pattern-dropdown-selector'
 import ProgressiveDisclosurePanel from './progressive-disclosure-panel'
 import { patternGenerators } from '@/components/pattern-generators'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { EducationalOverlay } from '@/components/ui/educational-overlay'
+import { useEducationalContent } from '@/lib/hooks/use-educational-content'
+import { getAllPatternIds } from '@/lib/educational-content-loader'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -35,12 +38,20 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   // Mobile UI state
   const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isEducationalVisible, setIsEducationalVisible] = useState(false)
 
   // Get current pattern
   const selectedPattern = useMemo(() => 
     patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0],
     [selectedPatternId]
   )
+
+  // AIDEV-NOTE: Load educational content for current pattern
+  const { content: educationalContent } = useEducationalContent(selectedPatternId)
+  
+  // Check if educational content is available for current pattern
+  const availableEducationalPatterns = getAllPatternIds()
+  const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
@@ -196,7 +207,8 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
   // Mobile layout - progressive disclosure
   return (
-    <div data-testid="mobile-layout" className={`${responsiveClasses.container} ${className}`}>
+    <>
+      <div data-testid="mobile-layout" className={`${responsiveClasses.container} ${className}`}>
       {/* Mobile Header */}
       <MobileHeader
         title="EIDOS ENGINE"
@@ -209,11 +221,28 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
       {/* Pattern Selector */}
       <div className="flex-shrink-0 p-4 border-b border-border">
-        <PatternDropdownSelector
-          patterns={patternGenerators}
-          selectedId={selectedPatternId}
-          onSelect={handlePatternSelect}
-        />
+        <div className="flex items-center justify-between">
+          <PatternDropdownSelector
+            patterns={patternGenerators}
+            selectedId={selectedPatternId}
+            onSelect={handlePatternSelect}
+            className="flex-1 mr-4"
+          />
+          
+          {/* Educational Content Button - Mobile */}
+          {hasEducationalContent && (
+            <button
+              onClick={() => setIsEducationalVisible(!isEducationalVisible)}
+              className={`border border-border px-3 py-2 font-mono text-sm transition-colors ${
+                isEducationalVisible 
+                  ? "bg-background text-foreground hover:bg-muted" 
+                  : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
+              }`}
+            >
+              {isEducationalVisible ? '📚 HIDE' : '🎓 LEARN'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Visualization Area */}
@@ -285,6 +314,17 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           </div>
         </div>
       </div>
+
+      {/* Educational Overlay - Mobile Sidebar */}
+      {hasEducationalContent && (
+        <EducationalOverlay
+          type="sidebar"
+          content={educationalContent}
+          isVisible={isEducationalVisible}
+          onClose={() => setIsEducationalVisible(false)}
+        />
+      )}
+    </>
   )
 })
 

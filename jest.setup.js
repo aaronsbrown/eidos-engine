@@ -36,6 +36,9 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 global.requestAnimationFrame = jest.fn(callback => setTimeout(callback, 16))
 global.cancelAnimationFrame = jest.fn(id => clearTimeout(id))
 
+// Mock fetch for educational content loading tests
+global.fetch = jest.fn()
+
 // Mock HTMLCanvasElement and WebGL context for pattern generators
 HTMLCanvasElement.prototype.getContext = jest.fn().mockImplementation((contextType) => {
   if (contextType === '2d') {
