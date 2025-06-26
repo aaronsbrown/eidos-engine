@@ -806,18 +806,18 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     id: "lorenz-attractor",
     name: "Lorenz Attractor",
     component: LorenzAttractorGenerator,
-    technology: 'CANVAS_2D',
+    technology: 'WEBGL_2.0',
     category: 'Simulation',
     schemaVersion: "1.0",
-    description: "A classic strange attractor that exhibits chaotic behavior, often visualized as a butterfly shape.",
-    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This visualization projects the 3D path of particles onto a 2D plane.",
+    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space.",
+    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This WebGL implementation renders particles in true 3D space with automatic camera rotation.",
     semantics: {
       primaryAlgorithmFamily: "StrangeAttractor",
-      keyMathematicalConcepts: ["ChaosTheory", "Calculus"],
-      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex"],
-      dimensionality: "3D_Projected",
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex", "Luminous"],
+      dimensionality: "True3D_WebGL",
       interactionStyle: "ParameterTuning",
-      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos"]
+      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl"]
     },
     performance: {
       computationalComplexity: "Medium",
