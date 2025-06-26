@@ -11,6 +11,28 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   </ThemeProvider>
 )
 
+// Mock educational content system to avoid educational buttons interfering with tests
+jest.mock('@/lib/hooks/use-educational-content', () => ({
+  useEducationalContent: () => ({
+    content: {
+      title: 'Educational Content: test',
+      layers: {
+        intuitive: { title: 'What is this?', content: 'Educational content is being loaded...' },
+        conceptual: { title: 'How does this work?', content: 'Educational content is being loaded...' },
+        technical: { title: 'Show me the code', content: 'Educational content is being loaded...' }
+      }
+    },
+    isLoading: false,
+    error: null
+  })
+}))
+
+// Mock educational content availability to return no patterns
+jest.mock('@/lib/educational-content-loader', () => ({
+  getAllPatternIds: () => [], // No educational content available
+  hasEducationalContent: async () => false
+}))
+
 // Mock pattern generators with minimal test data
 jest.mock('@/components/pattern-generators', () => ({
   patternGenerators: [

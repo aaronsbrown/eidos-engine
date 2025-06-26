@@ -45,27 +45,33 @@ jest.mock('@/components/pattern-generators', () => ({
 
 // Mock the educational content loader
 jest.mock('@/lib/hooks/use-educational-content', () => ({
-  useEducationalContent: () => ({
+  useEducationalContent: (patternId: string) => ({
     content: {
-    title: 'Mobile Educational Content',
+    title: patternId === 'cellular-automaton' ? 'Mobile Educational Content' : 'Educational Content: ' + patternId,
     layers: {
       intuitive: {
         title: 'Intuitive Mobile',
-        content: 'Mobile intuitive content for testing'
+        content: patternId === 'cellular-automaton' ? 'Mobile intuitive content for testing' : 'Educational content is being loaded...'
       },
       conceptual: {
         title: 'Conceptual Mobile',
-        content: 'Mobile conceptual content for testing'
+        content: patternId === 'cellular-automaton' ? 'Mobile conceptual content for testing' : 'Educational content is being loaded...'
       },
       technical: {
         title: 'Technical Mobile',
-        content: 'Mobile technical content for testing'
+        content: patternId === 'cellular-automaton' ? 'Mobile technical content for testing' : 'Educational content is being loaded...'
       }
     }
     },
     isLoading: false,
     error: null
   })
+}))
+
+// Mock the educational content availability
+jest.mock('@/lib/educational-content-loader', () => ({
+  getAllPatternIds: () => ['cellular-automaton'], // Only cellular automaton has educational content
+  hasEducationalContent: async (patternId: string) => patternId === 'cellular-automaton'
 }))
 
 // Mock mobile detection hook to force mobile layout

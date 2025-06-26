@@ -45,27 +45,33 @@ jest.mock('@/components/pattern-generators', () => ({
 
 // Mock the educational content loader
 jest.mock('@/lib/hooks/use-educational-content', () => ({
-  useEducationalContent: () => ({
+  useEducationalContent: (patternId: string) => ({
     content: {
-    title: 'Test Educational Content',
+    title: patternId === 'cellular-automaton' ? 'Test Educational Content' : 'Educational Content: ' + patternId,
     layers: {
       intuitive: {
         title: 'Intuitive Level',
-        content: 'This is intuitive content for testing'
+        content: patternId === 'cellular-automaton' ? 'This is intuitive content for testing' : 'Educational content is being loaded...'
       },
       conceptual: {
         title: 'Conceptual Level', 
-        content: 'This is conceptual content for testing'
+        content: patternId === 'cellular-automaton' ? 'This is conceptual content for testing' : 'Educational content is being loaded...'
       },
       technical: {
         title: 'Technical Level',
-        content: 'This is technical content for testing'
+        content: patternId === 'cellular-automaton' ? 'This is technical content for testing' : 'Educational content is being loaded...'
       }
     }
     },
     isLoading: false,
     error: null
   })
+}))
+
+// Mock the educational content availability
+jest.mock('@/lib/educational-content-loader', () => ({
+  getAllPatternIds: () => ['cellular-automaton'], // Only cellular automaton has educational content
+  hasEducationalContent: async (patternId: string) => patternId === 'cellular-automaton'
 }))
 
 // Mock the preset manager hook

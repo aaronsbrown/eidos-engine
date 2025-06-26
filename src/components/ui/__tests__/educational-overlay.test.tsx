@@ -7,12 +7,27 @@ import { screen, waitFor } from '@testing-library/react'
 import { render } from '@/test-utils/test-providers'
 import userEvent from '@testing-library/user-event'
 import { EducationalOverlay } from '../educational-overlay'
-import { getEducationalContentSync } from '@/lib/educational-content-loader'
 
 // AIDEV-NOTE: Behavioral tests per G-8 - focus on user behavior, not implementation details
 describe('EducationalOverlay - User Behavior', () => {
   const defaultProps = {
-    content: getEducationalContentSync('cellular-automata'),
+    content: {
+      title: 'Test Educational Content',
+      layers: {
+        intuitive: {
+          title: 'What is this?',
+          content: 'This is test intuitive content'
+        },
+        conceptual: {
+          title: 'How does this work?',
+          content: 'This is test conceptual content'
+        },
+        technical: {
+          title: 'Show me the code',
+          content: 'This is test technical content'
+        }
+      }
+    },
     onClose: jest.fn()
   }
 
@@ -44,7 +59,7 @@ describe('EducationalOverlay - User Behavior', () => {
       )
 
       // User should see the title and close button
-      expect(screen.getByText('Cellular Automata: Patterns from First Principles')).toBeInTheDocument()
+      expect(screen.getByText('Test Educational Content')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /close educational overlay/i })).toBeInTheDocument()
       
       // User should see horizontal tab navigation
@@ -65,7 +80,7 @@ describe('EducationalOverlay - User Behavior', () => {
       )
 
       // User starts on Intuitive level  
-      expect(screen.getByText('What am I looking at?')).toBeInTheDocument()
+      expect(screen.getByText('What is this?')).toBeInTheDocument()
 
       // User clicks Technical tab
       await user.click(screen.getByRole('button', { name: /technical/i }))
@@ -86,7 +101,7 @@ describe('EducationalOverlay - User Behavior', () => {
       )
 
       // User should see the title and vertical navigation
-      expect(screen.getByText('Cellular Automata: Patterns from First Principles')).toBeInTheDocument()
+      expect(screen.getByText('Test Educational Content')).toBeInTheDocument()
       
       // User should see vertical level buttons with icons
       expect(screen.getByRole('button', { name: /intuitive/i })).toBeInTheDocument()
@@ -122,7 +137,7 @@ describe('EducationalOverlay - User Behavior', () => {
           type="sidebar"
           isVisible={true}
           onClose={mockOnClose}
-          content={getEducationalContentSync('cellular-automata')}
+          content={defaultProps.content}
         />
       )
 
@@ -144,7 +159,7 @@ describe('EducationalOverlay - User Behavior', () => {
           type="sidebar"
           isVisible={true}
           onClose={mockOnClose}
-          content={getEducationalContentSync('cellular-automata')}
+          content={defaultProps.content}
         />
       )
 
@@ -227,8 +242,8 @@ describe('EducationalOverlay - User Behavior', () => {
       )
 
       // Should render normally (localStorage errors are handled gracefully in the component)
-      expect(screen.getByText('Cellular Automata: Patterns from First Principles')).toBeInTheDocument()
-      expect(screen.getByText('What am I looking at?')).toBeInTheDocument()
+      expect(screen.getByText('Test Educational Content')).toBeInTheDocument()
+      expect(screen.getByText('What is this?')).toBeInTheDocument()
     })
 
     it('handles invalid saved preferences gracefully', () => {
@@ -244,7 +259,7 @@ describe('EducationalOverlay - User Behavior', () => {
       )
 
       // Should default to intuitive level
-      expect(screen.getByText('What am I looking at?')).toBeInTheDocument()
+      expect(screen.getByText('What is this?')).toBeInTheDocument()
     })
   })
 })
