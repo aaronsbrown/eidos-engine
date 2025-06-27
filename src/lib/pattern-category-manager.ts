@@ -1,6 +1,6 @@
 import type { MixedPatternGenerator } from '@/components/pattern-generators/types'
 
-export type PatternCategory = 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization'
+export type PatternCategory = 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization' | 'Attractors'
 
 export interface CategoryGroup {
   category: PatternCategory

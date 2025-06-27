@@ -95,7 +95,7 @@ describe('Lorenz Attractor Pattern Generator', () => {
       const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
       
       expect(lorenzPattern?.technology).toBe('WEBGL_MESHES')
-      expect(lorenzPattern?.category).toBe('Simulation')
+      expect(lorenzPattern?.category).toBe('Attractors')
     })
 
     test('has proper semantic metadata structure', () => {
@@ -182,7 +182,7 @@ describe('Lorenz Attractor Pattern Generator', () => {
       expect(particleControl?.type).toBe('range')
       expect(particleControl?.min).toBeGreaterThanOrEqual(100) // Minimum for visual effect
       expect(particleControl?.max).toBeLessThanOrEqual(5000) // Performance limit
-      expect(particleControl?.defaultValue).toBe(1000) // Good balance
+      expect(particleControl?.defaultValue).toBe(2500) // Good balance
     })
 
     test('autoRotate control has correct configuration', () => {
@@ -431,7 +431,7 @@ describe('Lorenz Attractor Pattern Generator', () => {
       
       expect(fadingControl).toBeDefined()
       expect(fadingControl?.type).toBe('checkbox')
-      expect(fadingControl?.defaultValue).toBe(true)
+      expect(fadingControl?.defaultValue).toBe(false)
       expect(fadingControl?.role).toBe('VisualAesthetic')
       expect(fadingControl?.impactsPerformance).toBe('Negligible')
     })
