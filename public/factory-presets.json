@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Factory presets that ship with the Pattern Generator - curated mathematically significant parameter combinations",
   "presets": [
     {
@@ -321,6 +321,94 @@
       "isFactory": true,
       "category": "Variant",
       "mathematicalSignificance": "Demonstrates how increased damping constrains chaotic dynamics"
+    },
+    {
+      "id": "newton-leipnik-classic",
+      "name": "Classic Newton-Leipnik",
+      "generatorType": "newton-leipnik-attractor",
+      "parameters": {
+        "a": 0.4,
+        "b": 0.175,
+        "particleCount": 5000,
+        "particleSize": 0.1,
+        "autoRotate": false,
+        "autoRotateSpeed": 0.5,
+        "colorScheme": 0,
+        "depthFading": true,
+        "useCustomShader": true,
+        "showAxes": false,
+        "speed": 3.0
+      },
+      "description": "Standard Newton-Leipnik parameters (a=0.4, b=0.175) creating the characteristic butterfly-wing structure.",
+      "isFactory": true,
+      "category": "Classic",
+      "mathematicalSignificance": "Classic parameters demonstrating cross-coupling dynamics and butterfly structure formation"
+    },
+    {
+      "id": "newton-leipnik-critical-boundary",
+      "name": "Critical Boundary",
+      "generatorType": "newton-leipnik-attractor",
+      "parameters": {
+        "a": 0.35,
+        "b": 0.2,
+        "particleCount": 5000,
+        "particleSize": 0.1,
+        "autoRotate": false,
+        "autoRotateSpeed": 0.5,
+        "colorScheme": 0,
+        "depthFading": false,
+        "useCustomShader": false,
+        "showAxes": true,
+        "speed": 3.0
+      },
+      "description": "Near critical parameter values where the butterfly structure exhibits enhanced folding complexity.",
+      "isFactory": true,
+      "category": "Bifurcation",
+      "mathematicalSignificance": "Parameter region where cross-coupling terms create maximum structural complexity"
+    },
+    {
+      "id": "newton-leipnik-enhanced-butterfly",
+      "name": "Enhanced Butterfly",
+      "generatorType": "newton-leipnik-attractor",
+      "parameters": {
+        "a": 0.45,
+        "b": 0.15,
+        "particleCount": 5000,
+        "particleSize": 0.1,
+        "autoRotate": false,
+        "autoRotateSpeed": 0.3,
+        "colorScheme": 0,
+        "depthFading": true,
+        "useCustomShader": true,
+        "showAxes": false,
+        "speed": 3.0
+      },
+      "description": "Optimized for butterfly visualization with enhanced particle density and shader effects.",
+      "isFactory": true,
+      "category": "Enhanced",
+      "mathematicalSignificance": "Parameters selected to maximize visual clarity of folding dynamics and wing structure"
+    },
+    {
+      "id": "newton-leipnik-compact-wings",
+      "name": "Compact Wings",
+      "generatorType": "newton-leipnik-attractor",
+      "parameters": {
+        "a": 0.5,
+        "b": 0.2,
+        "particleCount": 5000,
+        "particleSize": 0.1,
+        "autoRotate": false,
+        "autoRotateSpeed": 0.5,
+        "colorScheme": 0,
+        "depthFading": false,
+        "useCustomShader": false,
+        "showAxes": false,
+        "speed": 3.0
+      },
+      "description": "Higher parameter values create more constrained butterfly wings with tighter folding patterns.",
+      "isFactory": true,
+      "category": "Variant",
+      "mathematicalSignificance": "Demonstrates how parameter changes affect wing span and folding characteristics"
     }
   ]
 }

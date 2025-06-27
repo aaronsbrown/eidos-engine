@@ -22,7 +22,7 @@ describe('PresetManager - Core Behaviors', () => {
   })
 
   describe('Local Save Behavior', () => {
-    test('user can save preset with unique name', () => {
+    test('user can save preset with unique name', async () => {
       const preset = PresetManager.createPreset(
         'Cosmic Storm',
         'pixelated-noise',
@@ -31,12 +31,12 @@ describe('PresetManager - Core Behaviors', () => {
 
       expect(() => PresetManager.addPreset(preset)).not.toThrow()
       
-      const saved = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const saved = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(saved).toHaveLength(1)
       expect(saved[0].name).toBe('Cosmic Storm')
     })
 
-    test('user cannot save preset with duplicate name', () => {
+    test('user cannot save preset with duplicate name', async () => {
       // First preset
       const preset1 = PresetManager.createPreset(
         'Cosmic Storm',
@@ -74,7 +74,7 @@ describe('PresetManager - Core Behaviors', () => {
       expect(() => PresetManager.addPreset(preset2)).toThrow('identical content already exists')
     })
 
-    test('user can save presets with same name for different pattern types', () => {
+    test('user can save presets with same name for different pattern types', async () => {
       const noisePreset = PresetManager.createPreset(
         'Cool Effect',
         'pixelated-noise',
@@ -89,8 +89,8 @@ describe('PresetManager - Core Behaviors', () => {
       expect(() => PresetManager.addPreset(noisePreset)).not.toThrow()
       expect(() => PresetManager.addPreset(motionPreset)).not.toThrow()
 
-      const noisePresets = PresetManager.getPresetsForGenerator('pixelated-noise')
-      const motionPresets = PresetManager.getPresetsForGenerator('brownian-motion')
+      const noisePresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
+      const motionPresets = await PresetManager.getPresetsForGenerator('brownian-motion')
       
       expect(noisePresets).toHaveLength(1)
       expect(motionPresets).toHaveLength(1)
@@ -100,12 +100,12 @@ describe('PresetManager - Core Behaviors', () => {
   })
 
   describe('Preset Loading Behavior', () => {
-    test('user can load preset and get all parameters', () => {
+    test('user can load preset and get all parameters', async () => {
       const originalParams = { pixelSize: 8, colorIntensity: 0.7, enabled: true }
       const preset = PresetManager.createPreset('Test Preset', 'pixelated-noise', originalParams)
       PresetManager.addPreset(preset)
 
-      const savedPresets = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const savedPresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
       const loadedPreset = savedPresets[0]
 
       expect(loadedPreset.parameters).toEqual(originalParams)
@@ -113,17 +113,17 @@ describe('PresetManager - Core Behaviors', () => {
       expect(loadedPreset.generatorType).toBe('pixelated-noise')
     })
 
-    test('user can delete preset and it disappears from list', () => {
+    test('user can delete preset and it disappears from list', async () => {
       const preset = PresetManager.createPreset('Temp Preset', 'pixelated-noise', { pixelSize: 4 })
       PresetManager.addPreset(preset)
 
-      const savedPresets = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const savedPresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(savedPresets).toHaveLength(1)
 
       const success = PresetManager.deletePreset(savedPresets[0].id)
       expect(success).toBe(true)
 
-      const afterDelete = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const afterDelete = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(afterDelete).toHaveLength(0)
     })
 
@@ -134,7 +134,7 @@ describe('PresetManager - Core Behaviors', () => {
   })
 
   describe('Persistence Behavior', () => {
-    test('presets survive page refresh (localStorage persistence)', () => {
+    test('presets survive page refresh (localStorage persistence)', async () => {
       const preset = PresetManager.createPreset(
         'Persistent Effect',
         'pixelated-noise',
@@ -143,17 +143,17 @@ describe('PresetManager - Core Behaviors', () => {
       PresetManager.addPreset(preset)
 
       // Simulate page refresh by creating new PresetManager instance
-      const afterRefresh = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const afterRefresh = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(afterRefresh).toHaveLength(1)
       expect(afterRefresh[0].name).toBe('Persistent Effect')
       expect(afterRefresh[0].parameters).toEqual({ pixelSize: 12, colorIntensity: 0.9 })
     })
 
-    test('last active preset is remembered across sessions', () => {
+    test('last active preset is remembered across sessions', async () => {
       const preset = PresetManager.createPreset('Active Preset', 'pixelated-noise', { pixelSize: 6 })
       PresetManager.addPreset(preset)
 
-      const saved = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const saved = await PresetManager.getPresetsForGenerator('pixelated-noise')
       PresetManager.setLastActivePreset(saved[0].id)
 
       // Simulate session restart
@@ -163,7 +163,7 @@ describe('PresetManager - Core Behaviors', () => {
   })
 
   describe('Import/Export Behavior', () => {
-    test('user can export preset and get downloadable JSON', () => {
+    test('user can export preset and get downloadable JSON', async () => {
       const preset = PresetManager.createPreset(
         'Export Test',
         'pixelated-noise',
@@ -171,7 +171,7 @@ describe('PresetManager - Core Behaviors', () => {
       )
       PresetManager.addPreset(preset)
 
-      const saved = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const saved = await PresetManager.getPresetsForGenerator('pixelated-noise')
       const exported = PresetManager.exportPresets([saved[0].id])
 
       expect(exported.version).toBeDefined()
@@ -181,7 +181,7 @@ describe('PresetManager - Core Behaviors', () => {
       expect(exported.exportedAt).toBeInstanceOf(Date)
     })
 
-    test('user can import new preset and it becomes available', () => {
+    test('user can import new preset and it becomes available', async () => {
       const exportData: PresetExportData = {
         version: '1.0.0',
         presets: [{
@@ -201,13 +201,13 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.skippedDuplicates).toHaveLength(0)
       expect(result.errors).toHaveLength(0)
 
-      const imported = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const imported = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(imported).toHaveLength(1)
       expect(imported[0].name).toBe('Imported Effect')
       expect(imported[0].parameters).toEqual({ pixelSize: 15, colorIntensity: 0.6 })
     })
 
-    test('user imports preset with name conflict - gets auto-renamed', () => {
+    test('user imports preset with name conflict - gets auto-renamed', async () => {
       // Create existing preset
       const existing = PresetManager.createPreset('Cool Preset', 'pixelated-noise', { pixelSize: 8 })
       PresetManager.addPreset(existing)
@@ -231,14 +231,14 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.importedIds).toHaveLength(1)
       expect(result.skippedDuplicates).toHaveLength(0)
 
-      const allPresets = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const allPresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(allPresets).toHaveLength(2)
       
       const names = allPresets.map(p => p.name).sort()
       expect(names).toEqual(['Cool Preset', 'Cool Preset (1)'])
     })
 
-    test('user imports duplicate content - gets skipped with feedback', () => {
+    test('user imports duplicate content - gets skipped with feedback', async () => {
       // Create existing preset
       const existing = PresetManager.createPreset(
         'Original Name',
@@ -269,12 +269,12 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.skippedDuplicates[0]).toContain('Original Name')
 
       // Should still only have original preset
-      const allPresets = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const allPresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(allPresets).toHaveLength(1)
       expect(allPresets[0].name).toBe('Original Name')
     })
 
-    test('user imports multiple presets with mixed results', () => {
+    test('user imports multiple presets with mixed results', async () => {
       // Create existing preset
       const existing = PresetManager.createPreset('Existing', 'pixelated-noise', { pixelSize: 8 })
       PresetManager.addPreset(existing)
@@ -316,7 +316,7 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.skippedDuplicates).toHaveLength(1) // 1 duplicate skipped
       expect(result.errors).toHaveLength(0)
 
-      const allPresets = PresetManager.getPresetsForGenerator('pixelated-noise')
+      const allPresets = await PresetManager.getPresetsForGenerator('pixelated-noise')
       expect(allPresets).toHaveLength(3) // Original + 2 imported
       
       const names = allPresets.map(p => p.name).sort()
@@ -339,7 +339,7 @@ describe('PresetManager - Core Behaviors', () => {
       localStorageMock.setItem('pattern-generator-presets', oldPresetData)
 
       // Loading should automatically add contentHash
-      const loaded = PresetManager.loadPresets()
+      const loaded = PresetManager.loadUserPresets()
       expect(loaded).toHaveLength(1)
       expect(loaded[0].contentHash).toBeDefined()
       expect(typeof loaded[0].contentHash).toBe('string')
@@ -359,7 +359,7 @@ describe('PresetManager - Core Behaviors', () => {
       localStorageMock.setItem('pattern-generator-presets', oldPresetData)
 
       // Load to trigger migration
-      PresetManager.loadPresets()
+      PresetManager.loadUserPresets()
 
       // Try to add identical content
       const newPreset = PresetManager.createPreset(
@@ -425,7 +425,7 @@ describe('PresetManager - Core Behaviors', () => {
 
     test('user can restore missing factory presets', async () => {
       // Start with no presets
-      expect(PresetManager.loadPresets()).toHaveLength(0)
+      expect(PresetManager.loadUserPresets()).toHaveLength(0)
 
       // Restore factory presets
       const result = await PresetManager.restoreFactoryPresets()
@@ -433,11 +433,11 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.imported).toBe(3) // All 3 factory presets imported
       expect(result.skipped).toBe(0)
 
-      // Check presets were imported correctly
-      const allPresets = PresetManager.loadPresets()
-      expect(allPresets).toHaveLength(3)
+      // Check that factory presets are available
+      const allPresets = PresetManager.loadUserPresets()
+      expect(allPresets).toHaveLength(0) // No user presets saved
 
-      const testPatternPresets = PresetManager.getPresetsForGenerator('test-pattern')
+      const testPatternPresets = await PresetManager.getPresetsForGenerator('test-pattern')
       expect(testPatternPresets).toHaveLength(2)
       
       const factoryPreset = testPatternPresets.find(p => p.name === 'Factory Classic')
@@ -447,59 +447,45 @@ describe('PresetManager - Core Behaviors', () => {
       expect(factoryPreset?.parameters).toEqual({ param1: 10, param2: 'classic' })
     })
 
-    test('user restores factory presets when some already exist', async () => {
-      // Add one factory preset manually (simulating existing state)
-      const existingFactoryPreset = {
-        id: 'existing-factory',
-        name: 'Factory Classic',
-        generatorType: 'test-pattern',
-        parameters: { param1: 10, param2: 'classic' },
-        createdAt: new Date(),
-        contentHash: 'existing-hash',
-        isFactory: true,
-        category: 'Classic'
-      }
-      
-      // Calculate the same content hash that restoreFactoryPresets would generate
-      // We'll use the same logic that's in the PresetManager internally
-      const contentString = JSON.stringify({
-        generatorType: 'test-pattern',
-        parameters: { param1: 10, param2: 'classic' }
-      })
-      
-      // Simple djb2 hash algorithm (same as used in PresetManager)
-      let hash = 5381
-      for (let i = 0; i < contentString.length; i++) {
-        hash = (hash * 33) ^ contentString.charCodeAt(i)
-      }
-      const expectedHash = Math.abs(hash).toString(36)
-      
-      existingFactoryPreset.contentHash = expectedHash
-      PresetManager.addPreset(existingFactoryPreset)
+    test('user restores factory presets when user presets already exist', async () => {
+      // Add a regular user preset (not factory)
+      const userPreset = PresetManager.createPreset(
+        'My Custom Preset',
+        'test-pattern',
+        { param1: 5, param2: 'custom' }
+      )
+      PresetManager.addPreset(userPreset)
+
+      // Verify user preset was saved
+      expect(PresetManager.loadUserPresets()).toHaveLength(1)
 
       // Restore factory presets
       const result = await PresetManager.restoreFactoryPresets()
 
-      expect(result.imported).toBe(2) // Only 2 new ones imported
-      expect(result.skipped).toBe(1) // 1 existing skipped
+      expect(result.imported).toBe(3) // All factory presets loaded fresh
+      expect(result.skipped).toBe(0)
 
-      const allPresets = PresetManager.loadPresets()
-      expect(allPresets).toHaveLength(3) // Still only 3 total (no duplicates)
+      // User presets should still be there, factory presets available through getPresetsForGenerator
+      const allUserPresets = PresetManager.loadUserPresets()
+      expect(allUserPresets).toHaveLength(1) // Still just the user preset
+      
+      const allTestPatternPresets = await PresetManager.getPresetsForGenerator('test-pattern')
+      expect(allTestPatternPresets).toHaveLength(3) // 1 user + 2 factory
     })
 
     test('user restores when all factory presets already exist', async () => {
       // Import all factory presets first
       await PresetManager.restoreFactoryPresets()
-      expect(PresetManager.loadPresets()).toHaveLength(3)
+      expect(PresetManager.loadUserPresets()).toHaveLength(0) // No user presets saved
 
       // Try to restore again
       const result = await PresetManager.restoreFactoryPresets()
 
-      expect(result.imported).toBe(0) // No new imports
-      expect(result.skipped).toBe(3) // All 3 skipped
+      expect(result.imported).toBe(3) // In new system, factory presets are always "fresh"
+      expect(result.skipped).toBe(0)
 
-      // Should still have same presets
-      expect(PresetManager.loadPresets()).toHaveLength(3)
+      // Should still have no user presets (factory presets don't save to localStorage)
+      expect(PresetManager.loadUserPresets()).toHaveLength(0)
     })
 
     test('user restores factory presets alongside existing user presets', async () => {
@@ -509,7 +495,7 @@ describe('PresetManager - Core Behaviors', () => {
       PresetManager.addPreset(userPreset1)
       PresetManager.addPreset(userPreset2)
 
-      expect(PresetManager.loadPresets()).toHaveLength(2)
+      expect(PresetManager.loadUserPresets()).toHaveLength(2)
 
       // Restore factory presets
       const result = await PresetManager.restoreFactoryPresets()
@@ -518,10 +504,10 @@ describe('PresetManager - Core Behaviors', () => {
       expect(result.skipped).toBe(0)
 
       // Should have user presets + factory presets
-      const allPresets = PresetManager.loadPresets()
-      expect(allPresets).toHaveLength(5)
+      const allPresets = PresetManager.loadUserPresets()
+      expect(allPresets).toHaveLength(2) // Only user presets in loadUserPresets
 
-      const testPatternPresets = PresetManager.getPresetsForGenerator('test-pattern')
+      const testPatternPresets = await PresetManager.getPresetsForGenerator('test-pattern')
       expect(testPatternPresets).toHaveLength(3) // 1 user + 2 factory
 
       // Verify user presets are still there
@@ -536,7 +522,7 @@ describe('PresetManager - Core Behaviors', () => {
     })
 
     test('restore handles fetch failure gracefully', async () => {
-      // Mock fetch failure - loadFactoryPresets catches errors and returns empty array
+      // Mock fetch failure - loadFactoryPresets returns empty array on error
       global.fetch = jest.fn(() =>
         Promise.reject(new Error('Network error'))
       ) as jest.Mock
@@ -547,7 +533,7 @@ describe('PresetManager - Core Behaviors', () => {
     })
 
     test('restore handles invalid JSON gracefully', async () => {
-      // Mock invalid JSON response - loadFactoryPresets catches errors and returns empty array
+      // Mock invalid JSON response - loadFactoryPresets returns empty array on error
       global.fetch = jest.fn(() =>
         Promise.reject(new Error('Parse error'))
       ) as jest.Mock
@@ -573,7 +559,7 @@ describe('PresetManager - Core Behaviors', () => {
 
       expect(result.imported).toBe(0)
       expect(result.skipped).toBe(0)
-      expect(PresetManager.loadPresets()).toHaveLength(0)
+      expect(PresetManager.loadUserPresets()).toHaveLength(0)
     })
   })
 })
