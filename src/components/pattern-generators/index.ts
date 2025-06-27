@@ -806,30 +806,30 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     id: "lorenz-attractor",
     name: "Lorenz Attractor",
     component: LorenzAttractorGenerator,
-    technology: 'CANVAS_2D',
+    technology: 'WEBGL_MESHES',
     category: 'Simulation',
     schemaVersion: "1.0",
-    description: "A classic strange attractor that exhibits chaotic behavior, often visualized as a butterfly shape.",
-    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This visualization projects the 3D path of particles onto a 2D plane.",
+    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space with camera controls and enhanced visual effects.",
+    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This 3D visualization renders particles in true spatial depth with interactive camera controls, optional coordinate axes, and depth-based visual enhancements.",
     semantics: {
       primaryAlgorithmFamily: "StrangeAttractor",
-      keyMathematicalConcepts: ["ChaosTheory", "Calculus"],
-      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex"],
-      dimensionality: "3D_Projected",
-      interactionStyle: "ParameterTuning",
-      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos"]
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex", "Luminous", "Smooth", "Continuous"],
+      dimensionality: "True3D_WebGL",
+      interactionStyle: "DirectManipulation",
+      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl", "camera", "depth", "interactive", "spatial"]
     },
     performance: {
       computationalComplexity: "Medium",
       typicalFrameRateTarget: "60fps",
-      notes: "Performance is dependent on the number of particles. Mobile devices may struggle with high particle counts."
+      notes: "Performance dependent on particle count and 3D rendering complexity. Mobile devices benefit from reduced particle counts and basic rendering mode."
     },
-    version: "1.0.0",
+    version: "1.1.0",
     author: "Aaron Brown & Gemini",
     dateAdded: "2025-06-25",
-    lastModified: "2025-06-25",
+    lastModified: "2025-06-27",
     status: "Production",
-    isInteractive: false,
+    isInteractive: true,
     isAnimatedByDefault: true,
     controls: [
         {
@@ -887,6 +887,109 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
                     mobile: 500,
                     desktop: 1500,
                     rationale: "High particle counts significantly impact performance on mobile devices."
+                }
+            },
+            group: "Simulation Parameters"
+        },
+        {
+            id: "particleSize",
+            label: "Particle Size",
+            type: "range",
+            min: 0.01,
+            max: 0.04,
+            step: 0.005,
+            defaultValue: 0.02,
+            description: "Size of individual particles - larger particles create more visible trails.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
+        },
+        {
+            id: "autoRotate",
+            label: "Auto Rotate",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Automatically rotate the camera around the Y-axis for a cinematic view of the attractor.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "autoRotateSpeed",
+            label: "Rotation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 1.0,
+            description: "Speed of automatic camera rotation - higher values create faster rotation.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "useCustomShader",
+            label: "Enhanced Rendering",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Enable advanced shader-based rendering with depth-based coloring and improved visual quality.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Custom shaders provide enhanced visual quality on desktop but may impact mobile GPU performance."
+                }
+            }
+        },
+        {
+            id: "colorScheme",
+            label: "Color Scheme",
+            type: "select",
+            defaultValue: 1,
+            options: [
+                { value: 0, label: "Rainbow Depth" },
+                { value: 1, label: "Warm-Cool" },
+                { value: 2, label: "Monochrome" }
+            ],
+            description: "Color scheme for depth-based particle coloring - creates natural depth perception.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "depthFading",
+            label: "Depth Fading",
+            type: "checkbox",
+            defaultValue: true,
+            description: "Fade distant particles for enhanced depth perception and focus on the attractor's core structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Depth fading enhances visual quality but requires additional GPU calculations on mobile devices."
+                }
+            }
+        },
+        {
+            id: "showAxes",
+            label: "Show Coordinate Axes",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Display 3D coordinate axes to provide spatial reference and help understand the mathematical space.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Coordinate axes help with spatial understanding on larger screens but may clutter mobile displays."
                 }
             }
         }

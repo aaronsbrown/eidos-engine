@@ -28,4 +28,4 @@ export function calculateLorenzPoint(
 }
 ```
 
-In the React component, we maintain an array of particles and, in each animation frame, we update their positions using this function. We then project the 3D `(x, y, z)` coordinates to a 2D canvas to be displayed.
+In the visualization, we maintain an array of particles and, in each animation frame, we update their positions using this function. The particles move through 3D space, creating the characteristic butterfly-shaped attractor pattern.
