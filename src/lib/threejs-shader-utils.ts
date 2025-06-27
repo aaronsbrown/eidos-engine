@@ -24,6 +24,7 @@ export async function createThreeJSShaderMaterial(
     const defaultUniforms = {
       u_time: { value: 0.0 },
       u_resolution: { value: new THREE.Vector2(1.0, 1.0) },
+      u_mouse: { value: new THREE.Vector2(0.0, 0.0) },
       ...uniforms
     }
     
@@ -33,7 +34,7 @@ export async function createThreeJSShaderMaterial(
       fragmentShader: shaderProgram.fragment,
       uniforms: defaultUniforms,
       transparent: true,
-      blending: THREE.NormalBlending
+      blending: THREE.AdditiveBlending
     })
     
     return material
@@ -65,5 +66,34 @@ export async function createShaderEnhancedMaterial(options: {
   } catch (error) {
     console.warn(`Shader enhancement failed, falling back to basic material:`, error)
     return fallbackMaterial
+  }
+}
+
+/**
+ * Update common shader uniforms for animation
+ * @param material - Three.js shader material to update
+ * @param time - Current time value
+ * @param resolution - Screen resolution {width, height}
+ * @param mouse - Mouse coordinates {x, y} (normalized 0-1)
+ */
+export function updateShaderUniforms(
+  material: THREE.ShaderMaterial,
+  time: number,
+  resolution?: { width: number; height: number },
+  mouse?: { x: number; y: number }
+): void {
+  // Update time uniform if it exists
+  if (material.uniforms.u_time) {
+    material.uniforms.u_time.value = time
+  }
+  
+  // Update resolution uniform if provided and exists
+  if (resolution && material.uniforms.u_resolution) {
+    material.uniforms.u_resolution.value.set(resolution.width, resolution.height)
+  }
+  
+  // Update mouse uniform if provided and exists
+  if (mouse && material.uniforms.u_mouse) {
+    material.uniforms.u_mouse.value.set(mouse.x, mouse.y)
   }
 }
