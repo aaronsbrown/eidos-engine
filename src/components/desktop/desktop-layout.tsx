@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from "react"
-import { Bookmark } from "lucide-react"
+import { Bookmark, ArrowUp, ArrowDown, GraduationCap, BookOpen } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { patternGenerators } from "@/components/pattern-generators"
 import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
@@ -260,17 +260,10 @@ export default function DesktopLayout() {
       <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="w-3 h-3 bg-accent-primary border border-border"></div>
             <h1 className="text-xl font-mono tracking-wider uppercase">Eidos Engine</h1>
-            <div className="text-xs font-mono text-muted-foreground bg-background border border-border px-2 py-1">
-              v1.0.0
-            </div>
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <div className="text-xs font-mono text-muted-foreground border border-border px-2 py-1 bg-background">
-              [{String(patternGenerators.findIndex(p => p.id === selectedPatternId) + 1).padStart(2, '0')}/{String(patternGenerators.length).padStart(2, '0')}]
-            </div>
           </div>
         </div>
       </header>
@@ -290,6 +283,7 @@ export default function DesktopLayout() {
           {/* Previous Pattern Button */}
           <div className="px-6 mb-1">
             <button
+              data-testid="pattern-prev-button"
               onClick={handlePreviousPattern}
               disabled={!canGoToPrevious}
               className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToPrevious
@@ -297,9 +291,7 @@ export default function DesktopLayout() {
                 : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
                 }`}
             >
-              <span className={`font-bold ${canGoToPrevious ? "text-accent-primary-foreground" : "text-muted-foreground"}`}>
-                ↑
-              </span>
+              <ArrowUp className={`w-3 h-3 ${canGoToPrevious ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
             </button>
           </div>
 
@@ -361,6 +353,7 @@ export default function DesktopLayout() {
           {/* Next Pattern Button */}
           <div className="px-6 mt-1 mb-2.5">
             <button
+              data-testid="pattern-next-button"
               onClick={handleNextPattern}
               disabled={!canGoToNext}
               className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToNext
@@ -368,9 +361,7 @@ export default function DesktopLayout() {
                 : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
                 }`}
             >
-              <span className={`font-bold ${canGoToNext ? "text-accent-primary-foreground" : "text-muted-foreground"}`}>
-                ↓
-              </span>
+              <ArrowDown className={`w-3 h-3 ${canGoToNext ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
             </button>
           </div>
 
@@ -425,7 +416,17 @@ export default function DesktopLayout() {
                     : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
                 }`}
               >
-                {isEducationalVisible ? '📚 HIDE LEARNING' : '🎓 LET\'S LEARN!'}
+{isEducationalVisible ? (
+                  <span className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-foreground" />
+                    HIDE LEARNING
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-accent-primary-foreground" />
+                    LET&apos;S LEARN!
+                  </span>
+                )}
               </button>
             ) : (
               <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>

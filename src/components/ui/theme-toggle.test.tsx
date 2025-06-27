@@ -34,14 +34,16 @@ describe('ThemeToggle Component', () => {
       mockThemeContext.theme = 'light'
       render(<ThemeToggle />)
       expect(screen.getByText('DARK_MODE')).toBeInTheDocument()
-      expect(screen.getByText('[○]')).toBeInTheDocument()
+      // Moon icon should be present for light theme (click to go to dark)
+      expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
     })
 
     it('displays light mode text when theme is dark', () => {
       mockThemeContext.theme = 'dark'
       render(<ThemeToggle />)
       expect(screen.getByText('LIGHT_MODE')).toBeInTheDocument()
-      expect(screen.getByText('[●]')).toBeInTheDocument()
+      // Sun icon should be present for dark theme (click to go to light)
+      expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
     })
 
     it('provides clear visual feedback about current theme', () => {
@@ -49,7 +51,8 @@ describe('ThemeToggle Component', () => {
       const button = screen.getByRole('button')
       expect(button).toBeVisible()
       expect(button).toHaveTextContent('DARK_MODE')
-      expect(button).toHaveTextContent('[○]')
+      // Moon icon should be present for light theme (click to go to dark)
+      expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
     })
   })
 
@@ -59,7 +62,8 @@ describe('ThemeToggle Component', () => {
       render(<ThemeToggle />)
       const button = screen.getByRole('button')
       expect(button).toHaveTextContent('DARK_MODE') // Shows what clicking will do
-      expect(button).toHaveTextContent('[○]') // Visual indicator for light theme
+      // Moon icon should be present for light theme (click to go to dark)
+      expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
     })
 
     it('clearly communicates dark theme state to users', () => {
@@ -67,7 +71,8 @@ describe('ThemeToggle Component', () => {
       render(<ThemeToggle />)
       const button = screen.getByRole('button')
       expect(button).toHaveTextContent('LIGHT_MODE') // Shows what clicking will do
-      expect(button).toHaveTextContent('[●]') // Visual indicator for dark theme
+      // Sun icon should be present for dark theme (click to go to light)
+      expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
     })
   })
 

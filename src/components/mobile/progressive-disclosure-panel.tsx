@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useState, useMemo, memo } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, GraduationCap, BookOpen } from 'lucide-react'
 import GroupedSimulationControlsPanel from '@/components/ui/grouped-simulation-controls-panel'
 import type { PatternControl } from '@/components/pattern-generators/types'
 import { getMobileControlLayout } from '@/lib/mobile-utils'
@@ -90,7 +90,17 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
                   : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
               }`}
             >
-              {isEducationalVisible ? '📚 HIDE' : '🎓 LEARN'}
+{isEducationalVisible ? (
+                <span className="flex items-center gap-1">
+                  <BookOpen className="w-3 h-3 text-foreground" />
+                  HIDE
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-accent-primary-foreground" />
+                  LEARN
+                </span>
+              )}
             </button>
           )}
         </div>

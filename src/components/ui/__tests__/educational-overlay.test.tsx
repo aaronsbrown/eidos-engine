@@ -103,11 +103,11 @@ describe('EducationalOverlay - User Behavior', () => {
       // User should see the title and vertical navigation
       expect(screen.getByText('Test Educational Content')).toBeInTheDocument()
       
-      // User should see vertical level buttons with icons
+      // User should see vertical level buttons with Lucide icons
       expect(screen.getByRole('button', { name: /intuitive/i })).toBeInTheDocument()
-      expect(screen.getByText('🌱')).toBeInTheDocument() // Intuitive icon
-      expect(screen.getByText('🧠')).toBeInTheDocument() // Conceptual icon  
-      expect(screen.getByText('⚙️')).toBeInTheDocument() // Technical icon
+      expect(screen.getByRole('button', { name: /conceptual/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /technical/i })).toBeInTheDocument()
+      // Icons are now Lucide icons - test their presence via accessible button roles
     })
 
     it('allows user to switch levels in sidebar', async () => {

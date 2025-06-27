@@ -186,7 +186,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User clicks the educational button
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
     // User should see the educational overlay content
@@ -199,7 +199,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens the educational overlay
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
     // Button text should change to "HIDE"
@@ -212,13 +212,14 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
-    // Should see vertical level navigation with icons (sidebar style)
-    expect(screen.getByText('🌱')).toBeInTheDocument() // Intuitive icon
-    expect(screen.getByText('🧠')).toBeInTheDocument() // Conceptual icon
-    expect(screen.getByText('⚙️')).toBeInTheDocument() // Technical icon
+    // Should see vertical level navigation with Lucide icons (sidebar style)
+    // Icons are now Lucide icons, so we check for level buttons instead
+    expect(screen.getByRole('button', { name: /intuitive/i })).toBeInTheDocument() 
+    expect(screen.getByRole('button', { name: /conceptual/i })).toBeInTheDocument() 
+    expect(screen.getByRole('button', { name: /technical/i })).toBeInTheDocument()
 
     // Should be able to switch between levels
     await user.click(screen.getByRole('button', { name: /conceptual/i }))
@@ -230,7 +231,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
     // Verify overlay is open
@@ -251,7 +252,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
     // User clicks backdrop
@@ -269,7 +270,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
 
     // Pattern selector and educational button should be in the same row
     const patternDropdown = screen.getByTestId('pattern-dropdown')
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
 
     // Both should be present in the UI
     expect(patternDropdown).toBeInTheDocument()
@@ -284,7 +285,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     render(<MobileLayoutWrapper />)
 
     // User opens educational overlay
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
     await user.click(learnButton)
 
     // Both pattern and educational content should be visible
@@ -311,7 +312,7 @@ describe('Mobile Layout - Educational Overlay Integration', () => {
     const user = userEvent.setup()
     render(<MobileLayoutWrapper />)
 
-    const learnButton = screen.getByRole('button', { name: /🎓 LEARN/i })
+    const learnButton = screen.getByRole('button', { name: /LEARN/i })
 
     // User rapidly toggles the overlay
     await user.click(learnButton)

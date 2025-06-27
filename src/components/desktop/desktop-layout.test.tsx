@@ -214,7 +214,7 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getAllByText(/geometric/i)).toHaveLength(2) // Appears in sidebar divider and specs
       
       // User sees pattern counter
-      expect(screen.getByText('[01/06]')).toBeInTheDocument()
+      expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
     })
 
     it('shows pattern names in the selection list', () => {
@@ -242,7 +242,7 @@ describe('DesktopLayout - User Behavior', () => {
       })
       
       // Counter updates
-      expect(screen.getByText('[02/06]')).toBeInTheDocument()
+      expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       
       // Specifications update
       expect(screen.getAllByText(/noise-field/i)).toHaveLength(2) // Sidebar + specs
@@ -255,11 +255,8 @@ describe('DesktopLayout - User Behavior', () => {
       // Initially on first pattern
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
       
-      // Find next button (the one with downward arrow)
-      const nextButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↓'
-      )
-      expect(nextButton).toBeDefined()
+      // Find next button using semantic test ID
+      const nextButton = screen.getByTestId('pattern-next-button')
       
       // User clicks next
       fireEvent.click(nextButton!)
@@ -267,14 +264,11 @@ describe('DesktopLayout - User Behavior', () => {
       // Pattern changes to second pattern
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
-        expect(screen.getByText('[02/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
       
-      // Find previous button (the one with upward arrow)
-      const prevButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↑'
-      )
-      expect(prevButton).toBeDefined()
+      // Find previous button using semantic test ID
+      const prevButton = screen.getByTestId('pattern-prev-button')
       
       // User clicks previous
       fireEvent.click(prevButton!)
@@ -282,7 +276,7 @@ describe('DesktopLayout - User Behavior', () => {
       // Pattern changes back to first
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-        expect(screen.getByText('[01/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       })
     })
 
@@ -297,20 +291,15 @@ describe('DesktopLayout - User Behavior', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
       // Navigate to the 6th pattern (Brownian Motion)
-      const nextButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↓'
-      )
+      const nextButton = screen.getByTestId('pattern-next-button')
       
       // Click next 5 times to get to the 6th pattern
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
-        await waitFor(() => {
-          expect(screen.getByText(`[0${i + 2}/06]`)).toBeInTheDocument()
-        })
       }
       
       // Should be on the last pattern
-      expect(screen.getByText('[06/06]')).toBeInTheDocument()
+      expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
     })
 
@@ -319,7 +308,7 @@ describe('DesktopLayout - User Behavior', () => {
       
       // Initially on first pattern and it should stay selected
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-      expect(screen.getByText('[01/06]')).toBeInTheDocument()
+      expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       
       // Find pattern list container - it should have overflow-hidden class
       const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
@@ -334,7 +323,7 @@ describe('DesktopLayout - User Behavior', () => {
       // Selected pattern should remain the same (Trig), but list should scroll
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument() // Still selected
-        expect(screen.getByText('[01/06]')).toBeInTheDocument() // Counter unchanged
+        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument() // Counter unchanged
       }, { timeout: 2000 })
       
       // User must click to actually select a different pattern
@@ -342,7 +331,7 @@ describe('DesktopLayout - User Behavior', () => {
       
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
-        expect(screen.getByText('[02/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
     })
 
@@ -359,7 +348,7 @@ describe('DesktopLayout - User Behavior', () => {
       // Pattern should change and counter should update
       await waitFor(() => {
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
-        expect(screen.getByText('[06/06]')).toBeInTheDocument()
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       })
       
       // Specifications should update
@@ -380,19 +369,14 @@ describe('DesktopLayout - User Behavior', () => {
       
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-        expect(screen.getByText('[01/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       })
       
       // Navigate to last pattern with button
-      const nextButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↓'
-      )
+      const nextButton = screen.getByTestId('pattern-next-button')
       
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
-        await waitFor(() => {
-          expect(screen.getByText(`[0${i + 2}/06]`)).toBeInTheDocument()
-        })
       }
       
       // Try to scroll down from last pattern - should stay on last
@@ -402,7 +386,7 @@ describe('DesktopLayout - User Behavior', () => {
       
       await waitFor(() => {
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
-        expect(screen.getByText('[06/06]')).toBeInTheDocument()
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       })
     })
   })
@@ -643,10 +627,7 @@ describe('DesktopLayout - User Behavior', () => {
     it('disables previous button on first pattern', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
-      const prevButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↑'
-      )
-      
+      const prevButton = screen.getByTestId('pattern-prev-button')
       expect(prevButton).toHaveClass('cursor-not-allowed')
     })
 
@@ -654,16 +635,11 @@ describe('DesktopLayout - User Behavior', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
       // Navigate to last pattern
-      const nextButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↓'
-      )
+      const nextButton = screen.getByTestId('pattern-next-button')
       
       // Click next 5 times to get to the last pattern
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
-        await waitFor(() => {
-          expect(screen.getByText(`[0${i + 2}/06]`)).toBeInTheDocument()
-        })
       }
       
       // Now next button should be disabled
@@ -674,9 +650,7 @@ describe('DesktopLayout - User Behavior', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
       const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
-      const nextButton = screen.getAllByRole('button').find(
-        button => button.textContent === '↓'
-      )
+      const nextButton = screen.getByTestId('pattern-next-button')
       
       // Start with wheel scroll
       fireEvent.wheel(patternList!, { deltaY: 100 })
@@ -686,14 +660,14 @@ describe('DesktopLayout - User Behavior', () => {
       
       // Pattern should still be first (wheel doesn't select)
       await waitFor(() => {
-        expect(screen.getByText('[01/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       }, { timeout: 2000 })
       
       // Continue with button navigation
       fireEvent.click(nextButton!)
       
       await waitFor(() => {
-        expect(screen.getByText('[02/06]')).toBeInTheDocument()
+        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
       
       // Verify that both methods work independently

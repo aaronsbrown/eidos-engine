@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { Button } from './button'
-import { X } from 'lucide-react'
+import { X, GraduationCap, Sprout, Brain, Settings } from 'lucide-react'
 
 // AIDEV-NOTE: Import highlight.js CSS for code syntax highlighting
 import 'highlight.js/styles/github-dark.css'
@@ -138,9 +138,9 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
   }
 
   const levelConfig = {
-    intuitive: { label: 'Intuitive', hint: 'Beginner-friendly' },
-    conceptual: { label: 'Conceptual', hint: 'Intermediate' },
-    technical: { label: 'Technical', hint: 'Advanced' }
+    intuitive: { label: 'Intuitive', hint: 'Beginner-friendly', icon: Sprout },
+    conceptual: { label: 'Conceptual', hint: 'Intermediate', icon: Brain },
+    technical: { label: 'Technical', hint: 'Advanced', icon: Settings }
   }
 
   const currentContent = content.layers[currentLevel]
@@ -150,7 +150,7 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
       {/* Header with close button */}
       <div className="flex justify-between items-center p-4 border-b border-border bg-background/50">
         <div className="flex items-center gap-3">
-          <span className="text-foreground text-lg">🎓</span>
+          <GraduationCap className="w-5 h-5 text-foreground" />
           <h3 className="text-foreground font-mono uppercase text-lg">{content.title}</h3>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Close educational overlay">
@@ -171,8 +171,13 @@ function AccordionOverlay({ content, onClose }: { content: EducationalContent; o
             }`}
           >
             <div className="text-center">
-              <div className="font-semibold">{config.label}</div>
-              <div className="text-xs opacity-75 mt-1">{config.hint}</div>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <config.icon className={`w-4 h-4 ${
+                  currentLevel === level ? 'text-accent-primary-foreground' : 'text-foreground'
+                }`} />
+                <div className="font-semibold">{config.label}</div>
+              </div>
+              <div className="text-xs opacity-75">{config.hint}</div>
             </div>
           </button>
         ))}
@@ -315,9 +320,9 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
   }
 
   const levelConfig = {
-    intuitive: { label: 'Intuitive', hint: 'Beginner', icon: '🌱' },
-    conceptual: { label: 'Conceptual', hint: 'Intermediate', icon: '🧠' },
-    technical: { label: 'Technical', hint: 'Advanced', icon: '⚙️' }
+    intuitive: { label: 'Intuitive', hint: 'Beginner', icon: Sprout },
+    conceptual: { label: 'Conceptual', hint: 'Intermediate', icon: Brain },
+    technical: { label: 'Technical', hint: 'Advanced', icon: Settings }
   }
 
   const currentContent = content.layers[currentLevel]
@@ -340,7 +345,7 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-border bg-background/50">
           <div className="flex items-center gap-2">
-            <span className="text-foreground text-lg">🎓</span>
+            <GraduationCap className="w-5 h-5 text-foreground" />
             <h3 className="text-foreground font-mono uppercase text-sm md:text-base">
               {content.title}
             </h3>
@@ -364,7 +369,9 @@ function SidebarOverlay({ content, onClose }: { content: EducationalContent; onC
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{config.icon}</span>
+                  <config.icon className={`w-5 h-5 ${
+                    currentLevel === level ? 'text-accent-primary-foreground' : 'text-foreground'
+                  }`} />
                   <div>
                     <div className="font-semibold uppercase">{config.label}</div>
                     <div className="text-xs opacity-75">{config.hint}</div>
