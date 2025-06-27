@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Factory presets that ship with the Pattern Generator - curated mathematically significant parameter combinations",
   "presets": [
     {
@@ -78,7 +78,7 @@
       "parameters": {
         "b": 0.208,
         "particleCount": 2500,
-        "particleSize": 0.04,
+        "particleSize": 0.08,
         "autoRotate": false,
         "autoRotateSpeed": 1.0,
         "colorScheme": 1,
@@ -99,14 +99,14 @@
       "parameters": {
         "b": 0.329,
         "particleCount": 2500,
-        "particleSize": 0.04,
+        "particleSize": 0.08,
         "autoRotate": false,
         "autoRotateSpeed": 1.0,
         "colorScheme": 0,
         "depthFading": false,
         "useCustomShader": false,
         "showAxes": true,
-        "speed": 1.5
+        "speed": 0.8
       },
       "description": "At the Hopf bifurcation point (b≈0.329) where stable limit cycles emerge before chaos onset.",
       "isFactory": true,
@@ -120,7 +120,7 @@
       "parameters": {
         "b": 0.19,
         "particleCount": 2500,
-        "particleSize": 0.04,
+        "particleSize": 0.08,
         "autoRotate": true,
         "autoRotateSpeed": 0.8,
         "colorScheme": 2,
@@ -237,6 +237,90 @@
       "isFactory": true,
       "category": "Variant",
       "mathematicalSignificance": "Shows how parameter tuning affects spatial distribution"
+    },
+    {
+      "id": "halvorsen-classic",
+      "name": "Classic Halvorsen",
+      "generatorType": "halvorsen-attractor",
+      "parameters": {
+        "a": 1.4,
+        "particleCount": 2500,
+        "particleSize": 0.08,
+        "autoRotate": false,
+        "autoRotateSpeed": 1.0,
+        "colorScheme": 1,
+        "depthFading": false,
+        "useCustomShader": false,
+        "showAxes": false,
+        "speed": 0.8
+      },
+      "description": "Standard Halvorsen parameters (a=1.4) creating the characteristic cyclically symmetric attractor.",
+      "isFactory": true,
+      "category": "Classic",
+      "mathematicalSignificance": "Demonstrates cyclic symmetry with quadratic nonlinear terms"
+    },
+    {
+      "id": "halvorsen-enhanced-chaos",
+      "name": "Enhanced Chaos",
+      "generatorType": "halvorsen-attractor",
+      "parameters": {
+        "a": 1.1,
+        "particleCount": 2500,
+        "particleSize": 0.08,
+        "autoRotate": true,
+        "autoRotateSpeed": 0.7,
+        "colorScheme": 2,
+        "depthFading": true,
+        "useCustomShader": true,
+        "showAxes": false,
+        "speed": 1.0
+      },
+      "description": "Lower damping parameter creates more complex chaotic behavior with enhanced visualization.",
+      "isFactory": true,
+      "category": "Enhanced",
+      "mathematicalSignificance": "Shows how reduced damping increases attractor complexity"
+    },
+    {
+      "id": "halvorsen-boundary",
+      "name": "Stability Boundary",
+      "generatorType": "halvorsen-attractor",
+      "parameters": {
+        "a": 0.8,
+        "particleCount": 2500,
+        "particleSize": 0.08,
+        "autoRotate": false,
+        "autoRotateSpeed": 1.0,
+        "colorScheme": 0,
+        "depthFading": false,
+        "useCustomShader": false,
+        "showAxes": true,
+        "speed": 0.6
+      },
+      "description": "Near the stability boundary where the system exhibits dramatic structural changes.",
+      "isFactory": true,
+      "category": "Bifurcation",
+      "mathematicalSignificance": "Critical parameter region where attractor structure becomes highly sensitive"
+    },
+    {
+      "id": "halvorsen-compact",
+      "name": "Compact Structure",
+      "generatorType": "halvorsen-attractor",
+      "parameters": {
+        "a": 2.0,
+        "particleCount": 2500,
+        "particleSize": 0.08,
+        "autoRotate": false,
+        "autoRotateSpeed": 1.0,
+        "colorScheme": 1,
+        "depthFading": false,
+        "useCustomShader": false,
+        "showAxes": false,
+        "speed": 1.0
+      },
+      "description": "Higher damping creates a more controlled, compact attractor form.",
+      "isFactory": true,
+      "category": "Variant",
+      "mathematicalSignificance": "Demonstrates how increased damping constrains chaotic dynamics"
     }
   ]
 }

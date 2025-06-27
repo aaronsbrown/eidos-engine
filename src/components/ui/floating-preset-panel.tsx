@@ -25,6 +25,7 @@ export function FloatingPresetPanel({
   const [internalIsOpen, setInternalIsOpen] = useState(false)
   const [renamingPresetId, setRenamingPresetId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
+  const [restoreMessage, setRestoreMessage] = useState<string | null>(null)
   
   // Use external onClose if provided, otherwise use internal state
   const isControlledExternally = Boolean(onClose)
@@ -38,7 +39,8 @@ export function FloatingPresetPanel({
     renamePreset,
     clearError,
     exportPreset,
-    importPreset
+    importPreset,
+    restoreFactoryPresets
   } = usePresetManager({
     patternId,
     controlValues,
@@ -51,6 +53,29 @@ export function FloatingPresetPanel({
       onClose()
     } else {
       setInternalIsOpen(false)
+    }
+  }
+
+  // Check if factory presets exist for this pattern
+  const hasFactoryPresets = presets.some(preset => preset.isFactory && preset.generatorType === patternId)
+
+  // Handle restore factory presets
+  const handleRestoreFactoryPresets = async () => {
+    try {
+      setRestoreMessage(null)
+      const result = await restoreFactoryPresets()
+      
+      if (result.imported > 0) {
+        setRestoreMessage(`✓ Restored ${result.imported} factory preset${result.imported === 1 ? '' : 's'}`)
+      } else {
+        setRestoreMessage('ℹ All factory presets already present')
+      }
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setRestoreMessage(null), 3000)
+    } catch {
+      setRestoreMessage('✗ Failed to restore factory presets')
+      setTimeout(() => setRestoreMessage(null), 3000)
     }
   }
 
@@ -298,8 +323,28 @@ export function FloatingPresetPanel({
 
             {/* Footer */}
             <div className="p-4 border-t border-border bg-muted/30">
-              <div className="text-xs font-mono text-muted-foreground">
-                Pattern: {patternId}
+              <div className="flex justify-between items-center">
+                <div className="text-xs font-mono text-muted-foreground">
+                  Pattern: {patternId}
+                </div>
+                {hasFactoryPresets && (
+                  <div className="flex flex-col items-end gap-1">
+                    {restoreMessage && (
+                      <div className="text-xs font-mono text-muted-foreground">
+                        {restoreMessage}
+                      </div>
+                    )}
+                    <Button
+                      onClick={handleRestoreFactoryPresets}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs font-mono border-border hover:border-accent-primary px-3 py-1"
+                      disabled={isLoading}
+                    >
+                      Restore Factory Presets
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

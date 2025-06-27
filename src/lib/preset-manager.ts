@@ -28,7 +28,7 @@ const STORAGE_KEYS = {
 } as const
 
 // AIDEV-NOTE: Current preset system version for future migration support
-export const PRESET_VERSION = '1.0.0'
+export const PRESET_VERSION = '1.0.1'
 
 /**
  * Generate a consistent hash for preset content to detect duplicates
@@ -477,6 +477,48 @@ export class PresetManager {
       localStorage.setItem(STORAGE_KEYS.FACTORY_PRESETS_LOADED, PRESET_VERSION)
     } catch (error) {
       console.warn('Failed to mark factory presets as loaded:', error)
+    }
+  }
+
+  /**
+   * Force re-import of factory presets (useful for restore functionality)
+   */
+  static async restoreFactoryPresets(): Promise<{ imported: number; skipped: number }> {
+    try {
+      const factoryPresets = await this.loadFactoryPresets()
+      if (factoryPresets.length === 0) {
+        console.warn('No factory presets found to restore')
+        return { imported: 0, skipped: 0 }
+      }
+
+      const existingPresets = this.loadPresets()
+      let importedCount = 0
+      let skippedCount = 0
+
+      // Import factory presets, skipping duplicates
+      for (const factoryPreset of factoryPresets) {
+        // Check if this factory preset already exists (by content hash)
+        const duplicate = existingPresets.find(p => 
+          p.contentHash === factoryPreset.contentHash && 
+          p.generatorType === factoryPreset.generatorType
+        )
+
+        if (!duplicate) {
+          existingPresets.push(factoryPreset)
+          importedCount++
+        } else {
+          skippedCount++
+        }
+      }
+
+      if (importedCount > 0) {
+        this.savePresets(existingPresets)
+      }
+
+      return { imported: importedCount, skipped: skippedCount }
+    } catch (error) {
+      console.error('Failed to restore factory presets:', error)
+      throw error
     }
   }
 
