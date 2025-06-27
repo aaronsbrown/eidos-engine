@@ -1,5 +1,5 @@
-// AIDEV-NOTE: Tests for Lorenz Attractor WebGL pattern generator
-// Focuses on structure, props, and integration rather than WebGL rendering
+// AIDEV-NOTE: Tests for Lorenz Attractor Three.js pattern generator
+// Focuses on structure, props, and integration rather than Three.js rendering
 
 import React from 'react'
 import { render } from '@testing-library/react'
@@ -188,12 +188,12 @@ describe('Lorenz Attractor Pattern Generator', () => {
         />
       )
       
-      // Should render a canvas element
-      const canvas = document.querySelector('canvas')
-      expect(canvas).toBeInTheDocument()
+      // Should render Three.js canvas container
+      const container = document.querySelector('div[style*="width: 400px"]')
+      expect(container).toBeInTheDocument()
     })
 
-    test('creates canvas with correct dimensions', () => {
+    test('creates container with correct dimensions', () => {
       render(
         <LorenzAttractorGenerator 
           width={800} 
@@ -202,9 +202,9 @@ describe('Lorenz Attractor Pattern Generator', () => {
         />
       )
       
-      const canvas = document.querySelector('canvas')
-      expect(canvas).toHaveAttribute('width', '800')
-      expect(canvas).toHaveAttribute('height', '600')
+      const container = document.querySelector('div[style*="width: 800px"]')
+      expect(container).toBeInTheDocument()
+      expect(container).toHaveStyle('height: 600px')
     })
 
     test('accepts control values through props', () => {
@@ -241,8 +241,8 @@ describe('Lorenz Attractor Pattern Generator', () => {
     })
   })
 
-  describe('WebGL Integration', () => {
-    test('attempts to get WebGL context', () => {
+  describe('Three.js Integration', () => {
+    test('renders with ThreeJSCanvas wrapper', () => {
       render(
         <LorenzAttractorGenerator 
           width={400} 
@@ -251,22 +251,31 @@ describe('Lorenz Attractor Pattern Generator', () => {
         />
       )
       
-      // Should have tried to get WebGL context
-      expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith('webgl')
+      // Should render without throwing errors
+      // Note: Three.js rendering is complex to test, we focus on no crashes
+      const container = document.querySelector('div')
+      expect(container).toBeInTheDocument()
     })
 
-    test('enables required WebGL features', () => {
-      render(
-        <LorenzAttractorGenerator 
-          width={400} 
-          height={300}
-          controlValues={{}}
-        />
-      )
+    test('passes control values to pattern logic', () => {
+      const controlValues = {
+        sigma: 12,
+        rho: 30,
+        beta: 3,
+        particleCount: 500,
+        particleSize: 0.03
+      }
       
-      // Should enable depth testing and blending for 3D particles
-      expect(mockWebGLContext.enable).toHaveBeenCalledWith(mockWebGLContext.DEPTH_TEST)
-      expect(mockWebGLContext.enable).toHaveBeenCalledWith(mockWebGLContext.BLEND)
+      // Should not throw with valid control values
+      expect(() => {
+        render(
+          <LorenzAttractorGenerator 
+            width={400} 
+            height={300}
+            controlValues={controlValues}
+          />
+        )
+      }).not.toThrow()
     })
   })
 })

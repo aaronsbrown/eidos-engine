@@ -809,8 +809,8 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     technology: 'WEBGL_2.0',
     category: 'Simulation',
     schemaVersion: "1.0",
-    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space.",
-    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This WebGL implementation renders particles in true 3D space with automatic camera rotation.",
+    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space with intuitive camera controls.",
+    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This Three.js implementation renders particles in true 3D space with mouse-controlled camera - drag to orbit, scroll to zoom.",
     semantics: {
       primaryAlgorithmFamily: "StrangeAttractor",
       keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
@@ -829,7 +829,7 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     dateAdded: "2025-06-25",
     lastModified: "2025-06-25",
     status: "Production",
-    isInteractive: false,
+    isInteractive: true,
     isAnimatedByDefault: true,
     controls: [
         {
@@ -888,7 +888,21 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
                     desktop: 1500,
                     rationale: "High particle counts significantly impact performance on mobile devices."
                 }
-            }
+            },
+            group: "Simulation Parameters"
+        },
+        {
+            id: "particleSize",
+            label: "Particle Size",
+            type: "range",
+            min: 0.01,
+            max: 0.04,
+            step: 0.005,
+            defaultValue: 0.02,
+            description: "Size of individual particles - larger particles create more visible trails.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
         }
     ]
   },
