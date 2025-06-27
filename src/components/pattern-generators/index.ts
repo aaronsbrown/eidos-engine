@@ -8,6 +8,7 @@ import FourPoleGradientGenerator from "./four-pole-gradient-generator"
 import LorenzAttractorGenerator from "./lorenz-attractor-generator"
 import ThomasAttractorGenerator from "./thomas-attractor-generator"
 import AizawaAttractorGenerator from "./aizawa-attractor-generator"
+import HalvorsenAttractorGenerator from "./halvorsen-attractor-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
@@ -1639,6 +1640,187 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
         }
     ]
   },
+  {
+    id: "halvorsen-attractor",
+    name: "Halvorsen Attractor",
+    component: HalvorsenAttractorGenerator,
+    technology: 'WEBGL_MESHES',
+    category: 'Attractors',
+    schemaVersion: "1.0",
+    description: "A cyclically symmetric strange attractor with elegant quadratic nonlinear terms, rendered in interactive 3D space.",
+    longDescription: "The Halvorsen Attractor is a 3D dynamical system with cyclically symmetric structure and quadratic nonlinearities. It exhibits rich chaotic behavior controlled by a single damping parameter, visualized with true spatial depth and interactive camera controls.",
+    semantics: {
+      primaryAlgorithmFamily: "StrangeAttractor",
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Continuous", "Symmetrical", "Luminous", "Smooth"],
+      dimensionality: "True3D_WebGL",
+      interactionStyle: "DirectManipulation",
+      keywords: ["halvorsen", "cyclic symmetry", "quadratic", "strange attractor", "3d", "webgl", "interactive", "spatial"]
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance dependent on particle count and 3D rendering complexity. Quadratic nonlinearities are efficient but 3D rendering benefits from GPU acceleration."
+    },
+    version: "1.0.0",
+    author: "Aaron Brown & Claude",
+    dateAdded: "2025-06-27",
+    lastModified: "2025-06-27",
+    status: "Production",
+    isInteractive: true,
+    isAnimatedByDefault: true,
+    relatedPatterns: ["lorenz-attractor", "thomas-attractor", "aizawa-attractor"],
+    controls: [
+        {
+            id: "a",
+            label: "Damping (a)",
+            type: "range",
+            min: 0.5,
+            max: 2.5,
+            step: 0.1,
+            defaultValue: 1.4,
+            description: "Damping parameter controlling chaotic behavior. Classic value is 1.4 for optimal chaos.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Halvorsen Parameters"
+        },
+        {
+            id: "speed",
+            label: "Animation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 0.8,
+            description: "Animation speed multiplier for the dynamical evolution.",
+            role: "AnimationBehavior",
+            impactsPerformance: "Minor",
+            group: "Animation"
+        },
+        {
+            id: "particleCount",
+            label: "Particle Count",
+            type: "range",
+            min: 100,
+            max: 5000,
+            step: 100,
+            defaultValue: 2500,
+            description: "Number of particles to trace the attractor's path.",
+            role: "PerformanceTuning",
+            impactsPerformance: "Significant",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: 500,
+                    desktop: 2500,
+                    rationale: "High particle counts significantly impact performance on mobile devices."
+                }
+            },
+            group: "Simulation Parameters"
+        },
+        {
+            id: "particleSize",
+            label: "Particle Size",
+            type: "range",
+            min: 0.01,
+            max: 0.1,
+            step: 0.005,
+            defaultValue: 0.08,
+            description: "Size of individual particles - larger particles create more visible trails.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
+        },
+        {
+            id: "autoRotate",
+            label: "Auto Rotate",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Automatically rotate the camera around the Y-axis for a cinematic view of the attractor.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "autoRotateSpeed",
+            label: "Rotation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 1.0,
+            description: "Speed of automatic camera rotation - higher values create faster rotation.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "useCustomShader",
+            label: "Enhanced Rendering",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Enable advanced shader-based rendering with cyclic symmetry-based coloring and improved visual quality.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Custom shaders provide enhanced visual quality on desktop but may impact mobile GPU performance."
+                }
+            }
+        },
+        {
+            id: "colorScheme",
+            label: "Color Scheme",
+            type: "select",
+            defaultValue: 1,
+            options: [
+                { value: 0, label: "Rainbow Depth" },
+                { value: 1, label: "Warm-Cool" },
+                { value: 2, label: "Halvorsen Gradient" }
+            ],
+            description: "Color scheme for depth and symmetry-based particle coloring - highlights mathematical properties.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "depthFading",
+            label: "Depth Fading",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Fade distant particles for enhanced depth perception and focus on the attractor's core structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: false,
+                    rationale: "Depth fading can be enabled for enhanced depth perception but is disabled by default for clearer particle visibility."
+                }
+            }
+        },
+        {
+            id: "showAxes",
+            label: "Show Coordinate Axes",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Display 3D coordinate axes to provide spatial reference and understand the cyclic symmetry.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Coordinate axes help with spatial understanding on larger screens but may clutter mobile displays."
+                }
+            }
+        }
+    ]
+  },
 ]
 
 // AIDEV-NOTE: Sort patterns by category to group them properly in the UI
@@ -1658,5 +1840,5 @@ export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
 })
 
-export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator, ThomasAttractorGenerator, AizawaAttractorGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator, ThomasAttractorGenerator, AizawaAttractorGenerator, HalvorsenAttractorGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"

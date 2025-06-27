@@ -33,6 +33,9 @@ export interface UsePresetManagerReturn {
   // Export/Import (basic - full implementation in future)
   exportPreset: (presetId: string) => string
   importPreset: (jsonData: string) => Promise<boolean>
+  
+  // Factory preset operations
+  restoreFactoryPresets: () => Promise<{ imported: number; skipped: number }>
 }
 
 /**
@@ -363,6 +366,27 @@ export function usePresetManager({
     setError(null)
   }, [])
 
+  // AIDEV-NOTE: Restore factory presets functionality
+  const restoreFactoryPresets = useCallback(async (): Promise<{ imported: number; skipped: number }> => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const result = await PresetManager.restoreFactoryPresets()
+      
+      // Refresh the presets list to show newly imported factory presets
+      refreshPresets()
+      
+      return result
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+      setError(`Failed to restore factory presets: ${errorMsg}`)
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }, [refreshPresets])
+
   return {
     // State
     presets,
@@ -381,6 +405,7 @@ export function usePresetManager({
     clearError,
     validatePreset,
     exportPreset,
-    importPreset
+    importPreset,
+    restoreFactoryPresets
   }
 }
