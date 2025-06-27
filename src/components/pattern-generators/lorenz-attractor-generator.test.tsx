@@ -94,7 +94,7 @@ describe('Lorenz Attractor Pattern Generator', () => {
     test('has correct WebGL technology specification', () => {
       const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
       
-      expect(lorenzPattern?.technology).toBe('WEBGL_2.0')
+      expect(lorenzPattern?.technology).toBe('WEBGL_MESHES')
       expect(lorenzPattern?.category).toBe('Simulation')
     })
 
