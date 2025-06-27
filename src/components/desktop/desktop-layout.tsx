@@ -439,13 +439,44 @@ export default function DesktopLayout() {
                 className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 value={activePresetId || ""}
                 onChange={(e) => {
-                  if (e.target.value && e.target.value !== activePresetId) {
+                  if (e.target.value === "") {
+                    // Reset to actual pattern defaults from control definitions
+                    const pattern = patternGenerators.find(p => p.id === selectedPatternId)
+                    const defaults: Record<string, number | string | boolean> = {}
+                    
+                    if (pattern?.controls) {
+                      pattern.controls.forEach(control => {
+                        // Check for platform-specific defaults first
+                        let defaultValue = control.defaultValue
+                        
+                        if (control.defaultRecommendations?.platformSpecific) {
+                          const platform = window.innerWidth >= 768 ? 'desktop' : 'mobile'
+                          const platformDefault = control.defaultRecommendations.platformSpecific[platform]
+                          if (platformDefault !== undefined) {
+                            defaultValue = platformDefault
+                          }
+                        }
+                        
+                        defaults[control.id] = defaultValue
+                      })
+                    }
+                    
+                    
+                    setControlValues(prev => ({
+                      ...prev,
+                      [selectedPatternId]: defaults
+                    }))
+                    // Clear active preset tracking
+                    window.localStorage.removeItem('pattern-generator-last-active-preset')
+                    // Trigger preset refresh to clear activePresetId
+                    window.dispatchEvent(new CustomEvent('preset-updated'))
+                  } else if (e.target.value !== activePresetId) {
                     loadPreset(e.target.value)
                   }
                 }}
                 disabled={isPresetLoading || presets.length === 0}
               >
-                <option value="">SELECT PRESET</option>
+                <option value="">[Default]</option>
                 {presets.map(preset => (
                   <option key={preset.id} value={preset.id}>
                     {preset.name}

@@ -511,10 +511,11 @@ describe('DesktopLayout - User Behavior', () => {
   })
 
   describe('User can manage presets', () => {
-    it('displays preset selection dropdown', () => {
+    it('allows user to browse and select available presets', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
-      const presetDropdown = screen.getByDisplayValue('SELECT PRESET')
+      // User can find and interact with preset selection
+      const presetDropdown = screen.getByRole('combobox')
       expect(presetDropdown).toBeInTheDocument()
       
       // User can see available presets
@@ -523,12 +524,14 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getByText('Preset 2')).toBeInTheDocument()
     })
 
-    it('loads preset when user selects one', async () => {
+    it('loads preset settings when user selects one', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
       
-      const presetDropdown = screen.getByDisplayValue('SELECT PRESET')
+      // User selects a preset from the dropdown
+      const presetDropdown = screen.getByRole('combobox')
       fireEvent.change(presetDropdown, { target: { value: 'preset-1' } })
       
+      // System loads the preset settings
       await waitFor(() => {
         expect(mockLoadPreset).toHaveBeenCalledWith('preset-1')
       })

@@ -9,6 +9,7 @@ import LorenzAttractorGenerator from "./lorenz-attractor-generator"
 import ThomasAttractorGenerator from "./thomas-attractor-generator"
 import AizawaAttractorGenerator from "./aizawa-attractor-generator"
 import HalvorsenAttractorGenerator from "./halvorsen-attractor-generator"
+import NewtonLeipnikAttractorGenerator from "./newton-leipnik-attractor-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
@@ -1821,6 +1822,200 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
         }
     ]
   },
+  {
+    id: "newton-leipnik-attractor",
+    name: "Newton-Leipnik Attractor",
+    component: NewtonLeipnikAttractorGenerator,
+    technology: 'WEBGL_MESHES',
+    category: 'Attractors',
+    schemaVersion: "1.0",
+    description: "A butterfly-structured strange attractor with distinctive folding dynamics and complex cross-coupling terms, rendered in interactive 3D space.",
+    longDescription: "The Newton-Leipnik Attractor is a 3D dynamical system known for its butterfly-like structure with complex folding dynamics. The cross-coupling terms (10yz, 5xz, 5xy) create intricate patterns with sensitive dependence on initial conditions, making it an excellent demonstration of chaos theory.",
+    semantics: {
+      primaryAlgorithmFamily: "StrangeAttractor",
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Continuous", "Complex", "Organic", "Luminous", "Smooth"],
+      dimensionality: "True3D_WebGL",
+      interactionStyle: "DirectManipulation",
+      keywords: ["newton-leipnik", "butterfly structure", "folding dynamics", "cross-coupling", "strange attractor", "3d", "webgl", "interactive", "spatial"]
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance dependent on particle count and 3D rendering complexity. Cross-coupling terms require additional computation but remain efficient for real-time visualization."
+    },
+    version: "1.0.0",
+    author: "Aaron Brown & Claude",
+    dateAdded: "2025-06-27",
+    lastModified: "2025-06-27",
+    status: "Production",
+    isInteractive: true,
+    isAnimatedByDefault: true,
+    relatedPatterns: ["lorenz-attractor", "thomas-attractor", "aizawa-attractor", "halvorsen-attractor"],
+    controls: [
+        {
+            id: "a",
+            label: "Parameter A",
+            type: "range",
+            min: 0.1,
+            max: 1.0,
+            step: 0.05,
+            defaultValue: 0.4,
+            description: "Primary parameter controlling the first equation. Classic value is 0.4 for optimal butterfly structure.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Newton-Leipnik Parameters"
+        },
+        {
+            id: "b",
+            label: "Parameter B",
+            type: "range",
+            min: 0.05,
+            max: 0.5,
+            step: 0.025,
+            defaultValue: 0.175,
+            description: "Secondary parameter controlling the third equation. Classic value is 0.175 for chaotic behavior.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Newton-Leipnik Parameters"
+        },
+        {
+            id: "speed",
+            label: "Animation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 3.0,
+            description: "Animation speed multiplier for the dynamical evolution.",
+            role: "AnimationBehavior",
+            impactsPerformance: "Minor",
+            group: "Animation"
+        },
+        {
+            id: "particleCount",
+            label: "Particle Count",
+            type: "range",
+            min: 100,
+            max: 5000,
+            step: 100,
+            defaultValue: 5000,
+            description: "Number of particles to trace the attractor's path.",
+            role: "PerformanceTuning",
+            impactsPerformance: "Significant",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: 500,
+                    desktop: 2500,
+                    rationale: "High particle counts significantly impact performance on mobile devices."
+                }
+            },
+            group: "Simulation Parameters"
+        },
+        {
+            id: "particleSize",
+            label: "Particle Size",
+            type: "range",
+            min: 0.01,
+            max: 0.1,
+            step: 0.005,
+            defaultValue: 0.1,
+            description: "Size of individual particles - larger particles create more visible butterfly trails.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
+        },
+        {
+            id: "autoRotate",
+            label: "Auto Rotate",
+            type: "checkbox",
+            defaultValue: true,
+            description: "Automatically rotate the camera around the Y-axis for a cinematic view of the butterfly structure.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "autoRotateSpeed",
+            label: "Rotation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 0.5,
+            description: "Speed of automatic camera rotation - slower values highlight the folding dynamics.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "useCustomShader",
+            label: "Enhanced Rendering",
+            type: "checkbox",
+            defaultValue: true,
+            description: "Enable advanced shader-based rendering with folding dynamics-based coloring and butterfly gradient effects.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Custom shaders provide enhanced butterfly visualization on desktop but may impact mobile GPU performance."
+                }
+            }
+        },
+        {
+            id: "colorScheme",
+            label: "Color Scheme",
+            type: "select",
+            defaultValue: 0,
+            options: [
+                { value: 0, label: "Rainbow Depth" },
+                { value: 1, label: "Warm-Cool" },
+                { value: 2, label: "Butterfly Gradient" }
+            ],
+            description: "Color scheme for depth and folding dynamics-based particle coloring - highlights butterfly structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "depthFading",
+            label: "Depth Fading",
+            type: "checkbox",
+            defaultValue: true,
+            description: "Fade distant particles for enhanced depth perception and focus on the butterfly wing structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Depth fading enhances the butterfly structure visualization on larger screens."
+                }
+            }
+        },
+        {
+            id: "showAxes",
+            label: "Show Coordinate Axes",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Display 3D coordinate axes to provide spatial reference and understand the folding dynamics.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Coordinate axes help with spatial understanding on larger screens but may clutter mobile displays."
+                }
+            }
+        }
+    ]
+  },
 ]
 
 // AIDEV-NOTE: Sort patterns by category to group them properly in the UI
@@ -1840,5 +2035,5 @@ export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
 })
 
-export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator, ThomasAttractorGenerator, AizawaAttractorGenerator, HalvorsenAttractorGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator, ThomasAttractorGenerator, AizawaAttractorGenerator, HalvorsenAttractorGenerator, NewtonLeipnikAttractorGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"

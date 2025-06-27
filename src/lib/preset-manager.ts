@@ -23,12 +23,8 @@ export interface PresetExportData {
 // AIDEV-NOTE: localStorage key constants to avoid typos and enable easy refactoring
 const STORAGE_KEYS = {
   PRESETS: 'pattern-generator-presets',
-  LAST_ACTIVE_PRESET: 'pattern-generator-last-active-preset',
-  FACTORY_PRESETS_LOADED: 'pattern-generator-factory-loaded'
+  LAST_ACTIVE_PRESET: 'pattern-generator-last-active-preset'
 } as const
-
-// AIDEV-NOTE: Current preset system version for future migration support
-export const PRESET_VERSION = '1.0.1'
 
 /**
  * Generate a consistent hash for preset content to detect duplicates
@@ -67,9 +63,9 @@ function generateContentHash(
  */
 export class PresetManager {
   /**
-   * Load all presets from localStorage
+   * Load user presets from localStorage (excludes factory presets)
    */
-  static loadPresets(): PatternPreset[] {
+  static loadUserPresets(): PatternPreset[] {
     try {
       if (typeof window === 'undefined') return []
       
@@ -79,49 +75,51 @@ export class PresetManager {
       const parsed = JSON.parse(stored) as PatternPreset[]
       let shouldSave = false
       
-      // AIDEV-NOTE: Convert date strings back to Date objects and ensure contentHash exists
-      const presets = parsed.map((preset) => {
-        const updatedPreset = {
-          ...preset,
-          createdAt: new Date(preset.createdAt)
-        }
-        
-        // Add contentHash if missing (backward compatibility)
-        if (!updatedPreset.contentHash) {
-          updatedPreset.contentHash = generateContentHash(
-            updatedPreset.name, 
-            updatedPreset.generatorType, 
-            updatedPreset.parameters
-          )
-          shouldSave = true
-        }
-        
-        return updatedPreset
-      })
+      // AIDEV-NOTE: Filter out factory presets and update user presets
+      const userPresets = parsed
+        .filter(preset => !preset.isFactory) // Only keep user presets
+        .map((preset) => {
+          const updatedPreset = {
+            ...preset,
+            createdAt: new Date(preset.createdAt)
+          }
+          
+          // Add contentHash if missing (backward compatibility)
+          if (!updatedPreset.contentHash) {
+            updatedPreset.contentHash = generateContentHash(
+              updatedPreset.name, 
+              updatedPreset.generatorType, 
+              updatedPreset.parameters
+            )
+            shouldSave = true
+          }
+          
+          return updatedPreset
+        })
       
-      // Save back to localStorage if we added any missing hashes
-      if (shouldSave) {
-        this.savePresets(presets)
+      // Save back to localStorage if we filtered out factory presets or added hashes
+      if (shouldSave || userPresets.length !== parsed.length) {
+        this.saveUserPresets(userPresets)
       }
       
-      return presets
+      return userPresets
     } catch (error) {
-      console.warn('Failed to load presets from localStorage:', error)
+      console.warn('Failed to load user presets from localStorage:', error)
       return []
     }
   }
 
   /**
-   * Save presets to localStorage
+   * Save user presets to localStorage (only user presets, not factory presets)
    */
-  static savePresets(presets: PatternPreset[]): boolean {
+  static saveUserPresets(userPresets: PatternPreset[]): boolean {
     try {
       if (typeof window === 'undefined') return false
       
-      localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(presets))
+      localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(userPresets))
       return true
     } catch (error) {
-      console.error('Failed to save presets to localStorage:', error)
+      console.error('Failed to save user presets to localStorage:', error)
       return false
     }
   }
@@ -152,10 +150,10 @@ export class PresetManager {
    * Add a new preset (for local saves - strict duplicate checking)
    */
   static addPreset(preset: PatternPreset): boolean {
-    const presets = this.loadPresets()
+    const userPresets = this.loadUserPresets()
     
     // AIDEV-NOTE: Check for exact content duplicates using hash
-    const contentDuplicate = presets.find(p => 
+    const contentDuplicate = userPresets.find(p => 
       p.contentHash === preset.contentHash && p.generatorType === preset.generatorType
     )
     
@@ -164,7 +162,7 @@ export class PresetManager {
     }
     
     // AIDEV-NOTE: Strict name checking for local saves - user should pick unique names
-    const nameDuplicate = presets.find(p => 
+    const nameDuplicate = userPresets.find(p => 
       p.name === preset.name && p.generatorType === preset.generatorType
     )
     
@@ -172,8 +170,8 @@ export class PresetManager {
       throw new Error(`Preset name "${preset.name}" already exists. Please choose a different name.`)
     }
     
-    presets.push(preset)
-    return this.savePresets(presets)
+    userPresets.push(preset)
+    return this.saveUserPresets(userPresets)
   }
 
   /**
@@ -223,31 +221,31 @@ export class PresetManager {
    * Delete a preset by ID
    */
   static deletePreset(presetId: string): boolean {
-    const presets = this.loadPresets()
-    const filtered = presets.filter(p => p.id !== presetId)
+    const userPresets = this.loadUserPresets()
+    const filtered = userPresets.filter(p => p.id !== presetId)
     
-    if (filtered.length === presets.length) {
+    if (filtered.length === userPresets.length) {
       return false // Preset not found
     }
     
-    return this.savePresets(filtered)
+    return this.saveUserPresets(filtered)
   }
 
   /**
    * Update an existing preset
    */
   static updatePreset(presetId: string, updates: Partial<Omit<PatternPreset, 'id' | 'createdAt'>>): boolean {
-    const presets = this.loadPresets()
-    const index = presets.findIndex(p => p.id === presetId)
+    const userPresets = this.loadUserPresets()
+    const index = userPresets.findIndex(p => p.id === presetId)
     
     if (index === -1) return false
     
     // AIDEV-NOTE: Check for name conflicts if name is being updated
     if (updates.name) {
-      const duplicate = presets.find((p, i) => 
+      const duplicate = userPresets.find((p, i) => 
         i !== index && 
         p.name === updates.name && 
-        p.generatorType === (updates.generatorType || presets[index].generatorType)
+        p.generatorType === (updates.generatorType || userPresets[index].generatorType)
       )
       
       if (duplicate) {
@@ -255,15 +253,31 @@ export class PresetManager {
       }
     }
     
-    presets[index] = { ...presets[index], ...updates }
-    return this.savePresets(presets)
+    userPresets[index] = { ...userPresets[index], ...updates }
+    return this.saveUserPresets(userPresets)
   }
 
   /**
-   * Get presets for a specific generator type
+   * Get presets for a specific generator type (combines factory + user presets)
    */
-  static getPresetsForGenerator(generatorType: string): PatternPreset[] {
-    return this.loadPresets().filter(p => p.generatorType === generatorType)
+  static async getPresetsForGenerator(generatorType: string): Promise<PatternPreset[]> {
+    try {
+      // Load factory presets fresh from JSON
+      const factoryPresets = await this.loadFactoryPresets()
+      
+      // Load user presets from localStorage
+      const userPresets = this.loadUserPresets()
+      
+      // Combine and filter by generator type
+      const allPresets = [...factoryPresets, ...userPresets]
+      const filtered = allPresets.filter(p => p.generatorType === generatorType)
+      
+      return filtered
+    } catch (error) {
+      console.warn('Failed to load presets for generator:', error)
+      // Fallback to user presets only
+      return this.loadUserPresets().filter(p => p.generatorType === generatorType)
+    }
   }
 
   /**
@@ -307,13 +321,13 @@ export class PresetManager {
    * Export presets to JSON format for sharing
    */
   static exportPresets(presetIds?: string[]): PresetExportData {
-    const allPresets = this.loadPresets()
+    const allPresets = this.loadUserPresets() // Fixed: use loadUserPresets instead of loadPresets
     const presetsToExport = presetIds 
       ? allPresets.filter(p => presetIds.includes(p.id))
       : allPresets
     
     return {
-      version: PRESET_VERSION,
+      version: "1.0.0", // Fixed: use string instead of PRESET_VERSION which was removed
       presets: presetsToExport,
       exportedAt: new Date()
     }
@@ -328,13 +342,19 @@ export class PresetManager {
     skippedDuplicates: string[]
     errors: string[]
   } {
-    const existingPresets = this.loadPresets()
+    const existingUserPresets = this.loadUserPresets()
     const importedIds: string[] = []
     const skippedDuplicates: string[] = []
     const errors: string[] = []
     
     for (const preset of exportData.presets) {
       try {
+        // Skip factory presets in imports - they should only come from JSON file
+        if (preset.isFactory) {
+          skippedDuplicates.push(`"${preset.name}" (factory preset - skipped)`)
+          continue
+        }
+        
         // AIDEV-NOTE: Ensure preset has contentHash for duplicate detection
         let contentHash = preset.contentHash
         if (!contentHash) {
@@ -350,13 +370,13 @@ export class PresetManager {
         }
         
         // Use auto-rename helper for conflict resolution
-        const addedPreset = this.addPresetWithAutoRename(importPreset, existingPresets)
+        const addedPreset = this.addPresetWithAutoRename(importPreset, existingUserPresets)
         
         if (addedPreset) {
           importedIds.push(addedPreset.id)
         } else {
           // Content duplicate was skipped
-          const existingDupe = existingPresets.find(p => 
+          const existingDupe = existingUserPresets.find(p => 
             p.contentHash === contentHash && p.generatorType === preset.generatorType
           )
           skippedDuplicates.push(`"${preset.name}" (identical to existing "${existingDupe?.name || 'unknown'}")`)
@@ -370,16 +390,16 @@ export class PresetManager {
     
     // Save all changes at once for better performance
     if (importedIds.length > 0) {
-      this.savePresets(existingPresets)
+      this.saveUserPresets(existingUserPresets)
     }
     
     return { importedIds, skippedDuplicates, errors }
   }
 
   /**
-   * Clear all presets (with confirmation in UI layer)
+   * Clear all user presets (with confirmation in UI layer)
    */
-  static clearAllPresets(): boolean {
+  static clearAllUserPresets(): boolean {
     try {
       if (typeof window === 'undefined') return false
       
@@ -387,8 +407,26 @@ export class PresetManager {
       localStorage.removeItem(STORAGE_KEYS.LAST_ACTIVE_PRESET)
       return true
     } catch (error) {
-      console.error('Failed to clear presets:', error)
+      console.error('Failed to clear user presets:', error)
       return false
+    }
+  }
+
+  /**
+   * One-time cleanup: Remove factory presets from localStorage (migration helper)
+   */
+  static cleanupFactoryPresetsFromStorage(): void {
+    try {
+      if (typeof window === 'undefined') return
+      
+      // Remove the old factory presets loading flag
+      localStorage.removeItem('pattern-generator-factory-loaded')
+      
+      // Load current presets and filter out factory ones
+      const currentPresets = this.loadUserPresets() // This already filters out factory presets
+      console.log(`Cleaned up localStorage: removed factory presets, kept ${currentPresets.length} user presets`)
+    } catch (error) {
+      console.warn('Failed to cleanup factory presets from localStorage:', error)
     }
   }
 
@@ -456,128 +494,30 @@ export class PresetManager {
   }
 
   /**
-   * Check if factory presets have been loaded for this version
-   */
-  static hasFactoryPresetsLoaded(): boolean {
-    try {
-      if (typeof window === 'undefined') return false
-      const loaded = localStorage.getItem(STORAGE_KEYS.FACTORY_PRESETS_LOADED)
-      return loaded === PRESET_VERSION
-    } catch {
-      return false
-    }
-  }
-
-  /**
-   * Mark factory presets as loaded for this version
-   */
-  static markFactoryPresetsLoaded(): void {
-    try {
-      if (typeof window === 'undefined') return
-      localStorage.setItem(STORAGE_KEYS.FACTORY_PRESETS_LOADED, PRESET_VERSION)
-    } catch (error) {
-      console.warn('Failed to mark factory presets as loaded:', error)
-    }
-  }
-
-  /**
-   * Force re-import of factory presets (useful for restore functionality)
+   * Restore factory presets (simplified - just returns fresh presets from JSON)
    */
   static async restoreFactoryPresets(): Promise<{ imported: number; skipped: number }> {
     try {
       const factoryPresets = await this.loadFactoryPresets()
-      if (factoryPresets.length === 0) {
-        console.warn('No factory presets found to restore')
-        return { imported: 0, skipped: 0 }
-      }
-
-      const existingPresets = this.loadPresets()
-      let importedCount = 0
-      let skippedCount = 0
-
-      // Import factory presets, skipping duplicates
-      for (const factoryPreset of factoryPresets) {
-        // Check if this factory preset already exists (by content hash)
-        const duplicate = existingPresets.find(p => 
-          p.contentHash === factoryPreset.contentHash && 
-          p.generatorType === factoryPreset.generatorType
-        )
-
-        if (!duplicate) {
-          existingPresets.push(factoryPreset)
-          importedCount++
-        } else {
-          skippedCount++
-        }
-      }
-
-      if (importedCount > 0) {
-        this.savePresets(existingPresets)
-      }
-
-      return { imported: importedCount, skipped: skippedCount }
+      // In the new system, factory presets are always "fresh" so we just return the count
+      return { imported: factoryPresets.length, skipped: 0 }
     } catch (error) {
-      console.error('Failed to restore factory presets:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Auto-import factory presets if not already loaded
-   */
-  static async ensureFactoryPresetsLoaded(): Promise<void> {
-    if (this.hasFactoryPresetsLoaded()) {
-      return // Already loaded for this version
-    }
-
-    try {
-      const factoryPresets = await this.loadFactoryPresets()
-      if (factoryPresets.length === 0) {
-        console.warn('No factory presets found to import')
-        return
-      }
-
-      const existingPresets = this.loadPresets()
-      let importedCount = 0
-
-      // Import factory presets, skipping duplicates
-      for (const factoryPreset of factoryPresets) {
-        // Check if this factory preset already exists (by content hash)
-        const duplicate = existingPresets.find(p => 
-          p.contentHash === factoryPreset.contentHash && 
-          p.generatorType === factoryPreset.generatorType
-        )
-
-        if (!duplicate) {
-          existingPresets.push(factoryPreset)
-          importedCount++
-        }
-      }
-
-      // Save updated presets if any were imported
-      if (importedCount > 0) {
-        this.savePresets(existingPresets)
-        console.log(`Imported ${importedCount} factory presets`)
-      }
-
-      // Mark as loaded regardless of whether anything was imported
-      this.markFactoryPresetsLoaded()
-    } catch (error) {
-      console.error('Failed to import factory presets:', error)
+      console.error('Failed to load factory presets:', error)
+      return { imported: 0, skipped: 0 }
     }
   }
 
   /**
    * Get only factory presets
    */
-  static getFactoryPresets(): PatternPreset[] {
-    return this.loadPresets().filter(p => p.isFactory === true)
+  static async getFactoryPresets(): Promise<PatternPreset[]> {
+    return await this.loadFactoryPresets()
   }
 
   /**
    * Get user-created presets (non-factory)
    */
   static getUserPresets(): PatternPreset[] {
-    return this.loadPresets().filter(p => !p.isFactory)
+    return this.loadUserPresets()
   }
 }

@@ -155,10 +155,10 @@ describe('usePresetManager - User Interaction Behaviors', () => {
       })
 
       // Manually add an extra parameter to the preset in storage
-      const savedPresets = PresetManager.loadPresets()
+      const savedPresets = PresetManager.loadUserPresets()
       if (savedPresets.length > 0) {
         savedPresets[0].parameters.oldParam = 123 // Add parameter not in controls
-        PresetManager.savePresets(savedPresets)
+        PresetManager.saveUserPresets(savedPresets)
       }
 
       // Refresh presets to get the modified one
@@ -542,9 +542,9 @@ describe('usePresetManager - User Interaction Behaviors', () => {
         restoreResult = await result.current.restoreFactoryPresets()
       })
 
-      expect(restoreResult?.imported).toBe(0)
-      expect(restoreResult?.skipped).toBe(2)
-      expect(result.current.presets).toHaveLength(2) // No duplicates
+      expect(restoreResult?.imported).toBe(2) // In new system, factory presets are always "fresh"
+      expect(restoreResult?.skipped).toBe(0)
+      expect(result.current.presets).toHaveLength(2) // Factory presets are shown
     })
 
     test('user restores factory presets with existing user presets', async () => {
@@ -598,7 +598,7 @@ describe('usePresetManager - User Interaction Behaviors', () => {
       // Factory preset loading gracefully degrades - returns 0 imported rather than throwing
       expect(restoreResult?.imported).toBe(0)
       expect(restoreResult?.skipped).toBe(0)
-      expect(result.current.error).toBeNull() // No error in hook since it's graceful degradation
+      expect(result.current.error).toBeTruthy() // Error is set in hook but doesn't throw
     })
 
     test('loading state is managed correctly during restore', async () => {
@@ -634,7 +634,7 @@ describe('usePresetManager - User Interaction Behaviors', () => {
       await restorePromise
 
       expect(result.current.isLoading).toBe(false)
-      expect(result.current.presets.length).toBeGreaterThanOrEqual(0) // May have auto-loaded factory presets
+      expect(result.current.error).toBeTruthy() // Should have error set
     })
   })
 })

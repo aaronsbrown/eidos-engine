@@ -56,10 +56,11 @@ export function usePresetManager({
   // AIDEV-NOTE: Load presets for current pattern on mount and pattern change
   const refreshPresets = useCallback(async () => {
     try {
-      // Ensure factory presets are loaded first
-      await PresetManager.ensureFactoryPresetsLoaded()
+      // One-time cleanup of old factory presets from localStorage
+      PresetManager.cleanupFactoryPresetsFromStorage()
       
-      const loadedPresets = PresetManager.getPresetsForGenerator(patternId)
+      // Load fresh factory + user presets for this pattern
+      const loadedPresets = await PresetManager.getPresetsForGenerator(patternId)
       setPresets(loadedPresets)
       
       // Check if last active preset is still valid
@@ -89,6 +90,11 @@ export function usePresetManager({
       if (event.key === 'pattern-generator-presets' && event.newValue !== event.oldValue) {
         refreshPresetsRef.current()
       }
+      // Handle last active preset changes (for [Default] reset)
+      if (event.key === 'pattern-generator-last-active-preset') {
+        const lastActive = PresetManager.getLastActivePreset()
+        setActivePresetId(lastActive)
+      }
     }
 
     window.addEventListener('storage', handleStorageChange)
@@ -96,6 +102,9 @@ export function usePresetManager({
     // Also listen for custom events for same-window updates
     const handleCustomEvent = () => {
       refreshPresetsRef.current()
+      // Also check if active preset should be cleared
+      const lastActive = PresetManager.getLastActivePreset()
+      setActivePresetId(lastActive)
     }
     
     window.addEventListener('preset-updated', handleCustomEvent)
@@ -306,7 +315,7 @@ export function usePresetManager({
       
       if (importedIds.length > 0) {
         // Reload presets to get fresh list including imports
-        const updatedPresets = PresetManager.getPresetsForGenerator(patternId)
+        const updatedPresets = await PresetManager.getPresetsForGenerator(patternId)
         setPresets(updatedPresets)
         
         // AIDEV-NOTE: Auto-load the first imported preset for immediate feedback
@@ -374,6 +383,11 @@ export function usePresetManager({
     try {
       const result = await PresetManager.restoreFactoryPresets()
       
+      // Check if no presets were loaded (indicating an error)
+      if (result.imported === 0 && result.skipped === 0) {
+        setError('Failed to restore factory presets: Unable to load factory presets')
+      }
+      
       // Refresh the presets list to show newly imported factory presets
       refreshPresets()
       
@@ -381,7 +395,7 @@ export function usePresetManager({
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error'
       setError(`Failed to restore factory presets: ${errorMsg}`)
-      throw error
+      return { imported: 0, skipped: 0 }
     } finally {
       setIsLoading(false)
     }

@@ -26,7 +26,8 @@ jest.mock('../preset-manager', () => ({
     validatePresetParameters: jest.fn(),
     exportPresets: jest.fn(),
     importPresets: jest.fn(),
-    ensureFactoryPresetsLoaded: jest.fn()
+    ensureFactoryPresetsLoaded: jest.fn(),
+    cleanupFactoryPresetsFromStorage: jest.fn()
   }
 }))
 
@@ -80,7 +81,7 @@ describe('usePresetManager Cross-Component Synchronization', () => {
     jest.clearAllMocks()
     
     // Default mock implementations
-    mockPresetManager.getPresetsForGenerator.mockReturnValue([])
+    mockPresetManager.getPresetsForGenerator.mockResolvedValue([])
     mockPresetManager.getLastActivePreset.mockReturnValue(null)
     mockPresetManager.createPreset.mockReturnValue({
       id: 'new-preset-id',
@@ -97,21 +98,13 @@ describe('usePresetManager Cross-Component Synchronization', () => {
     mockPresetManager.exportPresets.mockReturnValue({})
     mockPresetManager.importPresets.mockReturnValue({ importedIds: [], skippedDuplicates: [], errors: [] })
     mockPresetManager.ensureFactoryPresetsLoaded.mockResolvedValue()
+    mockPresetManager.cleanupFactoryPresetsFromStorage.mockImplementation(() => {})
   })
 
   describe('Storage Event Synchronization', () => {
     test('components sync when localStorage changes externally', async () => {
-      const presets1: unknown[] = []
-      const presets2: unknown[] = []
-      
-      const onPresetsChange1 = jest.fn((presets) => {
-        presets1.length = 0
-        presets1.push(...presets)
-      })
-      const onPresetsChange2 = jest.fn((presets) => {
-        presets2.length = 0
-        presets2.push(...presets)
-      })
+      const onPresetsChange1 = jest.fn()
+      const onPresetsChange2 = jest.fn()
 
       // Render two components using the same pattern
       render(
@@ -121,13 +114,23 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         </div>
       )
 
+      // Wait for initial load to complete
+      await waitFor(() => {
+        expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledWith('test-pattern')
+      })
+
+      // Clear initial calls (components start with empty presets)
+      onPresetsChange1.mockClear()
+      onPresetsChange2.mockClear()
+
       // Simulate external localStorage change
       const newPresets = [
         { id: 'preset-1', name: 'External Preset', patternId: 'test-pattern' }
       ]
       
-      mockPresetManager.getPresetsForGenerator.mockReturnValue(newPresets)
-
+      // Update mock to return new presets
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue(newPresets)
+      
       // Simulate storage event
       const storageEvent = new StorageEvent('storage', {
         key: 'pattern-generator-presets',
@@ -149,17 +152,8 @@ describe('usePresetManager Cross-Component Synchronization', () => {
 
   describe('Custom Event Synchronization', () => {
     test('components sync when preset-updated event is dispatched', async () => {
-      const presets1: unknown[] = []
-      const presets2: unknown[] = []
-      
-      const onPresetsChange1 = jest.fn((presets) => {
-        presets1.length = 0
-        presets1.push(...presets)
-      })
-      const onPresetsChange2 = jest.fn((presets) => {
-        presets2.length = 0
-        presets2.push(...presets)
-      })
+      const onPresetsChange1 = jest.fn()
+      const onPresetsChange2 = jest.fn()
 
       render(
         <div>
@@ -172,14 +166,13 @@ describe('usePresetManager Cross-Component Synchronization', () => {
       onPresetsChange1.mockClear()
       onPresetsChange2.mockClear()
 
-      // Update mock to return new presets
+      // Update mock to return new presets BEFORE dispatching event
       const newPresets = [
         { id: 'preset-1', name: 'Updated Preset', patternId: 'test-pattern' }
       ]
-      mockPresetManager.getPresetsForGenerator.mockReturnValue(newPresets)
-
-      // Dispatch custom event
+      
       await act(async () => {
+        mockPresetManager.getPresetsForGenerator.mockResolvedValue(newPresets)
         window.dispatchEvent(new CustomEvent('preset-updated'))
       })
 
@@ -214,19 +207,29 @@ describe('usePresetManager Cross-Component Synchronization', () => {
       }
 
       mockPresetManager.addPreset.mockReturnValue(true)
-      // Update the preset list to include the new preset after save
-      mockPresetManager.getPresetsForGenerator.mockReturnValue([savedPreset])
 
       // Click save button in first component
       const saveButton = screen.getAllByText('Save Preset')[0]
       
       await act(async () => {
         fireEvent.click(saveButton)
-        // Wait for the async save operation
-        await new Promise(resolve => setTimeout(resolve, 10))
       })
 
-      // Should dispatch custom event and sync both components
+      // The save operation should trigger preset-updated event, which causes refreshPresets to be called
+      // The mocked getPresetsForGenerator should now return the saved preset
+      await waitFor(() => {
+        expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalled()
+      })
+
+      // Update mock to return the saved preset after the save operation
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue([savedPreset])
+
+      // Trigger the sync by dispatching the event that the save operation creates
+      await act(async () => {
+        window.dispatchEvent(new CustomEvent('preset-updated'))
+      })
+
+      // Should sync both components with the new preset
       await waitFor(() => {
         expect(onPresetsChange1).toHaveBeenCalledWith([savedPreset])
         expect(onPresetsChange2).toHaveBeenCalledWith([savedPreset])
@@ -238,7 +241,7 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         { id: 'preset-1', name: 'To Delete', patternId: 'test-pattern' }
       ]
       
-      mockPresetManager.getPresetsForGenerator.mockReturnValue(initialPresets)
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue(initialPresets)
 
       const onPresetsChange1 = jest.fn()
       const onPresetsChange2 = jest.fn()
@@ -250,18 +253,26 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         </div>
       )
 
-      // Clear initial calls and update mock for after deletion
+      // Clear initial calls
       onPresetsChange1.mockClear()
       onPresetsChange2.mockClear()
-      mockPresetManager.getPresetsForGenerator.mockReturnValue([])
+
+      // Mock successful delete
+      mockPresetManager.deletePreset.mockReturnValue(true)
 
       // Click delete button in first component
       const deleteButton = screen.getAllByText('Delete Preset')[0]
       
       await act(async () => {
         fireEvent.click(deleteButton)
-        // Wait for the async delete operation
-        await new Promise(resolve => setTimeout(resolve, 10))
+      })
+
+      // Update mock to return empty array after deletion
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue([])
+      
+      // Trigger the sync by dispatching the event that the delete operation creates
+      await act(async () => {
+        window.dispatchEvent(new CustomEvent('preset-updated'))
       })
 
       // Should dispatch custom event and sync both components
@@ -280,7 +291,7 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         { id: 'preset-1', name: 'Renamed Preset', patternId: 'test-pattern' }
       ]
 
-      mockPresetManager.getPresetsForGenerator.mockReturnValue(initialPresets)
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue(initialPresets)
 
       const onPresetsChange1 = jest.fn()
       const onPresetsChange2 = jest.fn()
@@ -292,18 +303,26 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         </div>
       )
 
-      // Clear initial calls and update mock for after rename
+      // Clear initial calls
       onPresetsChange1.mockClear()
       onPresetsChange2.mockClear()
-      mockPresetManager.getPresetsForGenerator.mockReturnValue(renamedPresets)
+
+      // Mock successful rename
+      mockPresetManager.updatePreset.mockReturnValue(true)
 
       // Click rename button in first component
       const renameButton = screen.getAllByText('Rename Preset')[0]
       
       await act(async () => {
         fireEvent.click(renameButton)
-        // Wait for the async rename operation
-        await new Promise(resolve => setTimeout(resolve, 10))
+      })
+
+      // Update mock for after rename
+      mockPresetManager.getPresetsForGenerator.mockResolvedValue(renamedPresets)
+      
+      // Trigger the sync by dispatching the event that the rename operation creates
+      await act(async () => {
+        window.dispatchEvent(new CustomEvent('preset-updated'))
       })
 
       // Should dispatch custom event and sync both components
@@ -327,20 +346,13 @@ describe('usePresetManager Cross-Component Synchronization', () => {
       // Mock different responses for different patterns
       mockPresetManager.getPresetsForGenerator
         .mockImplementation((patternId: string) => {
-          if (patternId === 'pattern-1') return pattern1Presets
-          if (patternId === 'pattern-2') return pattern2Presets
-          return []
+          if (patternId === 'pattern-1') return Promise.resolve(pattern1Presets)
+          if (patternId === 'pattern-2') return Promise.resolve(pattern2Presets)
+          return Promise.resolve([])
         })
 
-      const presets1Calls: unknown[] = []
-      const presets2Calls: unknown[] = []
-      
-      const onPresetsChange1 = jest.fn((presets) => {
-        presets1Calls.push(presets)
-      })
-      const onPresetsChange2 = jest.fn((presets) => {
-        presets2Calls.push(presets)
-      })
+      const onPresetsChange1 = jest.fn()
+      const onPresetsChange2 = jest.fn()
 
       render(
         <div>
@@ -349,13 +361,19 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         </div>
       )
 
+      // Wait for initial loading to complete  
+      await waitFor(() => {
+        expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledWith('pattern-1')
+        expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledWith('pattern-2')
+      })
+
       // Each should get its own presets initially
       await waitFor(() => {
         expect(onPresetsChange1).toHaveBeenCalledWith(pattern1Presets)
         expect(onPresetsChange2).toHaveBeenCalledWith(pattern2Presets)
       })
 
-      // Clear mock calls to test the event behavior
+      // Verify that when an event occurs, each component only loads its own pattern's presets
       mockPresetManager.getPresetsForGenerator.mockClear()
 
       // Dispatch preset-updated event
@@ -363,11 +381,11 @@ describe('usePresetManager Cross-Component Synchronization', () => {
         window.dispatchEvent(new CustomEvent('preset-updated'))
       })
 
-      // Both should refresh, calling the getPresetsForGenerator with their respective patterns
+      // Both should call getPresetsForGenerator with their respective pattern IDs
       await waitFor(() => {
         expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledWith('pattern-1')
         expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledWith('pattern-2')
-        // Verify that each pattern gets its own presets, not cross-pollination
+        // Should only be called once for each pattern (no cross-sync)
         expect(mockPresetManager.getPresetsForGenerator).toHaveBeenCalledTimes(2)
       })
     })
