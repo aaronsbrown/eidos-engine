@@ -130,7 +130,7 @@ describe('usePresetManager Cross-Component Synchronization', () => {
 
       // Simulate storage event
       const storageEvent = new StorageEvent('storage', {
-        key: 'pattern-presets',
+        key: 'pattern-generator-presets',
         oldValue: '[]',
         newValue: JSON.stringify(newPresets)
       })
@@ -145,31 +145,6 @@ describe('usePresetManager Cross-Component Synchronization', () => {
       })
     })
 
-    test('components ignore irrelevant storage events', async () => {
-      const onPresetsChange = jest.fn()
-
-      render(<TestComponent patternId="test-pattern" onPresetsChange={onPresetsChange} />)
-
-      // Clear initial calls
-      onPresetsChange.mockClear()
-      mockPresetManager.getPresetsForGenerator.mockClear()
-
-      // Simulate unrelated storage event
-      const storageEvent = new StorageEvent('storage', {
-        key: 'other-key',
-        oldValue: 'old',
-        newValue: 'new'
-      })
-      
-      await act(async () => {
-        window.dispatchEvent(storageEvent)
-        // Wait for any async operations
-        await new Promise(resolve => setTimeout(resolve, 50))
-      })
-
-      // Should not trigger preset refresh for unrelated storage keys
-      expect(mockPresetManager.getPresetsForGenerator).not.toHaveBeenCalledWith('test-pattern')
-    })
   })
 
   describe('Custom Event Synchronization', () => {

@@ -1,7 +1,7 @@
 // AIDEV-NOTE: React hook for preset management - integrates with existing controlValues state pattern
 "use client"
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { PresetManager, PatternPreset } from '../preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
 
@@ -71,16 +71,20 @@ export function usePresetManager({
     }
   }, [patternId])
 
+  // AIDEV-NOTE: Use ref to avoid dependency cycle in all effects
+  const refreshPresetsRef = useRef(refreshPresets)
+  refreshPresetsRef.current = refreshPresets
+
   // Load presets when component mounts or pattern changes
   useEffect(() => {
-    refreshPresets()
-  }, [refreshPresets])
+    refreshPresetsRef.current()
+  }, [patternId]) // Only depend on patternId, not the function itself
 
   // AIDEV-NOTE: Listen for localStorage changes to sync preset updates between components
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'pattern-presets' && event.newValue !== event.oldValue) {
-        refreshPresets()
+      if (event.key === 'pattern-generator-presets' && event.newValue !== event.oldValue) {
+        refreshPresetsRef.current()
       }
     }
 
@@ -88,7 +92,7 @@ export function usePresetManager({
     
     // Also listen for custom events for same-window updates
     const handleCustomEvent = () => {
-      refreshPresets()
+      refreshPresetsRef.current()
     }
     
     window.addEventListener('preset-updated', handleCustomEvent)
@@ -97,7 +101,7 @@ export function usePresetManager({
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('preset-updated', handleCustomEvent)
     }
-  }, [refreshPresets])
+  }, []) // No dependencies - stable event listeners
 
   // AIDEV-NOTE: Save current pattern parameters as new preset
   const savePreset = useCallback(async (name: string, description?: string): Promise<boolean> => {
