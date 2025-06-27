@@ -4,6 +4,15 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { usePresetManager } from './use-preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
 
+// Mock fetch API for factory preset loading
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: false,
+    status: 404,
+    json: () => Promise.reject(new Error('Not found'))
+  })
+) as jest.Mock
+
 // Mock the preset manager utilities
 jest.mock('../preset-manager', () => ({
   PresetManager: {
@@ -16,7 +25,8 @@ jest.mock('../preset-manager', () => ({
     updatePreset: jest.fn(),
     validatePresetParameters: jest.fn(),
     exportPresets: jest.fn(),
-    importPresets: jest.fn()
+    importPresets: jest.fn(),
+    ensureFactoryPresetsLoaded: jest.fn()
   }
 }))
 
@@ -86,6 +96,7 @@ describe('usePresetManager Cross-Component Synchronization', () => {
     mockPresetManager.validatePresetParameters.mockReturnValue({ valid: true, warnings: [] })
     mockPresetManager.exportPresets.mockReturnValue({})
     mockPresetManager.importPresets.mockReturnValue({ importedIds: [], skippedDuplicates: [], errors: [] })
+    mockPresetManager.ensureFactoryPresetsLoaded.mockResolvedValue()
   })
 
   describe('Storage Event Synchronization', () => {
