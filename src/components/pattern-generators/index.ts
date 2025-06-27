@@ -806,28 +806,28 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
     id: "lorenz-attractor",
     name: "Lorenz Attractor",
     component: LorenzAttractorGenerator,
-    technology: 'WEBGL_2.0',
+    technology: 'WEBGL_MESHES',
     category: 'Simulation',
     schemaVersion: "1.0",
-    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space with intuitive camera controls.",
-    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This Three.js implementation renders particles in true 3D space with mouse-controlled camera - drag to orbit, scroll to zoom.",
+    description: "A classic strange attractor that exhibits chaotic behavior, rendered in interactive 3D space with camera controls and enhanced visual effects.",
+    longDescription: "The Lorenz Attractor is a system of three ordinary differential equations that results in chaotic, non-repeating, yet deterministic motion. This 3D visualization renders particles in true spatial depth with interactive camera controls, optional coordinate axes, and depth-based visual enhancements.",
     semantics: {
       primaryAlgorithmFamily: "StrangeAttractor",
       keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
-      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex", "Luminous"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex", "Luminous", "Smooth", "Continuous"],
       dimensionality: "True3D_WebGL",
-      interactionStyle: "ParameterTuning",
-      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl"]
+      interactionStyle: "DirectManipulation",
+      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl", "camera", "depth", "interactive", "spatial"]
     },
     performance: {
       computationalComplexity: "Medium",
       typicalFrameRateTarget: "60fps",
-      notes: "Performance is dependent on the number of particles. Mobile devices may struggle with high particle counts."
+      notes: "Performance dependent on particle count and 3D rendering complexity. Mobile devices benefit from reduced particle counts and basic rendering mode."
     },
-    version: "1.0.0",
+    version: "1.1.0",
     author: "Aaron Brown & Gemini",
     dateAdded: "2025-06-25",
-    lastModified: "2025-06-25",
+    lastModified: "2025-06-27",
     status: "Production",
     isInteractive: true,
     isAnimatedByDefault: true,
@@ -935,7 +935,14 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
             description: "Enable advanced shader-based rendering with depth-based coloring and improved visual quality.",
             role: "VisualAesthetic",
             impactsPerformance: "Minor",
-            group: "Visual Effects"
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Custom shaders provide enhanced visual quality on desktop but may impact mobile GPU performance."
+                }
+            }
         },
         {
             id: "colorScheme",
@@ -960,7 +967,14 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
             description: "Fade distant particles for enhanced depth perception and focus on the attractor's core structure.",
             role: "VisualAesthetic",
             impactsPerformance: "Negligible",
-            group: "Visual Effects"
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Depth fading enhances visual quality but requires additional GPU calculations on mobile devices."
+                }
+            }
         },
         {
             id: "showAxes",
@@ -970,7 +984,14 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
             description: "Display 3D coordinate axes to provide spatial reference and help understand the mathematical space.",
             role: "InteractionModifier",
             impactsPerformance: "Negligible",
-            group: "Visual Effects"
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Coordinate axes help with spatial understanding on larger screens but may clutter mobile displays."
+                }
+            }
         }
     ]
   },
