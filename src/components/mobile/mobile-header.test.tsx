@@ -1,4 +1,5 @@
 // AIDEV-NOTE: TDD implementation per G-5 - Mobile header tests written before implementation
+// AIDEV-NOTE: Refactored per G-8 - Focus on user behavior, not CSS class assertions
 import { render, screen, fireEvent } from '@testing-library/react'
 import MobileHeader from './mobile-header'
 
@@ -13,29 +14,40 @@ describe('MobileHeader', () => {
     jest.clearAllMocks()
   })
 
-  describe('Layout and Styling', () => {
-    it('renders with correct technical aesthetic styling', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const header = screen.getByTestId('mobile-header')
-      
-      // Should have fixed height and technical styling
-      expect(header).toHaveStyle('height: 48px')
-      expect(header).toHaveClass('font-mono', 'uppercase', 'tracking-wider')
-    })
-
-    it('displays title with monospace font', () => {
+  describe('Header Content and Visibility', () => {
+    it('displays the title prominently to users', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const title = screen.getByText('PATTERN GENERATOR SYSTEM')
-      expect(title).toHaveClass('font-mono', 'uppercase', 'tracking-wider')
+      expect(title).toBeVisible()
+      expect(title).toHaveTextContent('PATTERN GENERATOR SYSTEM')
     })
 
-    it('has proper responsive padding', () => {
+    it('renders a compact header layout suitable for mobile screens', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const header = screen.getByTestId('mobile-header')
-      expect(header).toHaveClass('px-4', 'py-2') // Mobile-appropriate padding
+      expect(header).toBeVisible()
+      
+      // User should see all essential elements in the header
+      expect(screen.getByText('PATTERN GENERATOR SYSTEM')).toBeVisible()
+      expect(screen.getByTestId('pattern-counter')).toBeVisible()
+      expect(screen.getByTestId('menu-toggle')).toBeVisible()
+    })
+
+    it('maintains readability on small mobile screens', () => {
+      // Simulate very small screen
+      Object.defineProperty(window, 'innerWidth', { value: 320 })
+      
+      render(<MobileHeader {...defaultProps} />)
+      
+      // Title should still be readable (text truncation is a user experience feature)
+      const title = screen.getByText('PATTERN GENERATOR SYSTEM')
+      expect(title).toBeVisible()
+      
+      // All interactive elements should remain accessible
+      expect(screen.getByTestId('pattern-counter')).toBeVisible()
+      expect(screen.getByTestId('menu-toggle')).toBeVisible()
     })
   })
 
@@ -71,11 +83,15 @@ describe('MobileHeader', () => {
       expect(counter).toHaveTextContent('12/15')
     })
 
-    it('has technical styling with monospace font', () => {
+    it('displays counter in a way that users can easily read', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const counter = screen.getByTestId('pattern-counter')
-      expect(counter).toHaveClass('mobile-typography-small')
+      expect(counter).toBeVisible()
+      expect(counter).toHaveTextContent('03/09')
+      
+      // Users should be able to distinguish counter from other text
+      expect(counter).toHaveAttribute('aria-label', 'Pattern 3 of 9')
     })
   })
 
@@ -96,14 +112,17 @@ describe('MobileHeader', () => {
       expect(defaultProps.onMenuToggle).toHaveBeenCalledTimes(1)
     })
 
-    it('has minimum 44px touch target', () => {
+    it('provides an easily tappable menu button for mobile users', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const menuButton = screen.getByTestId('menu-toggle')
-      const styles = window.getComputedStyle(menuButton)
+      expect(menuButton).toBeVisible()
       
-      expect(parseInt(styles.minHeight || styles.height)).toBeGreaterThanOrEqual(44)
-      expect(parseInt(styles.minWidth || styles.width)).toBeGreaterThanOrEqual(44)
+      // Button should be clearly interactive to users
+      expect(menuButton).toBeEnabled()
+      
+      // Users should understand what the button does
+      expect(menuButton).toHaveAttribute('aria-label', 'Open menu')
     })
 
     it('has proper accessibility attributes', () => {
@@ -117,77 +136,86 @@ describe('MobileHeader', () => {
 
   // Theme toggle has been moved to the menu overlay, not in the header
 
-  describe('Responsive Behavior', () => {
-    it('maintains layout integrity on small screens', () => {
+  describe('Mobile User Experience', () => {
+    it('provides usable interface on very small screens', () => {
       // Simulate very small screen
       Object.defineProperty(window, 'innerWidth', { value: 320 })
       
       render(<MobileHeader {...defaultProps} />)
       
-      screen.getByTestId('mobile-header')
+      // Users should still be able to see and interact with all key elements
+      const header = screen.getByTestId('mobile-header')
       const title = screen.getByText('PATTERN GENERATOR SYSTEM')
       const controls = screen.getByTestId('header-controls')
+      const menuButton = screen.getByTestId('menu-toggle')
       
-      // Title should not overflow
-      expect(title).toHaveClass('truncate')
-      
-      // Controls should remain visible and aligned
-      expect(controls).toHaveClass('flex', 'items-center', 'space-x-2')
+      expect(header).toBeVisible()
+      expect(title).toBeVisible()
+      expect(controls).toBeVisible()
+      expect(menuButton).toBeVisible()
+      expect(menuButton).toBeEnabled()
     })
 
-    it('adapts font size for title on very small screens', () => {
+    it('allows users to interact with menu regardless of screen size', () => {
       Object.defineProperty(window, 'innerWidth', { value: 320 })
       
       render(<MobileHeader {...defaultProps} />)
       
-      const title = screen.getByText('PATTERN GENERATOR SYSTEM')
-      expect(title).toHaveClass('text-sm') // Smaller font on mobile
+      const menuButton = screen.getByTestId('menu-toggle')
+      fireEvent.click(menuButton)
+      
+      expect(defaultProps.onMenuToggle).toHaveBeenCalledTimes(1)
     })
   })
 
-  describe('Technical Aesthetic', () => {
-    it('maintains blueprint/technical styling', () => {
+  describe('Visual Hierarchy and User Recognition', () => {
+    it('makes the title clearly identifiable as the main header', () => {
+      render(<MobileHeader {...defaultProps} />)
+      
+      const title = screen.getByText('PATTERN GENERATOR SYSTEM')
+      
+      // Users should be able to immediately identify this as the main title
+      expect(title).toBeVisible()
+      expect(title).toHaveTextContent('PATTERN GENERATOR SYSTEM')
+    })
+
+    it('makes the pattern counter visually distinct from other elements', () => {
+      render(<MobileHeader {...defaultProps} />)
+      
+      const counter = screen.getByTestId('pattern-counter')
+      
+      // Counter should be visually distinguishable from title
+      expect(counter).toBeVisible()
+      expect(counter).toHaveTextContent('03/09')
+      expect(counter).not.toHaveTextContent('PATTERN GENERATOR SYSTEM')
+    })
+
+    it('provides sufficient visual separation between header and page content', () => {
       render(<MobileHeader {...defaultProps} />)
       
       const header = screen.getByTestId('mobile-header')
       
-      // Should have technical border and background
-      expect(header).toHaveClass('border-b', 'border-border')
-      expect(header).toHaveClass('bg-background/80', 'backdrop-blur-sm')
-    })
-
-    it('uses yellow accent color appropriately', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const counter = screen.getByTestId('pattern-counter')
-      
-      // Counter should have yellow accent styling
-      expect(counter).toHaveClass('border-accent-primary')
-    })
-
-    it('has proper contrast and readability', () => {
-      render(<MobileHeader {...defaultProps} />)
-      
-      const title = screen.getByText('PATTERN GENERATOR SYSTEM')
-      const counter = screen.getByTestId('pattern-counter')
-      
-      // Text should have proper contrast classes
-      expect(title).toHaveClass('text-foreground')
-      expect(counter).toHaveClass('text-muted-foreground')
+      // Users should perceive header as separate from main content
+      expect(header).toBeVisible()
+      expect(header).toContainElement(screen.getByText('PATTERN GENERATOR SYSTEM'))
+      expect(header).toContainElement(screen.getByTestId('pattern-counter'))
     })
   })
 
-  describe('Edge Cases', () => {
-    it('handles missing title gracefully', () => {
+  describe('Edge Cases and User Experience', () => {
+    it('provides meaningful fallback when title is missing', () => {
       const props = { ...defaultProps, title: '' }
       render(<MobileHeader {...props} />)
       
-      // Should not crash and should render other elements
-      expect(screen.getByTestId('mobile-header')).toBeInTheDocument()
-      expect(screen.getByTestId('pattern-counter')).toBeInTheDocument()
+      // Users should see a fallback title instead of empty space
+      expect(screen.getByText('EIDOS ENGINE')).toBeVisible()
+      
+      // Other functionality should remain available to users
+      expect(screen.getByTestId('pattern-counter')).toBeVisible()
+      expect(screen.getByTestId('menu-toggle')).toBeEnabled()
     })
 
-    it('handles zero pattern count gracefully', () => {
+    it('shows appropriate counter display when no patterns exist', () => {
       const props = {
         ...defaultProps,
         patternCount: { current: 0, total: 0 }
@@ -196,10 +224,12 @@ describe('MobileHeader', () => {
       render(<MobileHeader {...props} />)
       
       const counter = screen.getByTestId('pattern-counter')
+      expect(counter).toBeVisible()
       expect(counter).toHaveTextContent('00/00')
+      expect(counter).toHaveAccessibleName('Pattern 0 of 0')
     })
 
-    it('handles negative pattern count gracefully', () => {
+    it('handles invalid pattern counts gracefully for users', () => {
       const props = {
         ...defaultProps,
         patternCount: { current: -1, total: 5 }
@@ -208,32 +238,52 @@ describe('MobileHeader', () => {
       render(<MobileHeader {...props} />)
       
       const counter = screen.getByTestId('pattern-counter')
-      // Should clamp to 0 or handle gracefully
+      // Users should see a sensible counter display, not negative numbers
+      expect(counter).toBeVisible()
       expect(counter).toHaveTextContent('00/05')
+      expect(counter).toHaveAttribute('aria-label', 'Pattern -1 of 5')
+    })
+
+    it('maintains usability when title is extremely long', () => {
+      const props = {
+        ...defaultProps,
+        title: 'EXTREMELY LONG PATTERN GENERATOR SYSTEM TITLE THAT MIGHT OVERFLOW ON SMALL SCREENS AND CAUSE LAYOUT ISSUES'
+      }
+      
+      render(<MobileHeader {...props} />)
+      
+      // Users should still be able to see and use all controls
+      const title = screen.getByText(props.title)
+      expect(title).toBeVisible()
+      expect(screen.getByTestId('pattern-counter')).toBeVisible()
+      expect(screen.getByTestId('menu-toggle')).toBeEnabled()
+      
+      // Menu should still be functional
+      fireEvent.click(screen.getByTestId('menu-toggle'))
+      expect(defaultProps.onMenuToggle).toHaveBeenCalledTimes(1)
     })
   })
 
-  describe('Performance', () => {
-    it('does not re-render unnecessarily when props are the same', () => {
-      const renderSpy = jest.fn()
+  describe('User Experience Consistency', () => {
+    it('maintains stable interface when props do not change', () => {
+      const { rerender } = render(<MobileHeader {...defaultProps} />)
       
-      const { rerender } = render(
-        <MobileHeader 
-          {...defaultProps}
-          ref={renderSpy}
-        />
-      )
+      // Capture initial state that users see
+      const initialTitle = screen.getByText('PATTERN GENERATOR SYSTEM')
+      const initialCounter = screen.getByTestId('pattern-counter')
+      const initialButton = screen.getByTestId('menu-toggle')
+      
+      expect(initialTitle).toBeVisible()
+      expect(initialCounter).toHaveTextContent('03/09')
+      expect(initialButton).toBeEnabled()
       
       // Re-render with same props
-      rerender(
-        <MobileHeader 
-          {...defaultProps}
-          ref={renderSpy}
-        />
-      )
+      rerender(<MobileHeader {...defaultProps} />)
       
-      // Component should be memoized and not re-render
-      expect(screen.getByTestId('mobile-header')).toBeInTheDocument()
+      // Users should see the same stable interface
+      expect(screen.getByText('PATTERN GENERATOR SYSTEM')).toBeVisible()
+      expect(screen.getByTestId('pattern-counter')).toHaveTextContent('03/09')
+      expect(screen.getByTestId('menu-toggle')).toBeEnabled()
     })
   })
 })

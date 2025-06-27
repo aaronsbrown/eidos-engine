@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Behavioral tests for floating preset panel focused on library management
+// AIDEV-NOTE: User behavior focused tests (Rule G-8): preset management, editing workflows, user interactions
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { FloatingPresetPanel } from './floating-preset-panel'
@@ -147,10 +147,9 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      // Should have 2 edit buttons (one per preset)
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg') // Edit2 icon
-      )
+      // Users should see edit functionality for each preset
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       expect(editButtons).toHaveLength(2)
 
       // Should have 2 export buttons
@@ -178,9 +177,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -210,9 +208,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -243,9 +240,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -272,9 +268,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -300,9 +295,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -328,9 +322,8 @@ describe('Floating Preset Panel - Library Management', () => {
 
       render(<FloatingPresetPanel {...defaultProps} />)
 
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       
       fireEvent.click(editButtons[0])
 
@@ -356,9 +349,8 @@ describe('Floating Preset Panel - Library Management', () => {
       render(<FloatingPresetPanel {...defaultProps} />)
 
       // User starts editing a preset name
-      const editButtons = screen.getAllByRole('button').filter(btn => 
-        btn.querySelector('svg')
-      )
+      const allButtons = screen.getAllByRole('button')
+      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
       fireEvent.click(editButtons[0])
 
       // User should not be able to save when system is busy

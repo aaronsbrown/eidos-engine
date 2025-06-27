@@ -19,9 +19,11 @@ describe('Checkbox Component', () => {
       expect(checkbox).toBeChecked()
     })
 
-    it('applies custom className', () => {
-      render(<Checkbox className="custom-class" aria-label="Custom checkbox" />)
+    it('accepts and applies custom className while maintaining functionality', () => {
+      const handleChange = jest.fn()
+      render(<Checkbox className="custom-class" onCheckedChange={handleChange} aria-label="Custom checkbox" />)
       const checkbox = screen.getByRole('checkbox')
+      expect(checkbox).toBeEnabled()
       expect(checkbox).toHaveClass('custom-class')
     })
 
@@ -108,11 +110,11 @@ describe('Checkbox Component', () => {
   })
 
   describe('Disabled State', () => {
-    it('applies disabled styles when disabled', () => {
+    it('becomes non-interactive when disabled', () => {
       render(<Checkbox disabled aria-label="Disabled checkbox" />)
       const checkbox = screen.getByRole('checkbox')
       expect(checkbox).toBeDisabled()
-      expect(checkbox).toHaveClass('disabled:cursor-not-allowed', 'disabled:opacity-50')
+      expect(checkbox).toHaveAccessibleName('Disabled checkbox')
     })
 
     it('does not call onCheckedChange when disabled and clicked', async () => {
@@ -127,10 +129,11 @@ describe('Checkbox Component', () => {
   })
 
   describe('Indeterminate State', () => {
-    it('handles indeterminate state', () => {
-      render(<Checkbox checked="indeterminate" aria-label="Indeterminate checkbox" />)
+    it('displays indeterminate state to users', () => {
+      render(<Checkbox checked="indeterminate" aria-label="Indeterminate checkbox - partially selected" />)
       const checkbox = screen.getByRole('checkbox')
       expect(checkbox).toHaveAttribute('data-state', 'indeterminate')
+      expect(checkbox).toHaveAccessibleName('Indeterminate checkbox - partially selected')
     })
 
     it('calls onCheckedChange when clicked from indeterminate state', async () => {

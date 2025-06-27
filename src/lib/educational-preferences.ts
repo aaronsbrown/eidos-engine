@@ -1,3 +1,4 @@
+import React from 'react'
 import type { EducationalLevel } from '@/components/ui/educational-overlay'
 
 const PREFERENCE_KEY = 'educational-level-preference'
@@ -53,6 +54,3 @@ export function useEducationalLevel(): [EducationalLevel, (level: EducationalLev
 
   return [level, updateLevel]
 }
-
-// Add React import for the hook
-import React from 'react'

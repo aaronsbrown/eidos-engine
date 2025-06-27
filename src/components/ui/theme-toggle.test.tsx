@@ -1,4 +1,4 @@
-// AIDEV-NOTE: ThemeToggle component tests - rendering, toggleTheme function, theme state display
+// AIDEV-NOTE: ThemeToggle component tests - user behavior focused (Rule G-8): theme switching, visual feedback, accessibility
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -44,29 +44,30 @@ describe('ThemeToggle Component', () => {
       expect(screen.getByText('[●]')).toBeInTheDocument()
     })
 
-    it('applies correct styling classes', () => {
+    it('provides clear visual feedback about current theme', () => {
       render(<ThemeToggle />)
       const button = screen.getByRole('button')
-      expect(button).toHaveClass(
-        'font-mono',
-        'text-xs'
-      )
+      expect(button).toBeVisible()
+      expect(button).toHaveTextContent('DARK_MODE')
+      expect(button).toHaveTextContent('[○]')
     })
   })
 
-  describe('Theme Indicator', () => {
-    it('shows gray indicator dot for light theme', () => {
+  describe('Theme State Communication', () => {
+    it('clearly communicates light theme state to users', () => {
       mockThemeContext.theme = 'light'
       render(<ThemeToggle />)
-      const indicator = screen.getByRole('button').querySelector('.bg-muted-foreground')
-      expect(indicator).toBeInTheDocument()
+      const button = screen.getByRole('button')
+      expect(button).toHaveTextContent('DARK_MODE') // Shows what clicking will do
+      expect(button).toHaveTextContent('[○]') // Visual indicator for light theme
     })
 
-    it('shows yellow indicator dot for dark theme', () => {
+    it('clearly communicates dark theme state to users', () => {
       mockThemeContext.theme = 'dark'
       render(<ThemeToggle />)
-      const indicator = screen.getByRole('button').querySelector('.bg-accent-primary')
-      expect(indicator).toBeInTheDocument()
+      const button = screen.getByRole('button')
+      expect(button).toHaveTextContent('LIGHT_MODE') // Shows what clicking will do
+      expect(button).toHaveTextContent('[●]') // Visual indicator for dark theme
     })
   })
 
