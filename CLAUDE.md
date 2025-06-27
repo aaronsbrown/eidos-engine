@@ -165,26 +165,26 @@ interface PatternControl {
 
 **Naming Convention:**
 - Educational content files must use the exact pattern ID as the filename
-- Pattern with `id: "noise"` → `docs/education/noise.md`
-- Content is automatically copied to `public/educational-content/` during build
+- Pattern with `id: "noise"` → `public/educational-content/noise.md`
+- Files are created directly in the public directory for immediate availability
 
 **Content Structure:**
-Follow the three-layer educational approach defined in `.claude/commands/flow/create_explainer.md`:
+Follow the three-layer educational approach:
 - **Layer 1**: "What is this?" (Intuitive/Experiential) - Visual description and real-world connections
 - **Layer 2**: "How does this work?" (Conceptual/Mechanical) - Algorithm explanation and principles  
 - **Layer 3**: "Show me the code" (Technical/Formal) - Implementation details with code references
 
 **Template Standard:**
-All educational content MUST follow the exact format specified in `docs/education/TEMPLATE.md`:
+All educational content MUST follow the established format:
 - **Header Format**: `## Layer N: "Title" (Audience/Type)` with exact spacing and parentheses
 - **Section Spacing**: Double newlines between major sections
 - **Consistent Structure**: All files must use identical section headers and organization
 - **Code Blocks**: Use TypeScript syntax highlighting for code examples
 
 **File Location:**
-- **Canonical source**: `docs/education/{patternId}.md`
-- **Runtime location**: `public/educational-content/{patternId}.md` (generated during build)
-- **Build command**: `npm run copy-educational-content` (integrated into main build)
+- **Single source of truth**: `public/educational-content/{patternId}.md`
+- Educational content is created directly in the public directory for immediate availability
+- No build step required - content is available at runtime
 
 ### 🏷️ Pattern Categorization System
 
@@ -193,10 +193,10 @@ All educational content MUST follow the exact format specified in `docs/educatio
 - **`'Geometric'`**: Mathematical shapes, gradients, geometric patterns (Trigonometric Circle, Four-Pole Gradient)
 - **`'Simulation'`**: Physics-based, cellular automata, particle systems (Particle System, Cellular Automaton) 
 - **`'Data Visualization'`**: Charts, spectrums, data-driven visuals (Frequency Spectrum, Barcode Scanner)
+- **`'Attractors'`**: Strange attractors and chaotic dynamical systems (Lorenz Attractor, Thomas Attractor)
 
 **Desktop UX Features:**
-- **Category Jump Buttons**: 2x2 grid above pattern list for quick navigation
-- **Visual Grouping**: Category dividers appear in 5-pattern window when category changes
+- **Visual Grouping**: Category dividers appear in pattern list when category changes
 - **Smart Paging**: Previous/Next buttons can skip to category boundaries
 - **Current Category Indicator**: Specifications panel shows pattern's category
 

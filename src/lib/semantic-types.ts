@@ -135,7 +135,7 @@ export interface RichPatternGeneratorDefinition {
   component: React.ComponentType<import("@/components/pattern-generators/types").PatternGeneratorProps>
   controls?: RichPatternControlDefinition[] // Use the new rich control type
   technology: TechnologyUsed | 'WEBGL_2.0' | 'CANVAS_2D' // Support both old and new technology types
-  category: 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization'
+  category: 'Noise' | 'Geometric' | 'Simulation' | 'Data Visualization' | 'Attractors'
 
   // New Semantic Fields
   schemaVersion: "1.0" // Version of this semantic schema itself

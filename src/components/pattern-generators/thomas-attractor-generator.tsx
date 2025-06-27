@@ -1,21 +1,19 @@
 "use client"
 
-// AIDEV-NOTE: Lorenz attractor using reusable ThreeJSCanvas system
-// Demonstrates scalable 3D pattern development approach
+// AIDEV-NOTE: Thomas attractor using reusable ThreeJSCanvas system
+// Demonstrates scalable 3D pattern development approach with cyclic symmetry
 
 import React, { useRef, useMemo, useEffect } from "react"
 import type { PatternGeneratorProps } from "./types"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import { calculateLorenzPoint } from '@/lib/math/lorenz'
+import { calculateThomasPoint } from '@/lib/math/thomas'
 import ThreeJSCanvas from "@/components/three-js/ThreeJSCanvas"
 import AxesHelper3D from "@/components/three-js/AxesHelper3D"
 import { createThreeJSShaderMaterial } from "@/lib/threejs-shader-utils"
 
-interface LorenzControls {
-  sigma: number
-  rho: number
-  beta: number
+interface ThomasControls {
+  b: number
   particleCount: number
   particleSize: number
   autoRotate: boolean
@@ -27,18 +25,18 @@ interface LorenzControls {
   speed: number
 }
 
-function LorenzPoints({ controls }: { controls: LorenzControls }) {
+function ThomasPoints({ controls }: { controls: ThomasControls }) {
   const pointsRef = useRef<THREE.Points>(null)
   const particlesRef = useRef<{ x: number; y: number; z: number }[]>([])
   
-  // Initialize particles
+  // Initialize particles with Thomas-appropriate initial conditions
   const particles = useMemo(() => {
     const particles = []
     for (let i = 0; i < controls.particleCount; i++) {
       particles.push({
-        x: Math.random() * 20 - 10,  // Lorenz x range
-        y: Math.random() * 20 - 10,  // Lorenz y range  
-        z: Math.random() * 30 + 5,   // Lorenz z range
+        x: Math.random() * 4 - 2,  // Thomas typical range: [-2, 2]
+        y: Math.random() * 4 - 2,  // Thomas typical range: [-2, 2]
+        z: Math.random() * 4 - 2,  // Thomas typical range: [-2, 2]
       })
     }
     return particles
@@ -52,9 +50,9 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
     const positions = new Float32Array(controls.particleCount * 3)
     
     particles.forEach((p, i) => {
-      positions[i * 3] = p.x * 0.04           // X: naturally centered
-      positions[i * 3 + 1] = p.y * 0.04       // Y: naturally centered  
-      positions[i * 3 + 2] = (p.z - 27) * 0.04  // Z: center around origin
+      positions[i * 3] = p.x * 0.4         // X: scale for good visual range
+      positions[i * 3 + 1] = p.y * 0.4     // Y: scale for good visual range
+      positions[i * 3 + 2] = p.z * 0.4     // Z: scale for good visual range
     })
     
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
@@ -85,7 +83,7 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
   // Load custom shader material only once when enabled/disabled
   useEffect(() => {
     if (controls.useCustomShader) {
-      createThreeJSShaderMaterial('lorenz-particles', 'lorenz-particles', {
+      createThreeJSShaderMaterial('thomas-particles', 'thomas-particles', {
         u_particleSize: { value: controls.particleSize },
         u_opacity: { value: 0.8 },
         u_colorScheme: { value: controls.colorScheme },
@@ -97,7 +95,7 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
         shaderMat.blending = THREE.NormalBlending
         setShaderMaterial(shaderMat)
       }).catch(err => {
-        console.warn('Failed to load Lorenz shader material:', err)
+        console.warn('Failed to load Thomas shader material:', err)
       })
     } else {
       setShaderMaterial(null)
@@ -126,22 +124,22 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
     frameCounter.current++
     
     // Adaptive time step for stability vs performance
-    const dt = 0.008 * controls.speed
+    const dt = 0.01 * controls.speed
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array
     
     // Batch update particles for better performance
     const particles = particlesRef.current
     const particleCount = particles.length
-    const scale = 0.04
+    const scale = 0.4  // Thomas attractor scaling
     
     // Use efficient loop with minimal allocations
     for (let i = 0; i < particleCount; i++) {
       const p = particles[i]
       
-      // Calculate Lorenz equations inline for better performance
-      const { newX, newY, newZ } = calculateLorenzPoint(
+      // Calculate Thomas equations inline for better performance
+      const { newX, newY, newZ } = calculateThomasPoint(
         p.x, p.y, p.z, 
-        controls.sigma, controls.rho, controls.beta, 
+        controls.b, 
         dt
       )
       
@@ -150,11 +148,11 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
       p.y = newY
       p.z = newZ
       
-      // Update geometry positions with efficient indexing and centering
+      // Update geometry positions with efficient indexing
       const idx = i * 3
-      positions[idx] = newX * scale           // X: naturally centered around 0
-      positions[idx + 1] = newY * scale       // Y: naturally centered around 0  
-      positions[idx + 2] = (newZ - 27) * scale  // Z: shift center from ~27 to 0
+      positions[idx] = newX * scale       // X: naturally centered around 0
+      positions[idx + 1] = newY * scale   // Y: naturally centered around 0  
+      positions[idx + 2] = newZ * scale   // Z: naturally centered around 0
     }
     
     // Mark geometry for update (Three.js will optimize this)
@@ -169,7 +167,7 @@ function LorenzPoints({ controls }: { controls: LorenzControls }) {
   ) : null
 }
 
-const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({ 
+const ThomasAttractorGenerator: React.FC<PatternGeneratorProps> = ({ 
   width, 
   height, 
   className = "",
@@ -177,19 +175,17 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
 }) => {
 
   // Use passed control values or defaults
-  const controls: LorenzControls = useMemo(() => ({
-      sigma: (controlValues?.sigma as number) ?? 10,
-      rho: (controlValues?.rho as number) ?? 28,
-      beta: (controlValues?.beta as number) ?? 8/3,
+  const controls: ThomasControls = useMemo(() => ({
+      b: (controlValues?.b as number) ?? 0.208,
       particleCount: (controlValues?.particleCount as number) ?? 2500,
-      particleSize: (controlValues?.particleSize as number) ?? 0.03,
+      particleSize: (controlValues?.particleSize as number) ?? 0.04,
       autoRotate: (controlValues?.autoRotate as boolean) ?? false,
       autoRotateSpeed: (controlValues?.autoRotateSpeed as number) ?? 1.0,
       colorScheme: (controlValues?.colorScheme as number) ?? 1, // Default to warm-cool
       depthFading: (controlValues?.depthFading as boolean) ?? false,
       useCustomShader: (controlValues?.useCustomShader as boolean) ?? false,
       showAxes: (controlValues?.showAxes as boolean) ?? false,
-      speed: (controlValues?.speed as number) ?? 0.3
+      speed: (controlValues?.speed as number) ?? 2.0
     }), [controlValues])
 
   return (
@@ -199,16 +195,16 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
       className={className}
       preset="orbital"
       customCamera={{
-        position: [2, 1.5, 2],
-        minDistance: 1,
-        maxDistance: 10
+        position: [1.5, 1.5, 1.5],
+        minDistance: 0.5,
+        maxDistance: 8
       }}
       showInstructions={true}
       backgroundColor="#000000"
       autoRotate={controls.autoRotate}
       autoRotateSpeed={controls.autoRotateSpeed}
     >
-      <LorenzPoints controls={controls} />
+      <ThomasPoints controls={controls} />
       {controls.showAxes && (
         <AxesHelper3D 
           size={1.5} 
@@ -220,4 +216,4 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
   )
 }
 
-export default LorenzAttractorGenerator
+export default ThomasAttractorGenerator
