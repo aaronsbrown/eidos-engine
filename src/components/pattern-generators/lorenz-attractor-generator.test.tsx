@@ -124,6 +124,12 @@ describe('Lorenz Attractor Pattern Generator', () => {
       expect(controlIds).toContain('particleCount')
       expect(controlIds).toContain('autoRotate')
       expect(controlIds).toContain('autoRotateSpeed')
+      
+      // Check for visual quality controls
+      expect(controlIds).toContain('useCustomShader')
+      expect(controlIds).toContain('colorScheme')
+      expect(controlIds).toContain('depthFading')
+      expect(controlIds).toContain('showAxes')
     })
 
     test('has performance metadata', () => {
@@ -344,6 +350,101 @@ describe('Lorenz Attractor Pattern Generator', () => {
           />
         )
       }).not.toThrow()
+    })
+
+    test('handles visual quality control values', () => {
+      const controlValues = {
+        sigma: 10,
+        rho: 28,
+        beta: 8/3,
+        particleCount: 1000,
+        useCustomShader: true,
+        colorScheme: 0, // Rainbow depth
+        depthFading: true,
+        showAxes: true
+      }
+      
+      // Should not throw with visual quality controls
+      expect(() => {
+        render(
+          <LorenzAttractorGenerator 
+            width={400} 
+            height={300}
+            controlValues={controlValues}
+          />
+        )
+      }).not.toThrow()
+    })
+
+    test('handles color scheme options correctly', () => {
+      const colorSchemes = [0, 1, 2] // Rainbow, Warm-Cool, Monochrome
+      
+      colorSchemes.forEach(scheme => {
+        const controlValues = {
+          sigma: 10,
+          rho: 28,
+          colorScheme: scheme,
+          useCustomShader: true
+        }
+        
+        expect(() => {
+          render(
+            <LorenzAttractorGenerator 
+              width={400} 
+              height={300}
+              controlValues={controlValues}
+            />
+          )
+        }).not.toThrow()
+      })
+    })
+  })
+
+  describe('Visual Quality Controls', () => {
+    test('useCustomShader control has correct configuration', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const shaderControl = lorenzPattern?.controls?.find(c => c.id === 'useCustomShader')
+      
+      expect(shaderControl).toBeDefined()
+      expect(shaderControl?.type).toBe('checkbox')
+      expect(shaderControl?.defaultValue).toBe(false)
+      expect(shaderControl?.role).toBe('VisualAesthetic')
+      expect(shaderControl?.group).toBe('Visual Effects')
+    })
+
+    test('colorScheme control has proper options', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const colorControl = lorenzPattern?.controls?.find(c => c.id === 'colorScheme')
+      
+      expect(colorControl).toBeDefined()
+      expect(colorControl?.type).toBe('select')
+      expect(colorControl?.defaultValue).toBe(1) // Warm-Cool default
+      expect(colorControl?.options).toHaveLength(3)
+      expect(colorControl?.options?.[0].label).toBe('Rainbow Depth')
+      expect(colorControl?.options?.[1].label).toBe('Warm-Cool')
+      expect(colorControl?.options?.[2].label).toBe('Monochrome')
+    })
+
+    test('depthFading control has appropriate settings', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const fadingControl = lorenzPattern?.controls?.find(c => c.id === 'depthFading')
+      
+      expect(fadingControl).toBeDefined()
+      expect(fadingControl?.type).toBe('checkbox')
+      expect(fadingControl?.defaultValue).toBe(true)
+      expect(fadingControl?.role).toBe('VisualAesthetic')
+      expect(fadingControl?.impactsPerformance).toBe('Negligible')
+    })
+
+    test('showAxes control configuration', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const axesControl = lorenzPattern?.controls?.find(c => c.id === 'showAxes')
+      
+      expect(axesControl).toBeDefined()
+      expect(axesControl?.type).toBe('checkbox')
+      expect(axesControl?.defaultValue).toBe(false)
+      expect(axesControl?.role).toBe('InteractionModifier')
+      expect(axesControl?.group).toBe('Visual Effects')
     })
   })
 })

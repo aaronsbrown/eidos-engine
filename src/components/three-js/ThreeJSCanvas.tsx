@@ -93,6 +93,7 @@ const ThreeJSCanvas: React.FC<ThreeJSCanvasProps> = ({
   autoRotate,
   autoRotateSpeed
 }) => {
+
   // Merge preset with custom overrides and top-level props
   const cameraConfig = { 
     ...CAMERA_PRESETS[preset], 
@@ -117,10 +118,17 @@ const ThreeJSCanvas: React.FC<ThreeJSCanvasProps> = ({
           gl={{ 
             antialias: true,
             alpha: false,
-            powerPreference: "high-performance"
+            powerPreference: "high-performance",
+            preserveDrawingBuffer: false
           }}
           onCreated={({ gl }) => {
             gl.setClearColor(backgroundColor)
+            // Enable depth testing for proper 3D rendering
+            const glContext = gl.getContext()
+            glContext.enable(glContext.DEPTH_TEST)
+            glContext.depthFunc(glContext.LEQUAL)
+            // Optimize for performance
+            glContext.disable(glContext.STENCIL_TEST)
           }}
         >
           {/* Standard lighting setup for 3D visualizations */}

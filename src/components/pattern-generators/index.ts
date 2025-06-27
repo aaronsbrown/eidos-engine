@@ -926,6 +926,51 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
             role: "InteractionModifier",
             impactsPerformance: "Negligible",
             group: "Camera Behavior"
+        },
+        {
+            id: "useCustomShader",
+            label: "Enhanced Rendering",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Enable advanced shader-based rendering with depth-based coloring and improved visual quality.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
+        },
+        {
+            id: "colorScheme",
+            label: "Color Scheme",
+            type: "select",
+            defaultValue: 1,
+            options: [
+                { value: 0, label: "Rainbow Depth" },
+                { value: 1, label: "Warm-Cool" },
+                { value: 2, label: "Monochrome" }
+            ],
+            description: "Color scheme for depth-based particle coloring - creates natural depth perception.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "depthFading",
+            label: "Depth Fading",
+            type: "checkbox",
+            defaultValue: true,
+            description: "Fade distant particles for enhanced depth perception and focus on the attractor's core structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "showAxes",
+            label: "Show Coordinate Axes",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Display 3D coordinate axes to provide spatial reference and help understand the mathematical space.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
         }
     ]
   },
