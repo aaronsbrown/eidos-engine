@@ -23,6 +23,7 @@ This document provides context for AI assistants working on the Generative Patte
 - **G-4**: **NEVER** merge feature branches without explicit approval
 - **G-5**: Main UI features MUST have behavioral tests (follow UI Development Workflow)
 - **G-7**: Audit ALL pattern-specific special cases before UI refactoring
+- **G-10**: **NEVER** commit without running COMPLETE 4-command preflight checklist
 
 ### 🔧 Essential Workflows
 
@@ -71,6 +72,7 @@ A Next.js-based showcase for real-time generative pattern visualizations with us
 | **G-7** | **🚨 Before UI refactoring, audit ALL pattern-specific special cases** | ❌ Refactor UI without cataloging existing customizations |
 | **G-8** | **Tests MUST focus on user behavior, not implementation details** | ❌ Write brittle tests asserting CSS classes/DOM structure |
 | **G-9** | **🚨 Storybook component mismatches indicate app architecture issues** | ❌ "Fix Storybook" with overrides; investigate root cause instead |
+| **G-10** | **🚨 NEVER commit without running COMPLETE 4-command preflight checklist** | ❌ Skip any preflight command or declare "preflight passed" when incomplete |
 
 ---
 
@@ -500,6 +502,7 @@ const mobileReady = isMobileFriendly(pattern)
 **When to ask for clarification?** When unsure about project-specific decisions (Rule G-0)
 **When to create implementation notes?** New features, major architectural changes (Rule G-6)
 **When to audit special cases?** Before refactoring UI components (Rule G-7)
+**When to commit code?** NEVER without running complete 4-command preflight: lint + build + test + storybook (Rule G-10)
 
 ### ✅ Common Task Checklists
 
@@ -566,12 +569,14 @@ export const Variants: Story = {
 
 **Target Ratio:** ~35% interactive, 65% static stories for optimal balance of usability and performance.
 
-**Preflight Checks (Before Commits/PRs):**
+**🚨 MANDATORY Preflight Checks (Rule G-10) - ALL 4 must pass:**
 
 - [ ] `npm run lint` - ESLint passes
-- [ ] `npm run build` - Next.js build succeeds with type checking
-- [ ] `npm run storybook` - Storybook starts without errors
-- [ ] `npm run test` - All tests pass (if applicable)
+- [ ] `npm run build` - Next.js build succeeds with type checking  
+- [ ] `npm run test` - All tests pass (NEVER skip this!)
+- [ ] `npm run storybook -- --no-open` - Storybook builds without errors
+
+**STOP on first failure. NEVER commit if any command fails.**
 
 ---
 
