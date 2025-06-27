@@ -903,6 +903,29 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
             role: "VisualAesthetic",
             impactsPerformance: "Minor",
             group: "Visual Effects"
+        },
+        {
+            id: "autoRotate",
+            label: "Auto Rotate",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Automatically rotate the camera around the Y-axis for a cinematic view of the attractor.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "autoRotateSpeed",
+            label: "Rotation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 1.0,
+            description: "Speed of automatic camera rotation - higher values create faster rotation.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
         }
     ]
   },

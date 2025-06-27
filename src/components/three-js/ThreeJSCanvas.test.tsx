@@ -7,7 +7,7 @@ import ThreeJSCanvas from './ThreeJSCanvas'
 
 // Mock Three.js components since they require WebGL context
 jest.mock('@react-three/fiber', () => ({
-  Canvas: ({ children, ...props }: any) => (
+  Canvas: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
     <div data-testid="three-canvas" {...props}>
       {children}
     </div>
@@ -169,6 +169,104 @@ describe('ThreeJSCanvas Component', () => {
       )
       
       // Should render without errors (backgroundColor handled internally)
+      const canvas = document.querySelector('[data-testid="three-canvas"]')
+      expect(canvas).toBeInTheDocument()
+    })
+  })
+
+  describe('Auto-Rotate Functionality', () => {
+    test('accepts autoRotate prop', () => {
+      render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          autoRotate={true}
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      // Should render without errors
+      const canvas = document.querySelector('[data-testid="three-canvas"]')
+      expect(canvas).toBeInTheDocument()
+    })
+
+    test('accepts autoRotateSpeed prop', () => {
+      render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          autoRotate={true}
+          autoRotateSpeed={2.5}
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      // Should render without errors
+      const canvas = document.querySelector('[data-testid="three-canvas"]')
+      expect(canvas).toBeInTheDocument()
+    })
+
+    test('shows auto-rotate indicator when enabled', () => {
+      const { container } = render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          autoRotate={true}
+          showInstructions={true}
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      expect(container.textContent).toContain('Auto-rotating')
+    })
+
+    test('hides auto-rotate indicator when disabled', () => {
+      const { container } = render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          autoRotate={false}
+          showInstructions={true}
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      expect(container.textContent).not.toContain('Auto-rotating')
+    })
+
+    test('overrides preset autoRotate with direct prop', () => {
+      render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          preset="orbital"
+          autoRotate={true}  // Override preset default (false)
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      // Should render without errors
+      const canvas = document.querySelector('[data-testid="three-canvas"]')
+      expect(canvas).toBeInTheDocument()
+    })
+
+    test('works with customCamera overrides', () => {
+      render(
+        <ThreeJSCanvas 
+          width={400} 
+          height={300} 
+          customCamera={{ autoRotate: true, autoRotateSpeed: 0.5 }}
+        >
+          <div>Test content</div>
+        </ThreeJSCanvas>
+      )
+      
+      // Should render without errors
       const canvas = document.querySelector('[data-testid="three-canvas"]')
       expect(canvas).toBeInTheDocument()
     })

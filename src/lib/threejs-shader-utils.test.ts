@@ -144,8 +144,9 @@ describe('Three.js Shader Utilities', () => {
 
     test('falls back on shader loading error', async () => {
       // Mock shader loading failure
-      const { loadShader } = require('./shader-loader')
-      loadShader.mockRejectedValueOnce(new Error('Shader not found'))
+      const shaderLoaderModule = await import('./shader-loader')
+      const mockLoadShader = shaderLoaderModule.loadShader as jest.MockedFunction<typeof shaderLoaderModule.loadShader>
+      mockLoadShader.mockRejectedValueOnce(new Error('Shader not found'))
 
       const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff })
       
@@ -181,8 +182,9 @@ describe('Three.js Shader Utilities', () => {
 
   describe('Error Handling', () => {
     test('handles shader loading failures gracefully', async () => {
-      const { loadShader } = require('./shader-loader')
-      loadShader.mockRejectedValueOnce(new Error('Network error'))
+      const shaderLoaderModule = await import('./shader-loader')
+      const mockLoadShader = shaderLoaderModule.loadShader as jest.MockedFunction<typeof shaderLoaderModule.loadShader>
+      mockLoadShader.mockRejectedValueOnce(new Error('Network error'))
 
       await expect(createThreeJSShaderMaterial('failing-shader'))
         .rejects.toThrow('Network error')

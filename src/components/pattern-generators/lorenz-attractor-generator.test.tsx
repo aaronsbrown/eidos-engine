@@ -122,6 +122,8 @@ describe('Lorenz Attractor Pattern Generator', () => {
       expect(controlIds).toContain('rho')  
       expect(controlIds).toContain('beta')
       expect(controlIds).toContain('particleCount')
+      expect(controlIds).toContain('autoRotate')
+      expect(controlIds).toContain('autoRotateSpeed')
     })
 
     test('has performance metadata', () => {
@@ -175,6 +177,30 @@ describe('Lorenz Attractor Pattern Generator', () => {
       expect(particleControl?.min).toBeGreaterThanOrEqual(100) // Minimum for visual effect
       expect(particleControl?.max).toBeLessThanOrEqual(5000) // Performance limit
       expect(particleControl?.defaultValue).toBe(1000) // Good balance
+    })
+
+    test('autoRotate control has correct configuration', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const autoRotateControl = lorenzPattern?.controls?.find(c => c.id === 'autoRotate')
+      
+      expect(autoRotateControl).toBeDefined()
+      expect(autoRotateControl?.type).toBe('checkbox')
+      expect(autoRotateControl?.defaultValue).toBe(false) // Disabled by default
+      expect(autoRotateControl?.role).toBe('InteractionModifier')
+      expect(autoRotateControl?.group).toBe('Camera Behavior')
+    })
+
+    test('autoRotateSpeed control has appropriate bounds', () => {
+      const lorenzPattern = patternGenerators.find(p => p.id === 'lorenz-attractor')
+      const speedControl = lorenzPattern?.controls?.find(c => c.id === 'autoRotateSpeed')
+      
+      expect(speedControl).toBeDefined()
+      expect(speedControl?.type).toBe('range')
+      expect(speedControl?.min).toBe(0.1) // Slow enough to be useful
+      expect(speedControl?.max).toBe(3.0) // Fast enough for dramatic effect
+      expect(speedControl?.defaultValue).toBe(1.0) // Standard speed
+      expect(speedControl?.role).toBe('InteractionModifier')
+      expect(speedControl?.group).toBe('Camera Behavior')
     })
   })
 
@@ -267,6 +293,48 @@ describe('Lorenz Attractor Pattern Generator', () => {
       }
       
       // Should not throw with valid control values
+      expect(() => {
+        render(
+          <LorenzAttractorGenerator 
+            width={400} 
+            height={300}
+            controlValues={controlValues}
+          />
+        )
+      }).not.toThrow()
+    })
+
+    test('handles autoRotate control values', () => {
+      const controlValues = {
+        sigma: 10,
+        rho: 28,
+        beta: 8/3,
+        particleCount: 1000,
+        particleSize: 0.02,
+        autoRotate: true,
+        autoRotateSpeed: 2.0
+      }
+      
+      // Should not throw with autoRotate control values
+      expect(() => {
+        render(
+          <LorenzAttractorGenerator 
+            width={400} 
+            height={300}
+            controlValues={controlValues}
+          />
+        )
+      }).not.toThrow()
+    })
+
+    test('uses default autoRotate values when not provided', () => {
+      const controlValues = {
+        sigma: 10,
+        rho: 28,
+        // autoRotate values intentionally omitted
+      }
+      
+      // Should not throw and use defaults
       expect(() => {
         render(
           <LorenzAttractorGenerator 

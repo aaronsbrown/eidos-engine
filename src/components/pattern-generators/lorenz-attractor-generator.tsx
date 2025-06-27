@@ -16,6 +16,8 @@ interface LorenzControls {
   beta: number
   particleCount: number
   particleSize: number
+  autoRotate: boolean
+  autoRotateSpeed: number
 }
 
 function LorenzPoints({ controls }: { controls: LorenzControls }) {
@@ -106,7 +108,9 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
     rho: (controlValues?.rho as number) ?? 28,
     beta: (controlValues?.beta as number) ?? 8/3,
     particleCount: (controlValues?.particleCount as number) ?? 1000,
-    particleSize: (controlValues?.particleSize as number) ?? 0.02
+    particleSize: (controlValues?.particleSize as number) ?? 0.02,
+    autoRotate: (controlValues?.autoRotate as boolean) ?? false,
+    autoRotateSpeed: (controlValues?.autoRotateSpeed as number) ?? 1.0
   }), [controlValues])
 
   return (
@@ -122,6 +126,8 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
       }}
       showInstructions={true}
       backgroundColor="#000000"
+      autoRotate={controls.autoRotate}
+      autoRotateSpeed={controls.autoRotateSpeed}
     >
       <LorenzPoints controls={controls} />
     </ThreeJSCanvas>

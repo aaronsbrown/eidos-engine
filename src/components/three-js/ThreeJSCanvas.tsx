@@ -18,6 +18,8 @@ interface CameraPreset {
   enablePan?: boolean
   enableZoom?: boolean
   enableRotate?: boolean
+  autoRotate?: boolean
+  autoRotateSpeed?: number
 }
 
 interface ThreeJSCanvasProps {
@@ -29,6 +31,8 @@ interface ThreeJSCanvasProps {
   children: ReactNode
   showInstructions?: boolean
   backgroundColor?: string
+  autoRotate?: boolean
+  autoRotateSpeed?: number
 }
 
 // Predefined camera presets for different visualization types
@@ -43,7 +47,9 @@ const CAMERA_PRESETS: Record<string, CameraPreset> = {
     maxDistance: 10,
     enablePan: true,
     enableZoom: true,
-    enableRotate: true
+    enableRotate: true,
+    autoRotate: false,
+    autoRotateSpeed: 1.0
   },
   "close-up": {
     position: [1.5, 1, 1.5],
@@ -55,7 +61,9 @@ const CAMERA_PRESETS: Record<string, CameraPreset> = {
     maxDistance: 5,
     enablePan: true,
     enableZoom: true,
-    enableRotate: true
+    enableRotate: true,
+    autoRotate: false,
+    autoRotateSpeed: 1.0
   },
   "wide-view": {
     position: [5, 4, 5],
@@ -67,7 +75,9 @@ const CAMERA_PRESETS: Record<string, CameraPreset> = {
     maxDistance: 20,
     enablePan: true,
     enableZoom: true,
-    enableRotate: true
+    enableRotate: true,
+    autoRotate: false,
+    autoRotateSpeed: 1.0
   }
 }
 
@@ -79,10 +89,17 @@ const ThreeJSCanvas: React.FC<ThreeJSCanvasProps> = ({
   customCamera = {},
   children,
   showInstructions = true,
-  backgroundColor = "#000000"
+  backgroundColor = "#000000",
+  autoRotate,
+  autoRotateSpeed
 }) => {
-  // Merge preset with custom overrides
-  const cameraConfig = { ...CAMERA_PRESETS[preset], ...customCamera }
+  // Merge preset with custom overrides and top-level props
+  const cameraConfig = { 
+    ...CAMERA_PRESETS[preset], 
+    ...customCamera,
+    ...(autoRotate !== undefined && { autoRotate }),
+    ...(autoRotateSpeed !== undefined && { autoRotateSpeed })
+  }
 
   return (
     <div className="relative">
@@ -126,6 +143,8 @@ const ThreeJSCanvas: React.FC<ThreeJSCanvasProps> = ({
             rotateSpeed={0.5}
             zoomSpeed={0.8}
             panSpeed={0.8}
+            autoRotate={cameraConfig.autoRotate}
+            autoRotateSpeed={cameraConfig.autoRotateSpeed}
           />
         </Canvas>
       </div>
@@ -136,6 +155,9 @@ const ThreeJSCanvas: React.FC<ThreeJSCanvasProps> = ({
           <div>🖱️ Drag to orbit</div>
           <div>🔄 Scroll to zoom</div>
           <div>📦 Right-drag to pan</div>
+          {cameraConfig.autoRotate && (
+            <div>🔄 Auto-rotating</div>
+          )}
         </div>
       )}
     </div>

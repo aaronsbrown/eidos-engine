@@ -57,6 +57,17 @@ Choose the appropriate preset for your visualization:
     target: [0, 1, 0]         // Look at specific point
   }}
 >
+
+### 4. Auto-Rotate Camera
+
+Enable automatic Y-axis rotation for cinematic viewing:
+
+```typescript
+<ThreeJSCanvas
+  preset="orbital"
+  autoRotate={true}           // Enable automatic rotation
+  autoRotateSpeed={1.5}       // Rotation speed (default: 1.0)
+>
 ```
 
 ## Advanced Features
@@ -122,6 +133,30 @@ Add your pattern to the index with appropriate metadata:
     // ...
   },
   controls: [
+    // Camera behavior controls
+    {
+      id: "autoRotate",
+      label: "Auto Rotate",
+      type: "checkbox",
+      defaultValue: false,
+      description: "Automatically rotate the camera around the Y-axis for a cinematic view.",
+      role: "InteractionModifier",
+      impactsPerformance: "Negligible",
+      group: "Camera Behavior"
+    },
+    {
+      id: "autoRotateSpeed",
+      label: "Rotation Speed",
+      type: "range",
+      min: 0.1,
+      max: 3.0,
+      step: 0.1,
+      defaultValue: 1.0,
+      description: "Speed of automatic camera rotation - higher values create faster rotation.",
+      role: "InteractionModifier",
+      impactsPerformance: "Negligible",
+      group: "Camera Behavior"
+    },
     // Include useCustomShader checkbox for shader-enhanced patterns
     {
       id: "useCustomShader",
@@ -183,6 +218,36 @@ function MeshPattern({ controls }) {
 }
 ```
 
+### 3D Pattern with Auto-Rotate
+
+```typescript
+const My3DPatternGenerator: React.FC<PatternGeneratorProps> = ({ 
+  width, height, controlValues 
+}) => {
+  const controls = useMemo(() => ({
+    // Pattern-specific controls
+    complexity: (controlValues?.complexity as number) ?? 5,
+    color: (controlValues?.color as string) ?? "#FACC15",
+    // Camera behavior controls
+    autoRotate: (controlValues?.autoRotate as boolean) ?? false,
+    autoRotateSpeed: (controlValues?.autoRotateSpeed as number) ?? 1.0
+  }), [controlValues])
+
+  return (
+    <ThreeJSCanvas
+      width={width}
+      height={height}
+      preset="orbital"
+      autoRotate={controls.autoRotate}
+      autoRotateSpeed={controls.autoRotateSpeed}
+      showInstructions={true}
+    >
+      <MyPattern controls={controls} />
+    </ThreeJSCanvas>
+  )
+}
+```
+
 ## Migration from Manual WebGL
 
 1. **Replace Canvas setup** with `<ThreeJSCanvas>`
@@ -194,11 +259,13 @@ function MeshPattern({ controls }) {
 ## Best Practices
 
 - **Start with built-in materials**, add custom shaders later
-- **Use semantic control grouping** ("Simulation Parameters", "Visual Effects", etc.)
+- **Use semantic control grouping** ("Simulation Parameters", "Visual Effects", "Camera Behavior", etc.)
 - **Provide platform-specific defaults** for performance-intensive controls
 - **Test on mobile devices** with reduced particle counts
 - **Document pattern-specific camera requirements** in comments
 - **Use TypeScript interfaces** for control value typing
+- **Include auto-rotate controls** for enhanced user experience in 3D patterns
+- **Auto-rotate instruction appears automatically** when enabled - no custom UI needed
 
 ## Troubleshooting
 
