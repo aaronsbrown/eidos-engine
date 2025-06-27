@@ -158,8 +158,73 @@ interface PatternControl {
 4. **Assign appropriate category** (see Pattern Categorization below)
 5. Follow existing patterns for control panel implementation
 6. For WebGL generators, use external shader loading system
-7. **Add semantic metadata** (see Semantic Layer below)
-8. **Create educational content** using `/create_explainer` flow (see Educational Content Convention below)
+7. **🚨 For patterns with custom shaders: Create shader files** (see Shader Requirements below)
+8. **Add semantic metadata** (see Semantic Layer below)
+9. **Create educational content** using `/create_explainer` flow (see Educational Content Convention below)
+
+### 🎨 Shader Requirements for WebGL Patterns
+
+**When custom shaders are needed:**
+- Patterns using `useCustomShader` control option
+- Patterns with `technology: 'WEBGL_MESHES'` that have enhanced rendering modes
+- Any pattern calling `createThreeJSShaderMaterial()` function
+
+**Required shader files:**
+```
+public/shaders/vertex/{pattern-id}.vert
+public/shaders/fragment/{pattern-id}.frag
+```
+
+**Shader naming convention:**
+- Use exact pattern ID as filename (e.g., `aizawa-attractor` → `aizawa-particles.vert/frag`)
+- For particle systems, append `-particles` to distinguish from other shader types
+
+**Required shader features:**
+- Consistent uniform interface: `u_time`, `u_particleSize`, `u_colorScheme`, `u_depthFading`, `u_opacity`
+- Depth-based coloring with `v_depth` varying
+- Multiple color schemes (typically 3: Rainbow, Warm-Cool, Pattern-specific)
+- Circular particle rendering with soft falloff
+- Performance optimizations for mobile devices
+
+### 🏭 Factory Preset System
+
+**Overview:**
+Factory presets are curated parameter combinations that ship with the application, providing users with mathematically significant starting points for exploration.
+
+**Factory Preset Features:**
+- **Auto-import on first load**: Factory presets are automatically imported into the user's preset collection
+- **Educational descriptions**: Each preset includes mathematical significance explanations
+- **Categorization**: Organized into Classic, Bifurcation, Enhanced, and Variant categories
+- **Version tracking**: Factory presets are only imported once per application version
+
+**Adding Factory Presets:**
+1. **Edit factory preset file**: `public/factory-presets.json`
+2. **Include required metadata**:
+   ```json
+   {
+     "id": "unique-preset-id",
+     "name": "Display Name",
+     "generatorType": "pattern-id",
+     "parameters": { /* parameter values */ },
+     "description": "User-friendly description",
+     "isFactory": true,
+     "category": "Classic|Bifurcation|Enhanced|Variant",
+     "mathematicalSignificance": "Educational explanation"
+   }
+   ```
+3. **Test parameter stability**: Ensure all parameters produce stable, visually appealing results
+4. **Mathematical relevance**: Choose parameters that demonstrate important mathematical concepts
+
+**Factory Preset Categories:**
+- **Classic**: Standard, well-known parameter sets (e.g., Lorenz σ=10, ρ=28, β=8/3)
+- **Bifurcation**: Parameters near critical transition points
+- **Enhanced**: Visually striking variations with enhanced features enabled
+- **Variant**: Alternative parameter combinations showing system diversity
+
+**Current Factory Presets:**
+- **Lorenz Attractor**: 3 presets (Classic, Pre-Chaos Boundary, Enhanced Chaos)
+- **Thomas Attractor**: 3 presets (Classic, Hopf Bifurcation, Enhanced Structure) 
+- **Aizawa Attractor**: 4 presets (Classic, Critical Boundary, Enhanced Complexity, Compact Form)
 
 ### 📚 Educational Content Convention
 
@@ -172,14 +237,16 @@ interface PatternControl {
 Follow the three-layer educational approach:
 - **Layer 1**: "What is this?" (Intuitive/Experiential) - Visual description and real-world connections
 - **Layer 2**: "How does this work?" (Conceptual/Mechanical) - Algorithm explanation and principles  
-- **Layer 3**: "Show me the code" (Technical/Formal) - Implementation details with code references
+- **Layer 3**: "Show me the mathematics" (Technical/Formal) - Mathematical analysis and theoretical foundations
+
+**🚨 CRITICAL RULE: Educational content must NEVER reference our tech stack, implementation details, or app-specific code. Content should focus ONLY on the mathematical/scientific concept being visualized, as if written for a general educational resource.**
 
 **Template Standard:**
 All educational content MUST follow the established format:
 - **Header Format**: `## Layer N: "Title" (Audience/Type)` with exact spacing and parentheses
 - **Section Spacing**: Double newlines between major sections
 - **Consistent Structure**: All files must use identical section headers and organization
-- **Code Blocks**: Use TypeScript syntax highlighting for code examples
+- **Mathematical Notation**: Use standard mathematical notation and LaTeX-style formatting for equations
 
 **File Location:**
 - **Single source of truth**: `public/educational-content/{patternId}.md`

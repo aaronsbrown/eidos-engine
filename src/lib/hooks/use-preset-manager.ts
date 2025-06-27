@@ -51,8 +51,11 @@ export function usePresetManager({
   const [error, setError] = useState<string | null>(null)
 
   // AIDEV-NOTE: Load presets for current pattern on mount and pattern change
-  const refreshPresets = useCallback(() => {
+  const refreshPresets = useCallback(async () => {
     try {
+      // Ensure factory presets are loaded first
+      await PresetManager.ensureFactoryPresetsLoaded()
+      
       const loadedPresets = PresetManager.getPresetsForGenerator(patternId)
       setPresets(loadedPresets)
       
