@@ -9,6 +9,9 @@ export interface PatternPreset {
   createdAt: Date
   description?: string
   contentHash: string // AIDEV-NOTE: Hash of meaningful content for duplicate detection
+  isFactory?: boolean // AIDEV-NOTE: Factory presets that ship with the app
+  category?: string // AIDEV-NOTE: Factory preset category (Classic, Bifurcation, Enhanced, etc.)
+  mathematicalSignificance?: string // AIDEV-NOTE: Educational description of mathematical importance
 }
 
 export interface PresetExportData {
@@ -20,7 +23,8 @@ export interface PresetExportData {
 // AIDEV-NOTE: localStorage key constants to avoid typos and enable easy refactoring
 const STORAGE_KEYS = {
   PRESETS: 'pattern-generator-presets',
-  LAST_ACTIVE_PRESET: 'pattern-generator-last-active-preset'
+  LAST_ACTIVE_PRESET: 'pattern-generator-last-active-preset',
+  FACTORY_PRESETS_LOADED: 'pattern-generator-factory-loaded'
 } as const
 
 // AIDEV-NOTE: Current preset system version for future migration support
@@ -407,5 +411,131 @@ export class PresetManager {
     } catch (error) {
       console.warn('Failed to save last active preset:', error)
     }
+  }
+
+  /**
+   * Load factory presets from the public directory
+   */
+  static async loadFactoryPresets(): Promise<PatternPreset[]> {
+    try {
+      const response = await fetch('/factory-presets.json')
+      if (!response.ok) {
+        throw new Error(`Failed to load factory presets: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      // Convert factory preset format to PatternPreset format
+      const factoryPresets: PatternPreset[] = data.presets.map((preset: {
+        id: string;
+        name: string;
+        generatorType: string;
+        parameters: Record<string, number | string | boolean>;
+        description?: string;
+        isFactory?: boolean;
+        category?: string;
+        mathematicalSignificance?: string;
+      }) => ({
+        id: preset.id,
+        name: preset.name,
+        generatorType: preset.generatorType,
+        parameters: preset.parameters,
+        createdAt: new Date(), // Set to current time for consistent sorting
+        description: preset.description,
+        contentHash: generateContentHash(preset.name, preset.generatorType, preset.parameters),
+        isFactory: preset.isFactory || true,
+        category: preset.category,
+        mathematicalSignificance: preset.mathematicalSignificance
+      }))
+      
+      return factoryPresets
+    } catch (error) {
+      console.warn('Failed to load factory presets:', error)
+      return []
+    }
+  }
+
+  /**
+   * Check if factory presets have been loaded for this version
+   */
+  static hasFactoryPresetsLoaded(): boolean {
+    try {
+      if (typeof window === 'undefined') return false
+      const loaded = localStorage.getItem(STORAGE_KEYS.FACTORY_PRESETS_LOADED)
+      return loaded === PRESET_VERSION
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * Mark factory presets as loaded for this version
+   */
+  static markFactoryPresetsLoaded(): void {
+    try {
+      if (typeof window === 'undefined') return
+      localStorage.setItem(STORAGE_KEYS.FACTORY_PRESETS_LOADED, PRESET_VERSION)
+    } catch (error) {
+      console.warn('Failed to mark factory presets as loaded:', error)
+    }
+  }
+
+  /**
+   * Auto-import factory presets if not already loaded
+   */
+  static async ensureFactoryPresetsLoaded(): Promise<void> {
+    if (this.hasFactoryPresetsLoaded()) {
+      return // Already loaded for this version
+    }
+
+    try {
+      const factoryPresets = await this.loadFactoryPresets()
+      if (factoryPresets.length === 0) {
+        console.warn('No factory presets found to import')
+        return
+      }
+
+      const existingPresets = this.loadPresets()
+      let importedCount = 0
+
+      // Import factory presets, skipping duplicates
+      for (const factoryPreset of factoryPresets) {
+        // Check if this factory preset already exists (by content hash)
+        const duplicate = existingPresets.find(p => 
+          p.contentHash === factoryPreset.contentHash && 
+          p.generatorType === factoryPreset.generatorType
+        )
+
+        if (!duplicate) {
+          existingPresets.push(factoryPreset)
+          importedCount++
+        }
+      }
+
+      // Save updated presets if any were imported
+      if (importedCount > 0) {
+        this.savePresets(existingPresets)
+        console.log(`Imported ${importedCount} factory presets`)
+      }
+
+      // Mark as loaded regardless of whether anything was imported
+      this.markFactoryPresetsLoaded()
+    } catch (error) {
+      console.error('Failed to import factory presets:', error)
+    }
+  }
+
+  /**
+   * Get only factory presets
+   */
+  static getFactoryPresets(): PatternPreset[] {
+    return this.loadPresets().filter(p => p.isFactory === true)
+  }
+
+  /**
+   * Get user-created presets (non-factory)
+   */
+  static getUserPresets(): PatternPreset[] {
+    return this.loadPresets().filter(p => !p.isFactory)
   }
 }

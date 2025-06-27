@@ -7,6 +7,7 @@ import CellularAutomatonGenerator from "./cellular-automaton-generator"
 import FourPoleGradientGenerator from "./four-pole-gradient-generator"
 import LorenzAttractorGenerator from "./lorenz-attractor-generator"
 import ThomasAttractorGenerator from "./thomas-attractor-generator"
+import AizawaAttractorGenerator from "./aizawa-attractor-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Migrated to semantic pattern definitions with rich metadata
@@ -1399,11 +1400,250 @@ const unsortedPatternGenerators: RichPatternGeneratorDefinition[] = [
       },
     ],
   },
+  {
+    id: "aizawa-attractor",
+    name: "Aizawa Attractor",
+    component: AizawaAttractorGenerator,
+    technology: 'WEBGL_MESHES',
+    category: 'Attractors',
+    schemaVersion: "1.0",
+    description: "A complex strange attractor with six parameters that creates intricate chaotic patterns in 3D space.",
+    longDescription: "The Aizawa Attractor is a sophisticated dynamical system with six tunable parameters, creating highly complex and beautiful chaotic patterns. This 3D visualization allows exploration of the rich parameter space and its effect on the attractor's structure.",
+    semantics: {
+      primaryAlgorithmFamily: "StrangeAttractor",
+      keyMathematicalConcepts: ["ChaosTheory", "Calculus", "LinearAlgebra"],
+      visualCharacteristics: ["Flowing", "Chaotic", "Complex", "Organic", "Luminous", "Smooth", "Continuous"],
+      dimensionality: "True3D_WebGL",
+      interactionStyle: "DirectManipulation",
+      keywords: ["aizawa", "strange attractor", "dynamical system", "chaos", "3d", "webgl", "parametric", "nonlinear"]
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance dependent on particle count and 3D rendering complexity. Six-parameter system requires more computation than simpler attractors."
+    },
+    version: "1.0.0",
+    author: "Aaron Brown & Claude",
+    dateAdded: "2025-06-27",
+    lastModified: "2025-06-27",
+    status: "Production",
+    isInteractive: true,
+    isAnimatedByDefault: true,
+    relatedPatterns: ["lorenz-attractor", "thomas-attractor"],
+    controls: [
+        {
+            id: "a",
+            label: "Parameter A",
+            type: "range",
+            min: 0.1,
+            max: 2.0,
+            step: 0.05,
+            defaultValue: 0.95,
+            description: "First Aizawa parameter - affects the overall structure and stability of the attractor.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "b",
+            label: "Parameter B",
+            type: "range",
+            min: 0.1,
+            max: 2.0,
+            step: 0.05,
+            defaultValue: 0.7,
+            description: "Second Aizawa parameter - controls the vertical dynamics of the system.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "c",
+            label: "Parameter C",
+            type: "range",
+            min: 0.1,
+            max: 2.0,
+            step: 0.05,
+            defaultValue: 0.6,
+            description: "Third Aizawa parameter - influences the nonlinear coupling strength.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "d",
+            label: "Parameter D",
+            type: "range",
+            min: 1.0,
+            max: 5.0,
+            step: 0.1,
+            defaultValue: 3.5,
+            description: "Fourth Aizawa parameter - controls the rotation and mixing in the xy-plane.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "e",
+            label: "Parameter E",
+            type: "range",
+            min: 0.1,
+            max: 1.0,
+            step: 0.05,
+            defaultValue: 0.25,
+            description: "Fifth Aizawa parameter - affects the coupling between horizontal and vertical motion.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "f",
+            label: "Parameter F",
+            type: "range",
+            min: 0.01,
+            max: 0.5,
+            step: 0.01,
+            defaultValue: 0.1,
+            description: "Sixth Aizawa parameter - introduces higher-order nonlinear terms.",
+            role: "PrimaryAlgorithmParameter",
+            impactsPerformance: "Negligible",
+            group: "Aizawa Parameters"
+        },
+        {
+            id: "speed",
+            label: "Animation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 1.0,
+            description: "Animation speed multiplier for the dynamical evolution.",
+            role: "AnimationBehavior",
+            impactsPerformance: "Minor",
+            group: "Animation"
+        },
+        {
+            id: "particleCount",
+            label: "Particle Count",
+            type: "range",
+            min: 100,
+            max: 5000,
+            step: 100,
+            defaultValue: 2500,
+            description: "Number of particles to trace the attractor's path.",
+            role: "PerformanceTuning",
+            impactsPerformance: "Significant",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: 500,
+                    desktop: 2500,
+                    rationale: "High particle counts significantly impact performance on mobile devices."
+                }
+            },
+            group: "Simulation Parameters"
+        },
+        {
+            id: "particleSize",
+            label: "Particle Size",
+            type: "range",
+            min: 0.01,
+            max: 0.1,
+            step: 0.005,
+            defaultValue: 0.03,
+            description: "Size of individual particles - larger particles create more visible trails.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects"
+        },
+        {
+            id: "autoRotate",
+            label: "Auto Rotate",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Automatically rotate the camera around the Y-axis for a cinematic view of the attractor.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "autoRotateSpeed",
+            label: "Rotation Speed",
+            type: "range",
+            min: 0.1,
+            max: 3.0,
+            step: 0.1,
+            defaultValue: 1.0,
+            description: "Speed of automatic camera rotation - higher values create faster rotation.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Camera Behavior"
+        },
+        {
+            id: "useCustomShader",
+            label: "Enhanced Rendering",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Enable advanced shader-based rendering with parameter-based coloring and improved visual quality.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Minor",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Custom shaders provide enhanced visual quality on desktop but may impact mobile GPU performance."
+                }
+            }
+        },
+        {
+            id: "colorScheme",
+            label: "Color Scheme",
+            type: "select",
+            defaultValue: 1,
+            options: [
+                { value: 0, label: "Rainbow Depth" },
+                { value: 1, label: "Warm-Cool" },
+                { value: 2, label: "Parameter Gradient" }
+            ],
+            description: "Color scheme for depth and parameter-based particle coloring - highlights mathematical properties.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "depthFading",
+            label: "Depth Fading",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Fade distant particles for enhanced depth perception and focus on the attractor's core structure.",
+            role: "VisualAesthetic",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects"
+        },
+        {
+            id: "showAxes",
+            label: "Show Coordinate Axes",
+            type: "checkbox",
+            defaultValue: false,
+            description: "Display 3D coordinate axes to provide spatial reference and understand the mathematical space.",
+            role: "InteractionModifier",
+            impactsPerformance: "Negligible",
+            group: "Visual Effects",
+            defaultRecommendations: {
+                platformSpecific: {
+                    mobile: false,
+                    desktop: true,
+                    rationale: "Coordinate axes help with spatial understanding on larger screens but may clutter mobile displays."
+                }
+            }
+        }
+    ]
+  },
 ]
 
 // AIDEV-NOTE: Sort patterns by category to group them properly in the UI
-// Category order: Noise, Geometric, Simulation, Data Visualization
-const categoryOrder = ['Noise', 'Geometric', 'Simulation', 'Data Visualization']
+// Category order: Noise, Geometric, Simulation, Data Visualization, Attractors
+const categoryOrder = ['Noise', 'Geometric', 'Simulation', 'Data Visualization', 'Attractors']
 
 export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   const aIndex = categoryOrder.indexOf(a.category)
@@ -1418,5 +1658,5 @@ export const patternGenerators = unsortedPatternGenerators.sort((a, b) => {
   return unsortedPatternGenerators.indexOf(a) - unsortedPatternGenerators.indexOf(b)
 })
 
-export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator }
+export { NoiseFieldGenerator, PixelatedNoiseGenerator, BrownianMotionGenerator, TrigonometricCircleGenerator, ParticleSystemGenerator, CellularAutomatonGenerator, FourPoleGradientGenerator, LorenzAttractorGenerator, ThomasAttractorGenerator, AizawaAttractorGenerator }
 export type { PatternGenerator, PatternGeneratorProps } from "./types"
