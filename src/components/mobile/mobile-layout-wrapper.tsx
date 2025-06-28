@@ -132,6 +132,22 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     setIsMenuOpen(!isMenuOpen)
   }, [isMenuOpen])
 
+  // AIDEV-NOTE: Auto-start mobile tour for first-time visitors (must be before early return)
+  useEffect(() => {
+    if (!isDesktop) { // Only run for mobile/tablet
+      const checkAndStartTour = () => {
+        if (shouldShowTour()) {
+          // Small delay to ensure UI is fully loaded
+          setTimeout(() => {
+            startMobileTour()
+          }, 1000)
+        }
+      }
+
+      checkAndStartTour()
+    }
+  }, [shouldShowTour, startMobileTour, isDesktop])
+
   // If desktop, render the existing desktop layout
   if (isDesktop) {
     return (
@@ -147,20 +163,6 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       </div>
     )
   }
-
-  // AIDEV-NOTE: Auto-start mobile tour for first-time visitors
-  useEffect(() => {
-    const checkAndStartTour = () => {
-      if (shouldShowTour()) {
-        // Small delay to ensure UI is fully loaded
-        setTimeout(() => {
-          startMobileTour()
-        }, 1000)
-      }
-    }
-
-    checkAndStartTour()
-  }, [shouldShowTour, startMobileTour])
 
   // AIDEV-NOTE: Tablet hybrid layout removed - tablets now use mobile layout for better UX
 

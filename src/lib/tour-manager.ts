@@ -1,5 +1,5 @@
 // AIDEV-NOTE: Basic TourManager for exploring Driver.js API and styling
-import { driver, DriveStep, Config } from 'driver.js'
+import { driver, Config } from 'driver.js'
 import { TourPreferencesManager } from './tour-preferences'
 
 export interface TourStep {
@@ -16,7 +16,6 @@ export interface TourConfig {
   steps: TourStep[]
   showProgress?: boolean
   allowClose?: boolean
-  overlayClickNext?: boolean
 }
 
 export class TourManager {
@@ -27,41 +26,41 @@ export class TourManager {
   }
 
   startTour(config: TourConfig): void {
-    const driverConfig: Config = {
-      showProgress: config.showProgress ?? true,
-      allowClose: config.allowClose ?? true,
-      overlayClickNext: config.overlayClickNext ?? false,
-      animate: true,
-      smoothScroll: true,
-      // AIDEV-NOTE: Custom styling options for technical blueprint aesthetic
-      popoverClass: 'driver-popover-custom',
-      progressText: '{{current}} of {{total}}',
-      nextBtnText: 'NEXT',
-      prevBtnText: 'PREV', 
-      doneBtnText: 'DONE',
-      // AIDEV-NOTE: Track tour completion and skipping
-      onDestroyed: (element, step, options) => {
-        if (options?.isLast) {
-          // Tour completed
+    try {
+      const driverConfig: Config = {
+        showProgress: config.showProgress ?? true,
+        allowClose: config.allowClose ?? true,
+        animate: true,
+        smoothScroll: true,
+        // AIDEV-NOTE: Custom styling options for technical blueprint aesthetic
+        popoverClass: 'driver-popover-custom',
+        progressText: '{{current}} of {{total}}',
+        nextBtnText: 'NEXT',
+        prevBtnText: 'PREV', 
+        doneBtnText: 'DONE',
+        // AIDEV-NOTE: Track tour completion and skipping
+        onDestroyed: () => {
+          // For now, just mark as completed when tour is destroyed
+          // TODO: Distinguish between completion and skipping if needed
           TourPreferencesManager.markTourCompleted()
-        } else {
-          // Tour was skipped/closed early
-          TourPreferencesManager.markTourSkipped()
-        }
-      },
-      steps: config.steps.map(step => ({
-        element: step.element,
-        popover: {
-          title: step.popover.title,
-          description: step.popover.description,
-          side: step.popover.side || 'bottom',
-          align: step.popover.align || 'start',
-        }
-      }))
-    }
+        },
+        steps: config.steps.map(step => ({
+          element: step.element,
+          popover: {
+            title: step.popover.title,
+            description: step.popover.description,
+            side: step.popover.side || 'bottom',
+            align: step.popover.align || 'start',
+          }
+        }))
+      }
 
-    this.driverInstance = driver(driverConfig)
-    this.driverInstance.drive()
+      this.driverInstance = driver(driverConfig)
+      this.driverInstance.drive()
+    } catch (error) {
+      console.warn('Failed to start tour:', error)
+      // Tour fails gracefully - user experience continues without tour
+    }
   }
 
   destroy(): void {
@@ -111,8 +110,7 @@ export class TourManager {
         }
       ],
       showProgress: true,
-      allowClose: true,
-      overlayClickNext: false
+      allowClose: true
     }
   }
 
@@ -154,8 +152,7 @@ export class TourManager {
         }
       ],
       showProgress: true,
-      allowClose: true,
-      overlayClickNext: false
+      allowClose: true
     }
   }
 }
