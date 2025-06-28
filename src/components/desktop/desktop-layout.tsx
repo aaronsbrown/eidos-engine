@@ -14,11 +14,33 @@ import { useEducationalContent } from "@/lib/hooks/use-educational-content"
 import { getAllPatternIds } from "@/lib/educational-content-loader"
 import { getPlatformDefaultValue } from "@/lib/semantic-utils"
 
+// AIDEV-NOTE: Desktop layout responsive breakpoints and sizing constants
+const DESKTOP_LAYOUT_CONSTANTS = {
+  // Responsive breakpoints
+  SMALL_DESKTOP_BREAKPOINT: 1200, // iPad Pro and smaller desktop screens
+  
+  // Default visualization dimensions for large screens
+  DEFAULT_WIDTH: 700,
+  DEFAULT_HEIGHT: 394,
+  
+  // Responsive sizing for small desktop screens
+  VIEWPORT_WIDTH_RATIO: 0.45, // 45% of viewport width
+  MIN_VISUALIZATION_WIDTH: 500, // Minimum width to prevent UI overlap
+  MAX_VISUALIZATION_WIDTH: 600, // Maximum width for optimal proportions
+  
+  // Layout spacing (for future calculations if needed)
+  LEFT_SIDEBAR_WIDTH: 256, // w-64 = 16rem = 256px
+  DEFAULT_RIGHT_SIDEBAR_WIDTH: 380,
+} as const
+
 export default function DesktopLayout() {
   const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
-  const [dimensions, setDimensions] = useState({ width: 700, height: 394 })
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ 
+    width: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_WIDTH, 
+    height: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_HEIGHT 
+  })
   const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
-  const [sidebarWidth, setSidebarWidth] = useState(380) // Default sidebar width
+  const [sidebarWidth, setSidebarWidth] = useState<number>(DESKTOP_LAYOUT_CONSTANTS.DEFAULT_RIGHT_SIDEBAR_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
   const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
@@ -43,6 +65,39 @@ export default function DesktopLayout() {
   // Check if educational content is available for current pattern
   const availableEducationalPatterns = getAllPatternIds()
   const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
+
+  // AIDEV-NOTE: Responsive dimensions for smaller desktop screens (like iPad Mini horizontal)
+  useEffect(() => {
+    const updateDimensions = () => {
+      const viewportWidth = window.innerWidth
+      
+      // For iPad Mini and similar small desktop screens, use more conservative sizing
+      if (viewportWidth <= DESKTOP_LAYOUT_CONSTANTS.SMALL_DESKTOP_BREAKPOINT) {
+        // Calculate responsive width with constraints
+        const calculatedWidth = viewportWidth * DESKTOP_LAYOUT_CONSTANTS.VIEWPORT_WIDTH_RATIO
+        const optimalWidth = Math.max(
+          DESKTOP_LAYOUT_CONSTANTS.MIN_VISUALIZATION_WIDTH,
+          Math.min(DESKTOP_LAYOUT_CONSTANTS.MAX_VISUALIZATION_WIDTH, calculatedWidth)
+        )
+        
+        // Maintain aspect ratio from default dimensions
+        const aspectRatio = DESKTOP_LAYOUT_CONSTANTS.DEFAULT_HEIGHT / DESKTOP_LAYOUT_CONSTANTS.DEFAULT_WIDTH
+        const optimalHeight = Math.round(optimalWidth * aspectRatio)
+        
+        setDimensions({ width: Math.round(optimalWidth), height: optimalHeight })
+      } else {
+        // For larger screens, use default dimensions
+        setDimensions({ 
+          width: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_WIDTH, 
+          height: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_HEIGHT 
+        })
+      }
+    }
+    
+    updateDimensions()
+    window.addEventListener('resize', updateDimensions)
+    return () => window.removeEventListener('resize', updateDimensions)
+  }, [sidebarWidth])
 
   // Initialize default control values for patterns that have controls
   // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile/desktop experience

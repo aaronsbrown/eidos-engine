@@ -30,7 +30,6 @@ describe('PatternGeneratorShowcase - Integration Tests', () => {
     // Default to desktop
     mockUseMobileDetection.mockReturnValue({
       isMobile: false,
-      isTablet: false,
       isDesktop: true,
       viewport: { width: 1024, height: 768 }
     })
@@ -51,7 +50,6 @@ describe('PatternGeneratorShowcase - Integration Tests', () => {
     it('renders mobile layout when user is on mobile device', () => {
       mockUseMobileDetection.mockReturnValue({
         isMobile: true,
-        isTablet: false,
         isDesktop: false,
         viewport: { width: 375, height: 667 }
       })
@@ -62,10 +60,10 @@ describe('PatternGeneratorShowcase - Integration Tests', () => {
       expect(screen.queryByTestId('desktop-layout')).not.toBeInTheDocument()
     })
 
-    it('renders mobile layout when user is on tablet device', () => {
+    it('renders mobile layout when user is on tablet device (mobile-first approach)', () => {
+      // AIDEV-NOTE: Updated for Issue #70 - tablets now use mobile layout 
       mockUseMobileDetection.mockReturnValue({
-        isMobile: false,
-        isTablet: true,
+        isMobile: true,  // Tablets are now considered mobile (≤1023px)
         isDesktop: false,
         viewport: { width: 768, height: 1024 }
       })
@@ -101,7 +99,6 @@ describe('PatternGeneratorShowcase - Integration Tests', () => {
       // Test mobile (no need to unmount, just re-render)
       mockUseMobileDetection.mockReturnValue({
         isMobile: true,
-        isTablet: false,
         isDesktop: false,
         viewport: { width: 375, height: 667 }
       })

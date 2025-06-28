@@ -194,9 +194,9 @@ describe('DesktopLayout - User Behavior', () => {
   })
   beforeEach(() => {
     jest.clearAllMocks()
-    // Mock window dimensions
-    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 })
-    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 768 })
+    // Mock window dimensions - use large desktop size by default to get default 700x394 dimensions
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1400 })
+    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 })
   })
 
   describe('User can see and navigate patterns', () => {
@@ -490,6 +490,39 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getByText('Viewport')).toBeInTheDocument()
       expect(screen.getByText('700px')).toBeInTheDocument() // Default width
       expect(screen.getByText('394px')).toBeInTheDocument() // Default height
+    })
+
+    it('automatically adjusts visualization size for smaller desktop screens (iPad Mini)', async () => {
+      // AIDEV-NOTE: Test responsive dimensions for Issue #70 - iPad Mini horizontal (1024x768)
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 })
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 768 })
+      
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      // For iPad Mini (1024px width), should use responsive sizing (45% of viewport = ~460px, but min 500px)
+      await waitFor(() => {
+        expect(screen.getByText('500px')).toBeInTheDocument() // Should be 500px (minimum width)
+        expect(screen.getByText('281px')).toBeInTheDocument() // Should be 281px (500 * 394/700)
+      })
+      
+      // Specifications should show the responsive dimensions
+      expect(screen.getByText('500 × 281')).toBeInTheDocument()
+    })
+
+    it('uses default dimensions for larger desktop screens', async () => {
+      // AIDEV-NOTE: Test that larger screens still get default dimensions
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1400 })
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 })
+      
+      render(<DesktopLayout />, { wrapper: TestWrapper })
+      
+      // For larger screens (>1200px), should use default dimensions
+      await waitFor(() => {
+        expect(screen.getByText('700px')).toBeInTheDocument() // Default width
+        expect(screen.getByText('394px')).toBeInTheDocument() // Default height
+      })
+      
+      expect(screen.getByText('700 × 394')).toBeInTheDocument()
     })
 
     it('allows user to resize pattern viewport', async () => {
