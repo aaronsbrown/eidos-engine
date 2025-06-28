@@ -17,7 +17,7 @@ You will be provided:
 
 <optional_arguments>
 $ARGUMENTS
-<optional_arguments>
+</optional_arguments>
 
 ## Role
 
@@ -37,14 +37,17 @@ Follow these steps precisely:
    - Reference current GitHub issue best practices for bug reports, feature requests, and improvements.
    - Review examples from high-quality open-source repositories (e.g., Microsoft, Vercel, Facebook).
 
-3. **Plan Presentation**
+3. **Application Implementation Notes**
+   - Read through 'docs/tech/implementation_notes" for history on interesting architectural decisions
+
+4. **Plan Presentation**
    - Draft a plan in `<plan>` tags:
      - Structure of the GitHub issue.
      - Intended issue type (`bug`, `enhancement`, or `question`).
      - Proposed labels, milestones, or assignees (based only on repo conventions).
 
 4. **GitHub Issue Generation**
-   - Prompt the user to confirm whether the generated issue is acceptable.
+   - You MUST explicitly rompt the user to confirm whether the generated issue is acceptable.
    - Upon plan approval:
      - Write the issue in `<github_issue>` tags.
      - Format using Markdown:

@@ -9,7 +9,7 @@ You are about to help the user start working on a new GitHub issue. This command
 
 <optional_arguments>
 $ARGUMENTS
-<optional_arguments>
+</optional_arguments>
 
 Follow this workflow:
 
@@ -59,12 +59,18 @@ git checkout -b [branch-name]
 
 Based on the selected issue:
 
-1. Use the TodoWrite tool to create a structured plan breaking down the work into specific, actionable tasks
-2. Consider the project's architecture and existing patterns (reference CLAUDE.md)
+1. Use the TodoWrite tool to create a structured plan breaking down the work into small, specific, actionable tasks
+
+2. Consider the project's architecture and existing patterns:
+   - Reference CLAUDE.md and especially note the Golden Rules
+   - Reference docs/tech/architecture_notes for future plans to keep in mind
+   - Reference docs/tech/implementation_notes for interesting architectural decisions
+   - Look over Pull Request topics to see if any thing worth reading from github
+
 3. Include tasks for:
    - Code implementation
-   - Testing (if applicable)
-   - Documentation updates (anchor comments)
+   - Testing (if applicable; all test should be behavioral tests vs implementation tests)
+   - Documentation updates (anchor comments, updates to CLaude.MD, or IMplementation Notes.)
    - Any other relevant steps
 
 ## Step 5: Confirm Plan
@@ -77,3 +83,4 @@ Remember to follow all guidelines from CLAUDE.md, especially:
 - Follow the established architecture
 - Maintain type safety
 - Consider performance implications
+- Follow preflight then commit process
