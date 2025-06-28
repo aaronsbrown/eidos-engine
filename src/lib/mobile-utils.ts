@@ -196,10 +196,10 @@ export function getOptimalCanvasDimensions(
 
 /**
  * Generates mobile-specific CSS classes for responsive design
+ * AIDEV-NOTE: Simplified to mobile-first approach - tablets use mobile layout
  */
 export function getMobileResponsiveClasses(
-  isMobile: boolean,
-  isTablet: boolean
+  isMobile: boolean
 ): {
   container: string
   header: string
@@ -212,15 +212,6 @@ export function getMobileResponsiveClasses(
       header: 'flex-shrink-0 h-12',
       content: 'flex-1 flex flex-col',
       controls: 'flex-shrink-0'
-    }
-  }
-  
-  if (isTablet) {
-    return {
-      container: 'flex flex-col md:flex-row min-h-screen',
-      header: 'flex-shrink-0 h-12 md:h-16',
-      content: 'flex-1 flex flex-col md:flex-row',
-      controls: 'md:w-80 flex-shrink-0'
     }
   }
   

@@ -6,13 +6,13 @@ import { DesktopLayout } from "@/components/desktop"
 import { useMobileDetection } from "@/components/hooks/useMobileDetection"
 
 export default function PatternGeneratorShowcase() {
-  // AIDEV-NOTE: Mobile responsive layout integration - Issue #1
-  const { isMobile, isTablet } = useMobileDetection()
+  // AIDEV-NOTE: Simplified mobile-first layout switching - tablets now use mobile layout (Issue #70)
+  const { isMobile } = useMobileDetection()
   
   return (
     <>
-      {/* If mobile or tablet, use new responsive layout */}
-      {(isMobile || isTablet) ? (
+      {/* Mobile-first approach: mobile layout for ≤1023px, desktop for ≥1024px */}
+      {isMobile ? (
         <MobileLayoutWrapper />
       ) : (
         <DesktopLayout />

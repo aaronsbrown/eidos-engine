@@ -26,7 +26,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   onPatternChange,
   className = ''
 }: MobileLayoutWrapperProps) {
-  const { isMobile, isTablet, isDesktop, viewport } = useMobileDetection()
+  const { isMobile, isDesktop, viewport } = useMobileDetection()
   
   // Pattern state
   const [selectedPatternId, setSelectedPatternId] = useState(
@@ -56,29 +56,18 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
-    getMobileResponsiveClasses(isMobile, isTablet),
-    [isMobile, isTablet]
+    getMobileResponsiveClasses(isMobile),
+    [isMobile]
   )
 
-  // Calculate optimal visualization dimensions
+  // AIDEV-NOTE: Simplified dimensions calculation - mobile for all tablets, desktop only at ≥1024px
   const visualizationDimensions = useMemo(() => {
     if (isDesktop) {
       // For desktop, return desktop defaults
       return { width: 700, height: 394 }
     }
-    
-    if (isTablet) {
-      // For tablet, use full available space minus sidebar
-      const availableWidth = viewport.width - 320 // subtract sidebar width (320px)
-      const availableHeight = viewport.height - 48 // subtract header height (48px)
-      
-      return {
-        width: availableWidth,
-        height: availableHeight
-      }
-    }
 
-    // For mobile, use 4:3 aspect ratio with full screen width
+    // For mobile and tablet (now unified), use 4:3 aspect ratio with full screen width
     const availableWidth = viewport.width // use full screen width
     const optimalHeight = availableWidth * 0.75 // 4:3 aspect ratio
     const maxHeight = viewport.height * 0.5 // don't exceed 50% of viewport
@@ -87,7 +76,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       width: availableWidth,
       height: Math.min(optimalHeight, maxHeight)
     }
-  }, [isTablet, isDesktop, viewport])
+  }, [isDesktop, viewport])
 
   // Initialize control values for pattern
   // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile experience
@@ -155,61 +144,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     )
   }
 
-  // Tablet layout - hybrid approach
-  if (isTablet) {
-    return (
-      <div data-testid="tablet-layout" className={`${responsiveClasses.container} ${className}`}>
-        <MobileHeader
-          title="EIDOS ENGINE"
-          patternCount={{
-            current: patternGenerators.findIndex(p => p.id === selectedPatternId) + 1,
-            total: patternGenerators.length
-          }}
-          onMenuToggle={handleMenuToggle}
-        />
-        
-        <div className="flex-1 flex">
-          {/* Side panel for tablet */}
-          <aside className="w-80 border-r border-border p-4 bg-background/50">
-            <PatternDropdownSelector
-              patterns={patternGenerators}
-              selectedId={selectedPatternId}
-              onSelect={handlePatternSelect}
-              className="mb-4"
-            />
-            
-            <ProgressiveDisclosurePanel
-              patternId={selectedPatternId}
-              controls={selectedPattern.controls || []}
-              controlValues={getCurrentControlValues()}
-              onControlChange={handleControlChange}
-              isExpanded={isAdvancedExpanded}
-              onToggleExpanded={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
-              hasEducationalContent={hasEducationalContent}
-              isEducationalVisible={isEducationalVisible}
-              onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
-            />
-          </aside>
-          
-          {/* Main content area */}
-          <main className="flex-1">
-            <div data-testid="tablet-visualization-area" className="w-full h-full bg-background">
-              {selectedPattern && (
-                <selectedPattern.component
-                  width={visualizationDimensions.width}
-                  height={visualizationDimensions.height}
-                  className="w-full h-full"
-                  controls={selectedPattern.controls}
-                  controlValues={getCurrentControlValues()}
-                  onControlChange={handleControlChange}
-                />
-              )}
-            </div>
-          </main>
-        </div>
-      </div>
-    )
-  }
+  // AIDEV-NOTE: Tablet hybrid layout removed - tablets now use mobile layout for better UX
 
   // Mobile layout - progressive disclosure
   return (

@@ -10,16 +10,13 @@ export interface ViewportInfo {
 
 export interface MobileDetectionResult {
   isMobile: boolean
-  isTablet: boolean
   isDesktop: boolean
   viewport: ViewportInfo
 }
 
-// Breakpoint constants matching design specifications
+// AIDEV-NOTE: Simplified mobile-first breakpoints - eliminates problematic tablet hybrid layout
 const BREAKPOINTS = {
-  MOBILE_MAX: 767,
-  TABLET_MIN: 768,
-  TABLET_MAX: 1023,
+  MOBILE_MAX: 1023,
   DESKTOP_MIN: 1024
 } as const
 
@@ -79,14 +76,12 @@ export function useMobileDetection(): MobileDetectionResult {
     }
   }, [handleResize])
 
-  // Calculate current breakpoint based on viewport width
+  // Calculate current breakpoint based on viewport width - mobile-first approach
   const isMobile = viewport.width <= BREAKPOINTS.MOBILE_MAX
-  const isTablet = viewport.width >= BREAKPOINTS.TABLET_MIN && viewport.width <= BREAKPOINTS.TABLET_MAX
   const isDesktop = viewport.width >= BREAKPOINTS.DESKTOP_MIN
 
   return {
     isMobile,
-    isTablet,
     isDesktop,
     viewport
   }
@@ -95,9 +90,8 @@ export function useMobileDetection(): MobileDetectionResult {
 /**
  * Utility function to get breakpoint name for the current viewport
  */
-export function getBreakpointName(width: number): 'mobile' | 'tablet' | 'desktop' {
+export function getBreakpointName(width: number): 'mobile' | 'desktop' {
   if (width <= BREAKPOINTS.MOBILE_MAX) return 'mobile'
-  if (width <= BREAKPOINTS.TABLET_MAX) return 'tablet'
   return 'desktop'
 }
 
