@@ -88,6 +88,9 @@ export class TourPreferencesManager {
 
   static resetTourPreferences(): void {
     try {
+      if (typeof localStorage === 'undefined' || !localStorage) {
+        return
+      }
       localStorage.removeItem(TOUR_STORAGE_KEY)
     } catch (error) {
       console.warn('Failed to reset tour preferences:', error)

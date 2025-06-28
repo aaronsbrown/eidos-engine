@@ -2,10 +2,26 @@
 import { TourPreferencesManager } from '../tour-preferences'
 
 describe('TourPreferencesManager - User Preference Behavior', () => {
+  let originalLocalStorage: Storage
+  
   beforeEach(() => {
+    // Save original localStorage reference
+    originalLocalStorage = window.localStorage
+    
     // Clear localStorage before each test to simulate fresh user
     if (typeof localStorage !== 'undefined' && localStorage.clear) {
       localStorage.clear()
+    }
+  })
+  
+  afterEach(() => {
+    // Restore original localStorage after each test
+    if (originalLocalStorage) {
+      Object.defineProperty(window, 'localStorage', {
+        value: originalLocalStorage,
+        writable: true,
+        configurable: true
+      })
     }
   })
 
@@ -138,6 +154,15 @@ describe('TourPreferencesManager - User Preference Behavior', () => {
     })
 
     it('handles localStorage quota exceeded gracefully', () => {
+      // Ensure localStorage is restored if it was mocked in previous test
+      if (typeof localStorage === 'undefined' || !localStorage) {
+        Object.defineProperty(window, 'localStorage', {
+          value: originalLocalStorage,
+          writable: true,
+          configurable: true
+        })
+      }
+      
       // Mock localStorage to throw quota exceeded error
       const originalSetItem = localStorage.setItem
       localStorage.setItem = jest.fn(() => {
