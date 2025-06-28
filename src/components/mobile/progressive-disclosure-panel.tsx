@@ -83,6 +83,7 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
           {/* Educational Content Button - Mobile */}
           {hasEducationalContent && onEducationalToggle && (
             <button
+              data-tour="mobile-learn-button"
               onClick={onEducationalToggle}
               className={`border border-border px-3 py-2 font-mono text-xs transition-colors ${
                 isEducationalVisible 
