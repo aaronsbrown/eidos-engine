@@ -12,6 +12,9 @@ const CURRENT_TOUR_VERSION = '1.0.0'
 export class TourPreferencesManager {
   private static getStoredPreferences(): TourPreferences | null {
     try {
+      if (typeof localStorage === 'undefined' || !localStorage) {
+        return null
+      }
       const stored = localStorage.getItem(TOUR_STORAGE_KEY)
       return stored ? JSON.parse(stored) : null
     } catch (error) {
@@ -22,6 +25,9 @@ export class TourPreferencesManager {
 
   private static savePreferences(preferences: TourPreferences): void {
     try {
+      if (typeof localStorage === 'undefined' || !localStorage) {
+        return
+      }
       localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(preferences))
     } catch (error) {
       console.warn('Failed to save tour preferences:', error)

@@ -4,7 +4,9 @@ import { TourPreferencesManager } from '../tour-preferences'
 describe('TourPreferencesManager - User Preference Behavior', () => {
   beforeEach(() => {
     // Clear localStorage before each test to simulate fresh user
-    localStorage.clear()
+    if (typeof localStorage !== 'undefined' && localStorage.clear) {
+      localStorage.clear()
+    }
   })
 
   describe('User first-visit detection', () => {
