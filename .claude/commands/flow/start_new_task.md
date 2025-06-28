@@ -49,6 +49,7 @@ gh issue view [issue-number] --json number,title,body,labels
 ```
 
 2. Create a descriptive branch name based on the issue (e.g., `feature/issue-123-add-controls`, `fix/issue-456-rendering-bug`)
+
 3. Create and switch to the new branch:
 
 ```bash
@@ -56,6 +57,8 @@ git checkout -b [branch-name]
 ```
 
 ## Step 4: Create Starter Plan
+
+You MUST switch to Plan-Mode.
 
 Based on the selected issue:
 
