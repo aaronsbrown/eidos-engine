@@ -1,5 +1,224 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "driver.js/dist/driver.css";
+
+/* AIDEV-NOTE: Driver.js custom styling - responsive to light/dark mode */
+.driver-popover {
+  background: white !important; /* White for light mode */
+  border: 1px solid rgb(229, 231, 235) !important; /* gray-200 border for light mode */
+  border-radius: 0 !important; /* Sharp corners for technical look */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  font-family: var(--font-mono) !important; /* Monospace font */
+  color: #1f2937 !important; /* gray-800 for text */
+}
+
+/* Dark mode popover styling */
+.dark .driver-popover {
+  background: rgb(205, 205, 208) !important; /* Gray for dark mode */
+  border: 1px solid rgb(185, 185, 188) !important; /* Slightly darker gray for border */
+  color: #1f2937 !important; /* Keep dark text for readability on gray */
+}
+
+.driver-popover-title {
+  color: #1f2937 !important; /* gray-800 */
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-bottom: 8px !important;
+}
+
+.driver-popover-description {
+  color: #6b7280 !important; /* gray-500 */
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  margin-bottom: 16px !important;
+}
+
+.driver-popover-navigation-btns {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: flex-end !important;
+}
+
+.driver-popover-next-btn,
+.driver-popover-prev-btn,
+.driver-popover-close-btn {
+  background: var(--accent-primary) !important;
+  color: #1f2937 !important; /* Dark gray text for better contrast on yellow */
+  border: 1px solid rgb(185, 185, 188) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important; /* Bold for better readability */
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 6px 12px !important;
+  height: 28px !important; /* Match progress indicator height */
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+  text-shadow: none !important; /* Remove any drop shadow */
+}
+
+.driver-popover-next-btn:hover,
+.driver-popover-prev-btn:hover,
+.driver-popover-close-btn:hover {
+  background: var(--accent-primary-strong) !important;
+  transform: translateY(-1px) !important;
+}
+
+.driver-popover-prev-btn {
+  background: rgb(195, 195, 198) !important; /* Slightly darker than popover */
+  color: #4b5563 !important; /* gray-600 */
+}
+
+.driver-popover-prev-btn:hover {
+  background: rgb(175, 175, 178) !important; /* Even darker on hover */
+  color: #1f2937 !important; /* gray-800 */
+}
+
+.driver-popover-progress-text {
+  color: #6b7280 !important; /* gray-500 */
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Driver.js overlay styling - no darkening at all */
+.driver-overlay {
+  background: transparent !important;
+  /* No darkening - let users see everything clearly */
+}
+
+/* Driver.js highlighted element styling - more prominent highlighting */
+.driver-highlighted-element {
+  box-shadow: 0 0 0 3px var(--accent-primary) !important;
+  position: relative !important;
+  z-index: 9999 !important;
+}
+
+/* Add glow effect to highlighted elements */
+.driver-highlighted-element::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: -6px !important;
+  border: 2px solid var(--accent-primary) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 0 1px var(--accent-primary), 
+              0 0 20px rgba(250, 204, 21, 0.3) !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Custom popover class - clean without any accent borders */
+.driver-popover-custom {
+  /* Clean styling without conflicting accents */
+}
+
+/* Proper Driver.js arrow styling - target only the visible border */
+.driver-popover-arrow {
+  z-index: 10 !important;
+}
+
+/* Target actual Driver.js arrow classes - responsive to theme */
+
+/* Light mode arrows */
+.driver-popover-arrow-side-bottom {
+  border-bottom-color: white !important;
+}
+
+.driver-popover-arrow-side-top {
+  border-top-color: white !important;
+}
+
+.driver-popover-arrow-side-left {
+  border-left-color: white !important;
+}
+
+.driver-popover-arrow-side-right {
+  border-right-color: white !important;
+}
+
+/* Dark mode arrows */
+.dark .driver-popover-arrow-side-bottom {
+  border-bottom-color: rgb(205, 205, 208) !important;
+}
+
+.dark .driver-popover-arrow-side-top {
+  border-top-color: rgb(205, 205, 208) !important;
+}
+
+.dark .driver-popover-arrow-side-left {
+  border-left-color: rgb(205, 205, 208) !important;
+}
+
+.dark .driver-popover-arrow-side-right {
+  border-right-color: rgb(205, 205, 208) !important;
+}
+
+/* Progress indicator styling - perfectly aligned with navigation buttons */
+.driver-popover-progress-text {
+  position: absolute !important;
+  bottom: 20px !important;
+  left: 12px !important;
+  background: rgb(243, 244, 246) !important; /* Light gray for light mode */
+  padding: 6px 8px !important;
+  border: 1px solid rgb(229, 231, 235) !important; /* gray-200 border for light mode */
+  font-size: 10px !important;
+  margin: 0 !important;
+  /* Match exact button styling */
+  height: 28px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Dark mode progress indicator */
+.dark .driver-popover-progress-text {
+  background: rgb(195, 195, 198) !important; /* Slightly darker than popover for dark mode */
+  border: 1px solid rgb(185, 185, 188) !important; /* Darker gray border for dark mode */
+}
+
+/* Close button positioning - replace X with perfectly centered one */
+.driver-popover-close-btn {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important; /* Hide original X */
+  line-height: 0 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  text-indent: 0 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Add perfectly centered X */
+.driver-popover-close-btn::before {
+  content: '×' !important;
+  font-size: 12px !important;
+  transform: translate(0px, -1px) !important;
+  display: block !important;
+  color: #1f2937 !important; /* Dark gray for visibility on yellow */
+  font-weight: 700 !important; /* Extra bold for the X */
+}
+
+/* Navigation buttons container - aligned with progress indicator */
+.driver-popover-navigation-btns {
+  padding-top: 12px !important;
+  margin-top: 12px !important;
+  margin-bottom: 4px !important;
+  /* Ensure proper alignment with progress text */
+}
 
 @custom-variant dark (&:is(.dark *));
 

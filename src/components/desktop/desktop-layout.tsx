@@ -13,6 +13,7 @@ import { EducationalOverlay } from "@/components/ui/educational-overlay"
 import { useEducationalContent } from "@/lib/hooks/use-educational-content"
 import { getAllPatternIds } from "@/lib/educational-content-loader"
 import { getPlatformDefaultValue } from "@/lib/semantic-utils"
+import { useTour } from "@/lib/hooks/use-tour"
 
 // AIDEV-NOTE: Desktop layout responsive breakpoints and sizing constants
 const DESKTOP_LAYOUT_CONSTANTS = {
@@ -61,6 +62,9 @@ export default function DesktopLayout() {
 
   // AIDEV-NOTE: Load educational content for current pattern
   const { content: educationalContent } = useEducationalContent(selectedPatternId)
+  
+  // AIDEV-NOTE: Tour system integration with first-visit detection
+  const { startDesktopTour, shouldShowTour, resetTourPreferences } = useTour()
   
   // Check if educational content is available for current pattern
   const availableEducationalPatterns = getAllPatternIds()
@@ -298,7 +302,19 @@ export default function DesktopLayout() {
     }
   }, [isResizing, handleMouseMove, handleMouseUp])
 
+  // AIDEV-NOTE: Auto-start tour for first-time visitors
+  useEffect(() => {
+    const checkAndStartTour = () => {
+      if (shouldShowTour()) {
+        // Small delay to ensure UI is fully loaded
+        setTimeout(() => {
+          startDesktopTour()
+        }, 1000)
+      }
+    }
 
+    checkAndStartTour()
+  }, [shouldShowTour, startDesktopTour])
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
@@ -318,6 +334,23 @@ export default function DesktopLayout() {
             <h1 className="text-xl font-mono tracking-wider uppercase">Eidos Engine</h1>
           </div>
           <div className="flex items-center space-x-4">
+            {/* AIDEV-NOTE: Tour control button - shows for returning users */}
+            {!shouldShowTour() && (
+              <button
+                onClick={startDesktopTour}
+                className="border border-border bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground px-3 py-1 text-xs font-mono transition-colors"
+              >
+                REPLAY TOUR
+              </button>
+            )}
+            {/* AIDEV-NOTE: Debug button to reset tour preferences */}
+            <button
+              onClick={resetTourPreferences}
+              className="border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground px-2 py-1 text-xs font-mono transition-colors"
+              title="Reset tour preferences (dev only)"
+            >
+              RESET
+            </button>
             <ThemeToggle />
           </div>
         </div>
@@ -329,97 +362,98 @@ export default function DesktopLayout() {
           {/* AIDEV-NOTE: Made sidebar flex column to enable proper scrolling layout */}
           <div className="p-6 pb-4">
             {/* Pattern Selection Header */}
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-accent-primary"></div>
-              <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
-            </div>
-          </div>
+            <div data-tour="pattern-selector" className="flex flex-col">
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-2 h-2 bg-accent-primary"></div>
+                <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">Pattern Selection</h2>
+              </div>
 
-          {/* Previous Pattern Button */}
-          <div className="px-6 mb-1">
-            <button
-              data-testid="pattern-prev-button"
-              onClick={handlePreviousPattern}
-              disabled={!canGoToPrevious}
-              className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToPrevious
-                ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
-                : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
-                }`}
-            >
-              <ArrowUp className={`w-3 h-3 ${canGoToPrevious ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
-            </button>
-          </div>
+              {/* Previous Pattern Button */}
+              <div className="px-6 mb-1">
+                <button
+                  data-testid="pattern-prev-button"
+                  onClick={handlePreviousPattern}
+                  disabled={!canGoToPrevious}
+                  className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToPrevious
+                    ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
+                    : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
+                    }`}
+                >
+                  <ArrowUp className={`w-3 h-3 ${canGoToPrevious ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
+                </button>
+              </div>
 
-          {/* Pattern List - Animated Pagination */}
-          <div
-            ref={patternListRef}
-            className="px-6 overflow-hidden"
-            style={{ height: `${patternsPerPage * 70 + 40}px` }} // AIDEV-NOTE: Adjusted height to fit patterns with category dividers properly
-          >
-            {/* AIDEV-NOTE: Fixed height container to show exactly 5 patterns + padding */}
-            <div
-              className="space-y-1 pt-1 pb-4 transition-transform duration-200 ease-out"
-              style={{
-                transform: `translateY(${-calculateTransformOffset(visiblePatternStart)}px)` // AIDEV-NOTE: Fixed to account for category dividers
-              }}
-            >
-              {patternGenerators.map((pattern, index) => {
-                const isVisible = index >= visiblePatternStart && index < visiblePatternStart + patternsPerPage
-                const prevPattern = index > 0 ? patternGenerators[index - 1] : null
-                
-                // AIDEV-NOTE: Show category divider when category changes from previous pattern
-                const showCategoryDivider = isVisible && (
-                  index === visiblePatternStart || // First visible pattern
-                  (prevPattern && prevPattern.category !== pattern.category) // Category boundary
-                )
-                
-                return (
-                  <div key={pattern.id}>
-                    {/* AIDEV-NOTE: Category divider when category changes - accessible colors */}
-                    {showCategoryDivider && (
-                      <div className="flex items-center my-2 px-1">
-                        <div className="flex-1 h-px bg-border"></div>
-                        <div className="px-2 text-xs font-mono text-foreground bg-background border border-border uppercase tracking-wider">
-                          {pattern.category}
-                        </div>
-                        <div className="flex-1 h-px bg-border"></div>
-                      </div>
-                    )}
+              {/* Pattern List - Animated Pagination */}
+              <div
+                ref={patternListRef}
+                className="px-6 overflow-hidden"
+                style={{ height: `${patternsPerPage * 70 + 40}px` }} // AIDEV-NOTE: Adjusted height to fit patterns with category dividers properly
+              >
+                {/* AIDEV-NOTE: Fixed height container to show exactly 5 patterns + padding */}
+                <div
+                  className="space-y-1 pt-1 pb-4 transition-transform duration-200 ease-out"
+                  style={{
+                    transform: `translateY(${-calculateTransformOffset(visiblePatternStart)}px)` // AIDEV-NOTE: Fixed to account for category dividers
+                  }}
+                >
+                  {patternGenerators.map((pattern, index) => {
+                    const isVisible = index >= visiblePatternStart && index < visiblePatternStart + patternsPerPage
+                    const prevPattern = index > 0 ? patternGenerators[index - 1] : null
                     
-                    <button
-                      onClick={() => handlePatternSelect(pattern.id)}
-                      className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
-                        ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
-                        : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
-                        }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="uppercase tracking-wider">{pattern.name}</span>
-                        <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                    // AIDEV-NOTE: Show category divider when category changes from previous pattern
+                    const showCategoryDivider = isVisible && (
+                      index === visiblePatternStart || // First visible pattern
+                      (prevPattern && prevPattern.category !== pattern.category) // Category boundary
+                    )
+                    
+                    return (
+                      <div key={pattern.id}>
+                        {/* AIDEV-NOTE: Category divider when category changes - accessible colors */}
+                        {showCategoryDivider && (
+                          <div className="flex items-center my-2 px-1">
+                            <div className="flex-1 h-px bg-border"></div>
+                            <div className="px-2 text-xs font-mono text-foreground bg-background border border-border uppercase tracking-wider">
+                              {pattern.category}
+                            </div>
+                            <div className="flex-1 h-px bg-border"></div>
+                          </div>
+                        )}
+                        
+                        <button
+                          onClick={() => handlePatternSelect(pattern.id)}
+                          className={`w-full text-left p-3 border transition-all font-mono text-xs ${selectedPatternId === pattern.id
+                            ? "bg-accent-primary-subtle dark:bg-accent-primary-subtle border-accent-primary text-foreground"
+                            : "bg-background border-border hover:border-muted-foreground text-muted-foreground hover:bg-muted/50"
+                            }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="uppercase tracking-wider">{pattern.name}</span>
+                            <span className="text-muted-foreground/60">{(index + 1).toString().padStart(2, '0')}</span>
+                          </div>
+                          <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
+                        </button>
                       </div>
-                      <div className="text-muted-foreground/80 mt-1">{pattern.id}</div>
-                    </button>
-                  </div>
-                )
-              })}
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Next Pattern Button */}
+              <div className="px-6 mt-1 mb-2.5">
+                <button
+                  data-testid="pattern-next-button"
+                  onClick={handleNextPattern}
+                  disabled={!canGoToNext}
+                  className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToNext
+                    ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
+                    : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
+                    }`}
+                >
+                  <ArrowDown className={`w-3 h-3 ${canGoToNext ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Next Pattern Button */}
-          <div className="px-6 mt-1 mb-2.5">
-            <button
-              data-testid="pattern-next-button"
-              onClick={handleNextPattern}
-              disabled={!canGoToNext}
-              className={`w-full h-6 border transition-all font-mono text-xs flex items-center justify-center ${canGoToNext
-                ? "border-accent-primary bg-accent-primary hover:bg-accent-primary-strong cursor-pointer"
-                : "border-disabled-border bg-disabled-background dark:bg-disabled-background dark:border-disabled-border cursor-not-allowed"
-                }`}
-            >
-              <ArrowDown className={`w-3 h-3 ${canGoToNext ? "text-accent-primary-foreground" : "text-muted-foreground"}`} />
-            </button>
-          </div>
-
 
           {/* Pattern Specifications - Fixed at bottom */}
           <div className="p-6 pt-4 border-t border-border">
@@ -464,6 +498,7 @@ export default function DesktopLayout() {
           <div className="absolute top-4 left-4 text-xs font-mono space-y-1">
             {hasEducationalContent ? (
               <button
+                data-tour="learn-button"
                 onClick={() => setIsEducationalVisible(!isEducationalVisible)}
                 className={`border border-border px-2 py-1 font-mono transition-colors ${
                   isEducationalVisible 
@@ -487,7 +522,7 @@ export default function DesktopLayout() {
               <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>
             )}
           </div>
-          <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
+          <div data-tour="preset-dropdown" className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
             <div className="flex items-center space-x-2">
               {/* Preset Selection Dropdown */}
               <select
@@ -662,7 +697,7 @@ export default function DesktopLayout() {
           </div>
 
           {/* Simulation Parameters - AIDEV-NOTE: Refactored into dedicated component for maintainability */}
-          <div className="border-t border-border pt-4">
+          <div data-tour="controls-panel" className="border-t border-border pt-4">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-2 h-2 bg-accent-primary"></div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-muted-foreground">

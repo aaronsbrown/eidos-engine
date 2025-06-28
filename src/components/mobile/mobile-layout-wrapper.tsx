@@ -2,7 +2,7 @@
 // AIDEV-NOTE: Tests rewritten per G-8 to focus on user behavior vs implementation details
 'use client'
 
-import React, { useState, useCallback, useMemo, memo } from 'react'
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react'
 import { useMobileDetection } from '@/components/hooks/useMobileDetection'
 import { getMobileResponsiveClasses } from '@/lib/mobile-utils'
 import MobileHeader from './mobile-header'
@@ -14,6 +14,7 @@ import { EducationalOverlay } from '@/components/ui/educational-overlay'
 import { useEducationalContent } from '@/lib/hooks/use-educational-content'
 import { getAllPatternIds } from '@/lib/educational-content-loader'
 import { getPlatformDefaultValue } from '@/lib/semantic-utils'
+import { useTour } from '@/lib/hooks/use-tour'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -53,6 +54,9 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   // Check if educational content is available for current pattern
   const availableEducationalPatterns = getAllPatternIds()
   const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
+
+  // AIDEV-NOTE: Tour system integration with first-visit detection
+  const { startMobileTour, shouldShowTour } = useTour()
 
   // Get responsive CSS classes
   const responsiveClasses = useMemo(() => 
@@ -128,6 +132,22 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     setIsMenuOpen(!isMenuOpen)
   }, [isMenuOpen])
 
+  // AIDEV-NOTE: Auto-start mobile tour for first-time visitors (must be before early return)
+  useEffect(() => {
+    if (!isDesktop) { // Only run for mobile/tablet
+      const checkAndStartTour = () => {
+        if (shouldShowTour()) {
+          // Small delay to ensure UI is fully loaded
+          setTimeout(() => {
+            startMobileTour()
+          }, 1000)
+        }
+      }
+
+      checkAndStartTour()
+    }
+  }, [shouldShowTour, startMobileTour, isDesktop])
+
   // If desktop, render the existing desktop layout
   if (isDesktop) {
     return (
@@ -158,6 +178,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           total: patternGenerators.length
         }}
         onMenuToggle={handleMenuToggle}
+        onStartTour={shouldShowTour() ? undefined : startMobileTour}
       />
 
       {/* Pattern Selector */}

@@ -9,12 +9,14 @@ export interface MobileHeaderProps {
   title: string
   patternCount: { current: number; total: number }
   onMenuToggle: () => void
+  onStartTour?: () => void // AIDEV-NOTE: Optional tour trigger for testing
 }
 
 const MobileHeader = memo(function MobileHeader({
   title,
   patternCount,
-  onMenuToggle
+  onMenuToggle,
+  onStartTour
 }: MobileHeaderProps) {
 
   // Format pattern counter with zero padding
@@ -39,6 +41,16 @@ const MobileHeader = memo(function MobileHeader({
 
       {/* Right side - Pattern counter and menu button */}
       <div data-testid="header-controls" className="flex items-center space-x-2">
+        {/* AIDEV-NOTE: Wet Paint tour testing button for mobile */}
+        {onStartTour && (
+          <button
+            onClick={onStartTour}
+            className="border border-border bg-accent-primary hover:bg-accent-primary-strong text-accent-primary-foreground px-2 py-1 text-xs font-mono transition-colors min-h-[28px]"
+          >
+            TOUR
+          </button>
+        )}
+        
         {/* Pattern Counter */}
         <div
           data-testid="pattern-counter"
