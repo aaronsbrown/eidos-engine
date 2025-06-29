@@ -1,61 +1,28 @@
-// AIDEV-NOTE: Core preset management utilities for Issue #16 - Pattern parameter saving/loading system
+// AIDEV-NOTE: Refactored preset management utilities - now focuses on core CRUD operations
+// Extracted modules: preset-types, preset-validation, factory-preset-operations, preset-import-export
 "use client"
 
-export interface PatternPreset {
-  id: string
-  name: string
-  generatorType: string
-  parameters: Record<string, number | string | boolean>
-  createdAt: Date
-  description?: string
-  contentHash: string // AIDEV-NOTE: Hash of meaningful content for duplicate detection
-  isFactory?: boolean // AIDEV-NOTE: Factory presets that ship with the app
-  category?: string // AIDEV-NOTE: Factory preset category (Classic, Bifurcation, Enhanced, etc.)
-  mathematicalSignificance?: string // AIDEV-NOTE: Educational description of mathematical importance
-}
+import type { 
+  PatternPreset, 
+  PresetExportData, 
+  PresetImportResult,
+  PresetValidationResult
+} from './preset-types'
+import { STORAGE_KEYS } from './preset-types'
+import { generateContentHash, validatePresetParameters } from './preset-validation'
+import { loadFactoryPresets } from './factory-preset-operations'
+import { exportPresets, importPresets } from './preset-import-export'
 
-export interface PresetExportData {
-  version: string
-  presets: PatternPreset[]
-  exportedAt: Date
-}
+// Re-export types for backward compatibility
+export type { 
+  PatternPreset, 
+  PresetExportData, 
+  PresetImportResult,
+  PresetValidationResult 
+} from './preset-types'
 
-// AIDEV-NOTE: localStorage key constants to avoid typos and enable easy refactoring
-const STORAGE_KEYS = {
-  PRESETS: 'pattern-generator-presets',
-  LAST_ACTIVE_PRESET: 'pattern-generator-last-active-preset'
-} as const
-
-/**
- * Generate a consistent hash for preset content to detect duplicates
- * Hash includes: generatorType and sorted parameters (NOT name, for true content detection)
- */
-function generateContentHash(
-  name: string,
-  generatorType: string,
-  parameters: Record<string, number | string | boolean>
-): string {
-  // AIDEV-NOTE: Create deterministic string by sorting parameters
-  const sortedParams = Object.keys(parameters)
-    .sort()
-    .reduce((sorted, key) => {
-      sorted[key] = parameters[key]
-      return sorted
-    }, {} as Record<string, number | string | boolean>)
-  
-  // AIDEV-NOTE: Hash based on content only (generatorType + parameters), not name
-  const contentString = JSON.stringify({
-    generatorType,
-    parameters: sortedParams
-  })
-  
-  // AIDEV-NOTE: Simple but effective hash function (djb2 algorithm)
-  let hash = 5381
-  for (let i = 0; i < contentString.length; i++) {
-    hash = (hash * 33) ^ contentString.charCodeAt(i)
-  }
-  return Math.abs(hash).toString(36)
-}
+// Re-export STORAGE_KEYS for external usage
+export { STORAGE_KEYS } from './preset-types'
 
 /**
  * Core preset management utilities
@@ -174,48 +141,6 @@ export class PresetManager {
     return this.saveUserPresets(userPresets)
   }
 
-  /**
-   * Add a preset with automatic conflict resolution (for imports)
-   */
-  private static addPresetWithAutoRename(preset: PatternPreset, existingPresets: PatternPreset[]): PatternPreset | null {
-    // Check for exact content duplicates - skip if found
-    const contentDuplicate = existingPresets.find(p => 
-      p.contentHash === preset.contentHash && p.generatorType === preset.generatorType
-    )
-    
-    if (contentDuplicate) {
-      return null // Signal to skip this preset
-    }
-    
-    // Auto-rename if name conflicts exist (common when importing from others)
-    const existingWithSameName = existingPresets.find(p => 
-      p.name === preset.name && p.generatorType === preset.generatorType
-    )
-    
-    let finalPreset: PatternPreset
-    
-    if (existingWithSameName) {
-      // AIDEV-NOTE: Auto-rename imported presets to avoid conflicts
-      let counter = 1
-      let newName = `${preset.name} (${counter})`
-      
-      while (existingPresets.find(p => p.name === newName && p.generatorType === preset.generatorType)) {
-        counter++
-        newName = `${preset.name} (${counter})`
-      }
-      
-      finalPreset = {
-        ...preset,
-        name: newName
-        // Keep same contentHash since parameters didn't change
-      }
-    } else {
-      finalPreset = { ...preset }
-    }
-    
-    existingPresets.push(finalPreset)
-    return finalPreset
-  }
 
   /**
    * Delete a preset by ID
@@ -287,113 +212,37 @@ export class PresetManager {
   static validatePresetParameters(
     preset: PatternPreset, 
     patternControls: Array<{id: string, type: string, min?: number, max?: number}>
-  ): { valid: boolean; warnings: string[] } {
-    const warnings: string[] = []
-    
-    // AIDEV-NOTE: Check if all preset parameters have corresponding controls
-    Object.keys(preset.parameters).forEach(paramId => {
-      const control = patternControls.find(c => c.id === paramId)
-      if (!control) {
-        warnings.push(`Parameter "${paramId}" no longer exists in current pattern`)
-        return
-      }
-      
-      const value = preset.parameters[paramId]
-      
-      // Validate numeric ranges
-      if (control.type === 'range' && typeof value === 'number') {
-        if (control.min !== undefined && value < control.min) {
-          warnings.push(`Parameter "${paramId}" value ${value} is below minimum ${control.min}`)
-        }
-        if (control.max !== undefined && value > control.max) {
-          warnings.push(`Parameter "${paramId}" value ${value} is above maximum ${control.max}`)
-        }
-      }
-    })
-    
-    return {
-      valid: warnings.length === 0,
-      warnings
-    }
+  ): PresetValidationResult {
+    return validatePresetParameters(preset, patternControls)
   }
 
   /**
    * Export presets to JSON format for sharing
    */
   static exportPresets(presetIds?: string[]): PresetExportData {
-    const allPresets = this.loadUserPresets() // Fixed: use loadUserPresets instead of loadPresets
-    const presetsToExport = presetIds 
-      ? allPresets.filter(p => presetIds.includes(p.id))
-      : allPresets
-    
-    return {
-      version: "1.0.0", // Fixed: use string instead of PRESET_VERSION which was removed
-      presets: presetsToExport,
-      exportedAt: new Date()
-    }
+    const userPresets = this.loadUserPresets()
+    return exportPresets(userPresets, presetIds)
   }
 
   /**
    * Import presets from JSON format with auto-conflict resolution
    * Returns object with imported IDs and skipped duplicates info
    */
-  static importPresets(exportData: PresetExportData): {
-    importedIds: string[]
-    skippedDuplicates: string[]
-    errors: string[]
-  } {
+  static importPresets(exportData: PresetExportData): PresetImportResult {
     const existingUserPresets = this.loadUserPresets()
-    const importedIds: string[] = []
-    const skippedDuplicates: string[] = []
-    const errors: string[] = []
+    const result = importPresets(exportData, existingUserPresets)
     
-    for (const preset of exportData.presets) {
-      try {
-        // Skip factory presets in imports - they should only come from JSON file
-        if (preset.isFactory) {
-          skippedDuplicates.push(`"${preset.name}" (factory preset - skipped)`)
-          continue
-        }
-        
-        // AIDEV-NOTE: Ensure preset has contentHash for duplicate detection
-        let contentHash = preset.contentHash
-        if (!contentHash) {
-          contentHash = generateContentHash(preset.name, preset.generatorType, preset.parameters)
-        }
-        
-        // AIDEV-NOTE: Generate new ID and prepare preset for import
-        const importPreset: PatternPreset = {
-          ...preset,
-          id: `preset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          createdAt: new Date(),
-          contentHash
-        }
-        
-        // Use auto-rename helper for conflict resolution
-        const addedPreset = this.addPresetWithAutoRename(importPreset, existingUserPresets)
-        
-        if (addedPreset) {
-          importedIds.push(addedPreset.id)
-        } else {
-          // Content duplicate was skipped
-          const existingDupe = existingUserPresets.find(p => 
-            p.contentHash === contentHash && p.generatorType === preset.generatorType
-          )
-          skippedDuplicates.push(`"${preset.name}" (identical to existing "${existingDupe?.name || 'unknown'}")`)
-        }
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-        errors.push(`"${preset.name}": ${errorMsg}`)
-        console.warn(`Failed to import preset "${preset.name}":`, error)
-      }
+    // Save updated presets if any were imported
+    if (result.importedIds.length > 0) {
+      this.saveUserPresets(result.updatedPresets)
     }
     
-    // Save all changes at once for better performance
-    if (importedIds.length > 0) {
-      this.saveUserPresets(existingUserPresets)
+    // Return result without the updatedPresets array for backward compatibility
+    return {
+      importedIds: result.importedIds,
+      skippedDuplicates: result.skippedDuplicates,
+      errors: result.errors
     }
-    
-    return { importedIds, skippedDuplicates, errors }
   }
 
   /**
@@ -455,63 +304,23 @@ export class PresetManager {
    * Load factory presets from the public directory
    */
   static async loadFactoryPresets(): Promise<PatternPreset[]> {
-    try {
-      const response = await fetch('/factory-presets.json')
-      if (!response.ok) {
-        throw new Error(`Failed to load factory presets: ${response.status}`)
-      }
-      
-      const data = await response.json()
-      
-      // Convert factory preset format to PatternPreset format
-      const factoryPresets: PatternPreset[] = data.presets.map((preset: {
-        id: string;
-        name: string;
-        generatorType: string;
-        parameters: Record<string, number | string | boolean>;
-        description?: string;
-        isFactory?: boolean;
-        category?: string;
-        mathematicalSignificance?: string;
-      }) => ({
-        id: preset.id,
-        name: preset.name,
-        generatorType: preset.generatorType,
-        parameters: preset.parameters,
-        createdAt: new Date(), // Set to current time for consistent sorting
-        description: preset.description,
-        contentHash: generateContentHash(preset.name, preset.generatorType, preset.parameters),
-        isFactory: preset.isFactory || true,
-        category: preset.category,
-        mathematicalSignificance: preset.mathematicalSignificance
-      }))
-      
-      return factoryPresets
-    } catch (error) {
-      console.warn('Failed to load factory presets:', error)
-      return []
-    }
+    return await loadFactoryPresets()
   }
 
   /**
    * Restore factory presets (simplified - just returns fresh presets from JSON)
    */
   static async restoreFactoryPresets(): Promise<{ imported: number; skipped: number }> {
-    try {
-      const factoryPresets = await this.loadFactoryPresets()
-      // In the new system, factory presets are always "fresh" so we just return the count
-      return { imported: factoryPresets.length, skipped: 0 }
-    } catch (error) {
-      console.error('Failed to load factory presets:', error)
-      return { imported: 0, skipped: 0 }
-    }
+    const { restoreFactoryPresets } = await import('./factory-preset-operations')
+    return await restoreFactoryPresets()
   }
 
   /**
    * Get only factory presets
    */
   static async getFactoryPresets(): Promise<PatternPreset[]> {
-    return await this.loadFactoryPresets()
+    const { getFactoryPresets } = await import('./factory-preset-operations')
+    return await getFactoryPresets()
   }
 
   /**
