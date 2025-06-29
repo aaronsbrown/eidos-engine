@@ -167,21 +167,25 @@ interface PatternControl {
 ### 🎨 Shader Requirements for WebGL Patterns
 
 **When custom shaders are needed:**
+
 - Patterns using `useCustomShader` control option
 - Patterns with `technology: 'WEBGL_MESHES'` that have enhanced rendering modes
 - Any pattern calling `createThreeJSShaderMaterial()` function
 
 **Required shader files:**
+
 ```
 public/shaders/vertex/{pattern-id}.vert
 public/shaders/fragment/{pattern-id}.frag
 ```
 
 **Shader naming convention:**
+
 - Use exact pattern ID as filename (e.g., `aizawa-attractor` → `aizawa-particles.vert/frag`)
 - For particle systems, append `-particles` to distinguish from other shader types
 
 **Required shader features:**
+
 - Consistent uniform interface: `u_time`, `u_particleSize`, `u_colorScheme`, `u_depthFading`, `u_opacity`
 - Depth-based coloring with `v_depth` varying
 - Multiple color schemes (typically 3: Rainbow, Warm-Cool, Pattern-specific)
@@ -194,14 +198,17 @@ public/shaders/fragment/{pattern-id}.frag
 Factory presets are curated parameter combinations that ship with the application, providing users with mathematically significant starting points for exploration.
 
 **Factory Preset Features:**
+
 - **Auto-import on first load**: Factory presets are automatically imported into the user's preset collection
 - **Educational descriptions**: Each preset includes mathematical significance explanations
 - **Categorization**: Organized into Classic, Bifurcation, Enhanced, and Variant categories
 - **Version tracking**: Factory presets are only imported once per application version
 
 **Adding Factory Presets:**
+
 1. **Edit factory preset file**: `public/factory-presets.json`
 2. **Include required metadata**:
+
    ```json
    {
      "id": "unique-preset-id",
@@ -214,29 +221,34 @@ Factory presets are curated parameter combinations that ship with the applicatio
      "mathematicalSignificance": "Educational explanation"
    }
    ```
+
 3. **Test parameter stability**: Ensure all parameters produce stable, visually appealing results
 4. **Mathematical relevance**: Choose parameters that demonstrate important mathematical concepts
 
 **Factory Preset Categories:**
+
 - **Classic**: Standard, well-known parameter sets (e.g., Lorenz σ=10, ρ=28, β=8/3)
 - **Bifurcation**: Parameters near critical transition points
 - **Enhanced**: Visually striking variations with enhanced features enabled
 - **Variant**: Alternative parameter combinations showing system diversity
 
 **Current Factory Presets:**
+
 - **Lorenz Attractor**: 3 presets (Classic, Pre-Chaos Boundary, Enhanced Chaos)
-- **Thomas Attractor**: 3 presets (Classic, Hopf Bifurcation, Enhanced Structure) 
+- **Thomas Attractor**: 3 presets (Classic, Hopf Bifurcation, Enhanced Structure)
 - **Aizawa Attractor**: 4 presets (Classic, Critical Boundary, Enhanced Complexity, Compact Form)
 
 ### 📚 Educational Content Convention
 
 **Naming Convention:**
+
 - Educational content files must use the exact pattern ID as the filename
 - Pattern with `id: "noise"` → `public/educational-content/noise.md`
 - Files are created directly in the public directory for immediate availability
 
 **Content Structure:**
 Follow the three-layer educational approach:
+
 - **Layer 1**: "What is this?" (Intuitive/Experiential) - Visual description and real-world connections
 - **Layer 2**: "How does this work?" (Conceptual/Mechanical) - Algorithm explanation and principles  
 - **Layer 3**: "Show me the mathematics" (Technical/Formal) - Mathematical analysis and theoretical foundations
@@ -245,12 +257,14 @@ Follow the three-layer educational approach:
 
 **Template Standard:**
 All educational content MUST follow the established format:
+
 - **Header Format**: `## Layer N: "Title" (Audience/Type)` with exact spacing and parentheses
 - **Section Spacing**: Double newlines between major sections
 - **Consistent Structure**: All files must use identical section headers and organization
 - **Mathematical Notation**: Use standard mathematical notation and LaTeX-style formatting for equations
 
 **File Location:**
+
 - **Single source of truth**: `public/educational-content/{patternId}.md`
 - Educational content is created directly in the public directory for immediate availability
 - No build step required - content is available at runtime
@@ -258,18 +272,21 @@ All educational content MUST follow the established format:
 ### 🏷️ Pattern Categorization System
 
 **Categories** (required field in PatternGenerator interface):
+
 - **`'Noise'`**: Perlin noise, random fields, stochastic patterns (Noise Field, Pixelated Noise, Brownian Motion)
 - **`'Geometric'`**: Mathematical shapes, gradients, geometric patterns (Trigonometric Circle, Four-Pole Gradient)
-- **`'Simulation'`**: Physics-based, cellular automata, particle systems (Particle System, Cellular Automaton) 
+- **`'Simulation'`**: Physics-based, cellular automata, particle systems (Particle System, Cellular Automaton)
 - **`'Data Visualization'`**: Charts, spectrums, data-driven visuals (Frequency Spectrum, Barcode Scanner)
 - **`'Attractors'`**: Strange attractors and chaotic dynamical systems (Lorenz Attractor, Thomas Attractor)
 
 **Desktop UX Features:**
+
 - **Visual Grouping**: Category dividers appear in pattern list when category changes
 - **Smart Paging**: Previous/Next buttons can skip to category boundaries
 - **Current Category Indicator**: Specifications panel shows pattern's category
 
 **Implementation:**
+
 ```typescript
 // In components/pattern-generators/index.ts
 {
@@ -283,6 +300,7 @@ All educational content MUST follow the established format:
 ```
 
 **Category Management Utility:**
+
 - Use `PatternCategoryManager` from `@/lib/pattern-category-manager`
 - Provides filtering, grouping, and navigation utilities
 - Handles category boundaries for desktop paging navigation
@@ -535,18 +553,21 @@ const mobileReady = isMobileFriendly(pattern)
 **Storybook Interactivity Best Practices:**
 
 **✅ Make These Interactive (use `render()` with `useState`):**
+
 - [ ] **Default/Primary stories** - Main use case that people interact with most
 - [ ] **"Interactive" or "Playground" stories** - Dedicated sandbox for testing
 - [ ] **Form/control components** - Controls users naturally expect to work
 - [ ] **Complex state demos** - Multi-step flows, state management examples
 
 **📸 Keep These Static (use `args` object):**
+
 - [ ] **Visual variations** - Color schemes, sizes, themes, layout demos
 - [ ] **State examples** - Loading, error, empty, disabled states
 - [ ] **Documentation stories** - "Here's what X looks like" examples
 - [ ] **Edge cases** - Error conditions, extreme values, unusual inputs
 
 **Example Pattern:**
+
 ```typescript
 // ✅ INTERACTIVE - Primary use case
 export const Default: Story = {
@@ -617,3 +638,4 @@ stories/                       # Storybook stories
 ### Development Memories
 
 - Remember to use .tsx files for storybook when using jsx code
+- Remember to search directories starting with a "." when you are searching for files. For example, ".claude/"
