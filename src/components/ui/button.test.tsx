@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Button component tests - rendering, onClick, disabled state, and variant/size props
+// AIDEV-NOTE: COMPONENT_TEST - Button component rendering, onClick, disabled state, and variant/size props
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Button } from './button'

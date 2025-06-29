@@ -6,6 +6,17 @@ const createJestConfig = nextJest({
   dir: './',
 })
 
+// AIDEV-NOTE: Helper function for test type filtering
+function getTestTypePattern(testType) {
+  const patterns = {
+    unit: '(utils|math|validation|semantic|simplex).*test',
+    integration: '(hooks|integration|manager|context|preset).*test',
+    behavioral: '(layout|workflow|tour|educational|page).*test',
+    component: '(ui|button|theme|checkbox|header|canvas|generator).*test'
+  }
+  return patterns[testType] || undefined
+}
+
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
@@ -14,6 +25,7 @@ const customJestConfig = {
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)'
   ],
+  // AIDEV-NOTE: Test type filtering removed from config - now handled via command-line args
   moduleNameMapper: {
     // Handle module aliases (if you use them in your Next.js app)
     '^@/components/(.*)$': '<rootDir>/src/components/$1',

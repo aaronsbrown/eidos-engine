@@ -7,7 +7,7 @@ Run all required checks before committing code:
 1. **`npm run lint`** - Check code style and syntax
 2. **`npm run build`** - Verify TypeScript compilation and Next.js build
 3. **`npm run test`** - Run complete test suite  
-4. **`npm run storybook -- --no-open`** - Verify Storybook builds without opening browser
+4. **`npm run build-storybook** - Verify Storybook builds w
 
 ## Rules
 
