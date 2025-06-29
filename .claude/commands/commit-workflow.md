@@ -4,7 +4,7 @@ Complete preflight checks and commit process:
 
 ## Step 1: Preflight Validation
 
-1. **Run `/preflight` command first** (includes `npm run storybook -- --no-open`)
+1. **Run `/preflight` command first** (includes `npm run build-storybook`)
 2. **STOP if any preflight check fails** - Do not proceed to commit
 3. **Only continue if all preflight checks pass**
 
@@ -18,6 +18,7 @@ Complete preflight checks and commit process:
 
 1. **Stage relevant files** with `git add [files]`
 2. **Create commit** with proper message format:
+
    ```bash
    git commit -m "$(cat <<'EOF'
    [type]: [description]
@@ -30,6 +31,7 @@ Complete preflight checks and commit process:
    EOF
    )"
    ```
+
 3. **Verify commit** with `git status`
 
 ## Critical Rules

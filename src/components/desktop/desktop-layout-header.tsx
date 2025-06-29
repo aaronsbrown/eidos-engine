@@ -1,0 +1,47 @@
+// AIDEV-NOTE: Extracted desktop layout header from main component for better maintainability
+"use client"
+
+import React from "react"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+
+interface DesktopLayoutHeaderProps {
+  shouldShowTour: () => boolean
+  startDesktopTour: () => void
+  resetTourPreferences: () => void
+}
+
+export function DesktopLayoutHeader({
+  shouldShowTour,
+  startDesktopTour,
+  resetTourPreferences
+}: DesktopLayoutHeaderProps) {
+  return (
+    <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <h1 className="text-xl font-mono tracking-wider uppercase">Eidos Engine</h1>
+        </div>
+        <div className="flex items-center space-x-4">
+          {/* AIDEV-NOTE: Tour control button - shows for returning users */}
+          {!shouldShowTour() && (
+            <button
+              onClick={startDesktopTour}
+              className="border border-border bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground px-3 py-1 text-xs font-mono transition-colors"
+            >
+              REPLAY TOUR
+            </button>
+          )}
+          {/* AIDEV-NOTE: Debug button to reset tour preferences */}
+          <button
+            onClick={resetTourPreferences}
+            className="border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground px-2 py-1 text-xs font-mono transition-colors"
+            title="Reset tour preferences (dev only)"
+          >
+            RESET
+          </button>
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+  )
+}
