@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Utility function tests - cn function for className merging with clsx and tailwind-merge
+// AIDEV-NOTE: UNIT_TEST - Utility function tests for className merging with clsx and tailwind-merge
 import { cn } from './utils'
 
 describe('Utils', () => {

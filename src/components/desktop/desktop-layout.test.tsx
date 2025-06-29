@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Behavioral tests for DesktopLayout component - Issue #12
+// AIDEV-NOTE: BEHAVIORAL_TEST - Desktop layout user workflows and interactions - Issue #12
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DesktopLayout from './desktop-layout'

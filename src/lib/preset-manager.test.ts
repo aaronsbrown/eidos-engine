@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Behavioral tests for preset system - cement UX contracts before UI polish (Rule G-8)
+// AIDEV-NOTE: INTEGRATION_TEST - Preset system business logic integration and UX contracts (Rule G-8)
 import { PresetManager, PresetExportData } from './preset-manager'
 
 // Mock localStorage for testing
