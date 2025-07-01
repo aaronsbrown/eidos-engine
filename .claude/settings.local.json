@@ -8,7 +8,8 @@
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(rg:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ],
     "deny": [
       "Bash(rm:*)",
