@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useEffect, useState } from 'react'
 
 const meta: Meta = {
   title: 'Design System/Color Swatches',
@@ -9,7 +10,76 @@ const meta: Meta = {
 
 export default meta
 
-// Color swatch component
+// Helper function to convert OKLCH to RGB
+const oklchToRgb = (l: number, c: number, h: number): [number, number, number] => {
+  // Convert OKLCH to OKLab
+  const a = c * Math.cos((h * Math.PI) / 180)
+  const b = c * Math.sin((h * Math.PI) / 180)
+  
+  // Convert OKLab to linear RGB
+  const l_ = l + 0.3963377774 * a + 0.2158037573 * b
+  const m_ = l - 0.1055613458 * a - 0.0638541728 * b
+  const s_ = l - 0.0894841775 * a - 1.2914855480 * b
+  
+  const l3 = l_ * l_ * l_
+  const m3 = m_ * m_ * m_
+  const s3 = s_ * s_ * s_
+  
+  const r = +4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3
+  const g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3
+  const b_rgb = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3
+  
+  // Convert linear RGB to sRGB
+  const toSrgb = (c: number) => {
+    if (c <= 0.0031308) return 12.92 * c
+    return 1.055 * Math.pow(c, 1 / 2.4) - 0.055
+  }
+  
+  return [
+    Math.round(Math.max(0, Math.min(255, toSrgb(r) * 255))),
+    Math.round(Math.max(0, Math.min(255, toSrgb(g) * 255))),
+    Math.round(Math.max(0, Math.min(255, toSrgb(b_rgb) * 255)))
+  ]
+}
+
+// Helper function to get hex from CSS variable
+const getHexFromCSSVar = (cssVar: string): string => {
+  if (typeof window === 'undefined') return '#000000'
+  
+  const computedValue = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim()
+  if (!computedValue) return '#000000'
+  
+  // Try to get computed RGB first (in case browser supports OKLCH)
+  const temp = document.createElement('div')
+  temp.style.backgroundColor = `var(${cssVar})`
+  document.body.appendChild(temp)
+  const computedStyle = getComputedStyle(temp)
+  const bgColor = computedStyle.backgroundColor
+  document.body.removeChild(temp)
+  
+  // Parse RGB if available
+  const rgbMatch = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1])
+    const g = parseInt(rgbMatch[2])
+    const b = parseInt(rgbMatch[3])
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase()
+  }
+  
+  // Parse OKLCH manually
+  const oklchMatch = computedValue.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)/)
+  if (oklchMatch) {
+    const l = parseFloat(oklchMatch[1])
+    const c = parseFloat(oklchMatch[2])
+    const h = parseFloat(oklchMatch[3])
+    const [r, g, b] = oklchToRgb(l, c, h)
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase()
+  }
+  
+  return '#000000'
+}
+
+// Color swatch component with hex display
 const ColorSwatch = ({ 
   name, 
   cssVar, 
@@ -20,19 +90,52 @@ const ColorSwatch = ({
   cssVar: string
   description?: string
   className?: string
-}) => (
-  <div className="flex flex-col space-y-2">
-    <div
-      className={`w-20 h-20 rounded-lg border border-border shadow-sm ${className}`}
-      style={{ backgroundColor: `var(${cssVar})` }}
-    />
-    <div className="text-xs font-mono">
-      <div className="font-semibold text-foreground">{name}</div>
-      <div className="text-muted-foreground">{cssVar}</div>
-      {description && <div className="text-xs text-muted-foreground mt-1">{description}</div>}
+}) => {
+  const [hexValue, setHexValue] = useState<string>('#000000')
+
+  useEffect(() => {
+    const updateHex = () => {
+      const hex = getHexFromCSSVar(cssVar)
+      setHexValue(hex)
+    }
+    
+    updateHex()
+    
+    // Update on theme changes
+    const observer = new MutationObserver(updateHex)
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    })
+    
+    return () => observer.disconnect()
+  }, [cssVar])
+
+  const handleHexClick = () => {
+    navigator.clipboard.writeText(hexValue)
+  }
+
+  return (
+    <div className="flex flex-col space-y-2">
+      <div
+        className={`w-20 h-20 rounded-lg border border-border shadow-sm ${className}`}
+        style={{ backgroundColor: `var(${cssVar})` }}
+      />
+      <div className="text-xs font-mono">
+        <div className="font-semibold text-foreground">{name}</div>
+        <div className="text-muted-foreground">{cssVar}</div>
+        <div 
+          className="text-accent-primary cursor-pointer hover:text-accent-primary-strong transition-colors"
+          onClick={handleHexClick}
+          title="Click to copy hex value"
+        >
+          {hexValue}
+        </div>
+        {description && <div className="text-xs text-muted-foreground mt-1">{description}</div>}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 // Primary color palette
 export const PrimaryColors: StoryObj = {
