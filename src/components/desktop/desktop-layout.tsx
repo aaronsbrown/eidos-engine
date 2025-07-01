@@ -34,7 +34,7 @@ export default function DesktopLayout() {
   const { content: educationalContent } = useEducationalContent(selectedPatternId)
   
   // AIDEV-NOTE: Tour system integration with first-visit detection
-  const { startDesktopTour, shouldShowTour, resetTourPreferences } = useTour()
+  const { startDesktopTour, shouldShowTour } = useTour()
   
   // Check if educational content is available for current pattern
   const availableEducationalPatterns = getAllPatternIds()
@@ -94,7 +94,6 @@ export default function DesktopLayout() {
       <DesktopLayoutHeader
         shouldShowTour={shouldShowTour}
         startDesktopTour={startDesktopTour}
-        resetTourPreferences={resetTourPreferences}
       />
 
       <div className="flex relative">

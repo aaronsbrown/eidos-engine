@@ -7,13 +7,11 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 interface DesktopLayoutHeaderProps {
   shouldShowTour: () => boolean
   startDesktopTour: () => void
-  resetTourPreferences: () => void
 }
 
 export function DesktopLayoutHeader({
   shouldShowTour,
-  startDesktopTour,
-  resetTourPreferences
+  startDesktopTour
 }: DesktopLayoutHeaderProps) {
   return (
     <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
@@ -31,14 +29,6 @@ export function DesktopLayoutHeader({
               REPLAY TOUR
             </button>
           )}
-          {/* AIDEV-NOTE: Debug button to reset tour preferences */}
-          <button
-            onClick={resetTourPreferences}
-            className="border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground px-2 py-1 text-xs font-mono transition-colors"
-            title="Reset tour preferences (dev only)"
-          >
-            RESET
-          </button>
           <ThemeToggle />
         </div>
       </div>

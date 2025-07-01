@@ -6,13 +6,11 @@ import DesktopLayout from '../desktop-layout'
 // Mock the tour hook to control tour behavior in tests
 const mockStartDesktopTour = jest.fn()
 const mockShouldShowTour = jest.fn(() => true)
-const mockResetTourPreferences = jest.fn()
 
 jest.mock('@/lib/hooks/use-tour', () => ({
   useTour: () => ({
     startDesktopTour: mockStartDesktopTour,
-    shouldShowTour: mockShouldShowTour,
-    resetTourPreferences: mockResetTourPreferences
+    shouldShowTour: mockShouldShowTour
   })
 }))
 
@@ -93,24 +91,6 @@ describe('DesktopLayout Tour Integration - User Behavior', () => {
     })
   })
 
-  describe('User can manage tour preferences', () => {
-    it('provides reset button for tour preferences', () => {
-      render(<DesktopLayout />)
-      
-      // Users should be able to reset their preferences
-      expect(screen.getByText('RESET')).toBeInTheDocument()
-    })
-
-    it('allows users to reset tour preferences', () => {
-      render(<DesktopLayout />)
-      
-      const resetButton = screen.getByText('RESET')
-      fireEvent.click(resetButton)
-      
-      // User click should reset preferences
-      expect(mockResetTourPreferences).toHaveBeenCalledTimes(1)
-    })
-  })
 
   describe('User sees proper tour targets', () => {
     it('provides pattern selector as tour target', () => {
@@ -180,14 +160,10 @@ describe('DesktopLayout Tour Integration - User Behavior', () => {
       render(<DesktopLayout />)
       
       const replayButton = screen.getByText('REPLAY TOUR')
-      const resetButton = screen.getByText('RESET')
       
-      // Tour control buttons should be accessible
+      // Tour control button should be accessible
       expect(replayButton).toBeInTheDocument()
       expect(replayButton.tagName).toBe('BUTTON')
-      expect(resetButton).toBeInTheDocument()
-      expect(resetButton.tagName).toBe('BUTTON')
-      expect(resetButton).toHaveAttribute('title') // Has tooltip for accessibility
     })
 
     it('maintains keyboard navigation for tour controls', () => {
@@ -224,8 +200,7 @@ describe('DesktopLayout Tour Integration - User Behavior', () => {
       jest.doMock('@/lib/hooks/use-tour', () => ({
         useTour: () => ({
           startDesktopTour: undefined,
-          shouldShowTour: () => false,
-          resetTourPreferences: undefined
+          shouldShowTour: () => false
         })
       }))
       
