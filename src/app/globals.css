@@ -272,6 +272,7 @@
   --color-border-form: var(--border-form);
   --color-disabled-border: var(--disabled-border);
   --color-disabled-background: var(--disabled-background);
+  --color-header-text: var(--header-text);
   
   /* Missing shadow utilities */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -340,6 +341,9 @@
   
   /* Success states */
   --success-foreground: oklch(0.627 0.194 149.214); /* Production green-600 exact match */
+  
+  /* Header text - dark on light header background */
+  --header-text: oklch(0.129 0.042 264.695); /* Dark navy for light mode */
 }
 
 .dark {
@@ -385,6 +389,9 @@
   /* Dark mode disabled states */
   --disabled-background: oklch(0.279 0.041 260.031); /* Disabled background (gray-700) */
   --disabled-border: oklch(0.354 0.041 260.031);   /* Disabled border (gray-600) */
+  
+  /* Header text - dark navy on light header background in dark mode */
+  --header-text: oklch(0.129 0.042 264.695); /* Same dark navy for dark mode */
 }
 
 /* AIDEV-NOTE: Fixed mobile dropdown focus bug by removing global outline-ring/50 from * selector */
