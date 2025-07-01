@@ -19,7 +19,7 @@ export function DesktopLayoutHeader({
     <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <h1 className="text-xl font-mono tracking-wider uppercase">Eidos Engine</h1>
+          <h1 className="text-xl font-mono tracking-wider uppercase text-header-text">Eidos Engine</h1>
         </div>
         <div className="flex items-center space-x-4">
           {/* AIDEV-NOTE: Tour control button - shows for returning users */}
