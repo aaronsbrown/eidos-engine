@@ -146,7 +146,7 @@ export class TourManager {
           element: '[data-tour="preset-dropdown"]',
           popover: {
             title: 'Preset Management',
-            description: 'Save current settings with the bookmark button, load saved presets from the dropdown, or open the full preset manager for import/export functionality.',
+            description: 'Save current settings with the bookmark button, load saved presets from the dropdown, or set any preset as your default with the star button. The \'*\' indicator shows when you\'ve modified a preset\'s parameters.',
             side: 'bottom'
           }
         }
