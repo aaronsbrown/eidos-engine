@@ -7,24 +7,16 @@ import { Menu } from 'lucide-react'
 
 export interface MobileHeaderProps {
   title: string
-  patternCount: { current: number; total: number }
   onMenuToggle: () => void
   onStartTour?: () => void // AIDEV-NOTE: Optional tour trigger for testing
 }
 
 const MobileHeader = memo(function MobileHeader({
   title,
-  patternCount,
   onMenuToggle,
   onStartTour
 }: MobileHeaderProps) {
 
-  // Format pattern counter with zero padding
-  const formatCounter = (current: number, total: number): string => {
-    const currentStr = Math.max(0, current).toString().padStart(2, '0')
-    const totalStr = Math.max(0, total).toString().padStart(2, '0')
-    return `${currentStr}/${totalStr}`
-  }
 
   return (
     <header
@@ -39,7 +31,7 @@ const MobileHeader = memo(function MobileHeader({
         </h1>
       </div>
 
-      {/* Right side - Pattern counter and menu button */}
+      {/* Right side - Tour button and menu button */}
       <div data-testid="header-controls" className="flex items-center space-x-2">
         {/* AIDEV-NOTE: Wet Paint tour testing button for mobile */}
         {onStartTour && (
@@ -50,15 +42,6 @@ const MobileHeader = memo(function MobileHeader({
             TOUR
           </button>
         )}
-        
-        {/* Pattern Counter */}
-        <div
-          data-testid="pattern-counter"
-          className="mobile-typography-small text-muted-foreground bg-background border border-accent-primary px-2 py-1 min-w-[50px] text-center"
-          aria-label={`Pattern ${patternCount.current} of ${patternCount.total}`}
-        >
-          {formatCounter(patternCount.current, patternCount.total)}
-        </div>
 
         {/* Menu button */}
         <Button
