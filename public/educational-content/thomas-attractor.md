@@ -1,16 +1,21 @@
 ## Layer 1: "What is this?" (Intuitive/Experiential)
 
-The Thomas Attractor is an elegant, flowing pattern that exhibits beautiful cyclic symmetry - imagine three interconnected spirals dancing together in perfect mathematical harmony. Unlike the butterfly shape of the Lorenz Attractor, the Thomas system creates smooth, curved trajectories that seem to breathe and pulse as they trace their paths through 3D space. The particles follow sinusoidal forces that push and pull them in cyclically symmetric ways, creating organic, wave-like motions that never quite repeat but always maintain their graceful structure. With interactive 3D camera controls, you can explore this chaotic dance from any angle, discovering hidden patterns and symmetries.
-
+The Thomas Attractor is an elegant, flowing pattern with three interconnected spirals dancing in perfect, cyclic symmetry. Unlike the Lorenz attractor’s butterfly shape, Thomas flows with a softer, breathing motion as particles trace curved paths through 3D space. Driven by sinusoidal forces, the system pushes and pulls particles into organic, wave-like trajectories that never quite repeat—but always retain their graceful structure. With interactive 3D camera controls, you can orbit around the chaos and uncover hidden symmetries in its dance.
 
 ## Layer 2: "How does this work?" (Conceptual/Mechanical)
 
-The Thomas Attractor is governed by a beautifully simple system of three differential equations that use sine functions and a single damping parameter 'b'. Each coordinate influences the next in a cyclic pattern: x affects z, z affects y, and y affects x. This cyclic symmetry means you can rotate the variable names and get the exact same system - a mathematical property that creates the attractor's balanced, symmetric appearance. The damping parameter 'b' controls how dissipative the system is: higher values lead to stable fixed points, while lower values (around 0.208) produce rich chaotic behavior with the characteristic flowing patterns. The 3D visualization uses WebGL and Three.js to render thousands of particles in real-time, with advanced shaders that highlight the mathematical structure through depth-based coloring and the unique cyclic symmetry properties.
+The system is described by three coupled differential equations using sine functions and a single damping parameter b. Each coordinate influences the next in a cycle: x → y → z → x. That cyclic symmetry means you can rotate the variables and the equations still hold—a key reason Thomas looks so balanced.
 
+The damping parameter b controls the attractor’s behavior:
+ • High b dampens motion into stable fixed points.
+ • Around b ≈ 0.2–0.21, the system enters chaos, showing the classic flowing attractor.
+ • At b = 0, the system becomes conservative, wandering more like a 3D random walk.
+
+In the 3D demo, WebGL and Three.js render thousands of particles in real time. The shaders use depth-based coloring to visually emphasize symmetry and phase structure—so you can feel the math as you watch it.
 
 ## Layer 3: "Show me the code" (Technical/Formal)
 
-The Thomas Attractor is implemented using three coupled differential equations with sinusoidal nonlinearities and cyclic symmetry. The system is advanced using Euler's method for numerical integration.
+Here’s how Thomas is implemented using simple Euler integration:
 
 ```typescript
 // In src/lib/math/thomas.ts
@@ -22,12 +27,12 @@ export function calculateThomasPoint(
   const dy = Math.sin(z) - b * y;
   const dz = Math.sin(x) - b * z;
 
-  const newX = x + dx * dt;
-  const newY = y + dy * dt;
-  const newZ = z + dz * dt;
-
-  return { newX, newY, newZ };
+  return {
+    newX: x + dx * dt,
+    newY: y + dy * dt,
+    newZ: z + dz * dt,
+  };
 }
 ```
 
-The equations show the cyclic symmetry clearly: each variable is driven by the sine of the next variable and damped by the parameter 'b'. The 3D visualization (src/components/pattern-generators/thomas-attractor-generator.tsx) uses the ThreeJSCanvas framework with WebGL shaders for enhanced performance and visual effects. The custom shaders (public/shaders/vertex/thomas-particles.vert and thomas-particles.frag) implement depth-based coloring and highlight the cyclic symmetry through specialized color schemes that respond to the mathematical structure of the attractor.
+This structure reveals the cyclic symmetry—each axis is driven by the sine of the next and damped by b. The Three.js component wraps this logic, using GPU-accelerated WebGL shaders for smooth performance and visual depth. Vertex and fragment shaders handle particle position and rendering, highlighting layers and structural symmetry.

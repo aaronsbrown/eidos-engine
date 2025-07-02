@@ -29,29 +29,29 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   className = ''
 }: MobileLayoutWrapperProps) {
   const { isMobile, isDesktop, viewport } = useMobileDetection()
-  
+
   // Pattern state
   const [selectedPatternId, setSelectedPatternId] = useState(
     initialPatternId || patternGenerators[0]?.id || ''
   )
-  
+
   // Control values state
   const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
-  
+
   // Mobile UI state
   const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isEducationalVisible, setIsEducationalVisible] = useState(false)
 
   // Get current pattern
-  const selectedPattern = useMemo(() => 
+  const selectedPattern = useMemo(() =>
     patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0],
     [selectedPatternId]
   )
 
   // AIDEV-NOTE: Load educational content for current pattern
   const { content: educationalContent } = useEducationalContent(selectedPatternId)
-  
+
   // Check if educational content is available for current pattern
   const availableEducationalPatterns = getAllPatternIds()
   const hasEducationalContent = availableEducationalPatterns.includes(selectedPatternId)
@@ -60,7 +60,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   const { startMobileTour, shouldShowTour } = useTour()
 
   // Get responsive CSS classes
-  const responsiveClasses = useMemo(() => 
+  const responsiveClasses = useMemo(() =>
     getMobileResponsiveClasses(isMobile),
     [isMobile]
   )
@@ -76,7 +76,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     const availableWidth = viewport.width // use full screen width
     const optimalHeight = availableWidth * 0.75 // 4:3 aspect ratio
     const maxHeight = viewport.height * 0.5 // don't exceed 50% of viewport
-    
+
     return {
       width: availableWidth,
       height: Math.min(optimalHeight, maxHeight)
@@ -111,7 +111,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   const handlePatternSelect = useCallback((patternId: string) => {
     setSelectedPatternId(patternId)
     setIsAdvancedExpanded(false) // Collapse advanced controls when switching patterns
-    
+
     if (onPatternChange) {
       onPatternChange(patternId)
     }
@@ -133,19 +133,19 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     try {
       // Get the effective default preset using precedence rules
       const effectiveDefault = await PresetManager.getEffectiveDefault(selectedPatternId)
-      
+
       if (effectiveDefault) {
         // Reset to the effective default preset values
         const validParameters: Record<string, number | string | boolean> = {}
         const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId)
         const currentControlIds = new Set(selectedPattern?.controls?.map(c => c.id) || [])
-        
+
         Object.entries(effectiveDefault.parameters).forEach(([key, value]) => {
           if (currentControlIds.has(key)) {
             validParameters[key] = value
           }
         })
-        
+
         setControlValues(prev => ({
           ...prev,
           [selectedPatternId]: validParameters
@@ -160,7 +160,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
       }
     } catch (error) {
       console.warn('Failed to reset to defaults, falling back to pattern defaults:', error)
-      
+
       // Emergency fallback: reset to pattern defaults
       const defaults = initializeControlValues(selectedPatternId)
       setControlValues(prev => ({
@@ -213,78 +213,72 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
   return (
     <>
       <div data-testid="mobile-layout" className={`${responsiveClasses.container} ${className}`}>
-      {/* Mobile Header */}
-      <MobileHeader
-        title="EIDOS ENGINE"
-        patternCount={{
-          current: patternGenerators.findIndex(p => p.id === selectedPatternId) + 1,
-          total: patternGenerators.length
-        }}
-        onMenuToggle={handleMenuToggle}
-        onStartTour={shouldShowTour() ? undefined : startMobileTour}
-      />
-
-      {/* Pattern Selector */}
-      <div className="flex-shrink-0 p-4 border-b border-border">
-        <PatternDropdownSelector
-          patterns={patternGenerators}
-          selectedId={selectedPatternId}
-          onSelect={handlePatternSelect}
-          className="w-full"
+        {/* Mobile Header */}
+        <MobileHeader
+          title="EIDOS ENGINE"
+          onMenuToggle={handleMenuToggle}
+          onStartTour={shouldShowTour() ? undefined : startMobileTour}
         />
-      </div>
 
-      {/* Visualization Area */}
-      <div 
-        data-testid="mobile-visualization-area"
-        className="flex-shrink-0 bg-background"
-        aria-label="Pattern visualization"
-        style={{
-          width: visualizationDimensions.width,
-          height: visualizationDimensions.height
-        }}
-      >
-        {selectedPattern && (
-          <selectedPattern.component
-            width={visualizationDimensions.width}
-            height={visualizationDimensions.height}
-            className="w-full h-full"
-            controls={selectedPattern.controls}
+        {/* Pattern Selector */}
+        <div className="flex-shrink-0 p-4 border-b border-border">
+          <PatternDropdownSelector
+            patterns={patternGenerators}
+            selectedId={selectedPatternId}
+            onSelect={handlePatternSelect}
+            className="w-full"
+          />
+        </div>
+
+        {/* Visualization Area */}
+        <div
+          data-testid="mobile-visualization-area"
+          className="flex-shrink-0 bg-background"
+          aria-label="Pattern visualization"
+          style={{
+            width: visualizationDimensions.width,
+            height: visualizationDimensions.height
+          }}
+        >
+          {selectedPattern && (
+            <selectedPattern.component
+              width={visualizationDimensions.width}
+              height={visualizationDimensions.height}
+              className="w-full h-full"
+              controls={selectedPattern.controls}
+              controlValues={getCurrentControlValues()}
+              onControlChange={handleControlChange}
+            />
+          )}
+        </div>
+
+        {/* Progressive Disclosure Controls */}
+        <div className="flex-shrink-0 border-t border-border bg-background/50 backdrop-blur-sm">
+          <ProgressiveDisclosurePanel
+            patternId={selectedPatternId}
+            controls={selectedPattern.controls || []}
             controlValues={getCurrentControlValues()}
             onControlChange={handleControlChange}
+            isExpanded={isAdvancedExpanded}
+            onToggleExpanded={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
+            hasEducationalContent={hasEducationalContent}
+            isEducationalVisible={isEducationalVisible}
+            onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
+            onResetToDefaults={handleResetToDefaults}
           />
-        )}
-      </div>
+        </div>
 
-      {/* Progressive Disclosure Controls */}
-      <div className="flex-shrink-0 border-t border-border bg-background/50 backdrop-blur-sm">
-        <ProgressiveDisclosurePanel
-          patternId={selectedPatternId}
-          controls={selectedPattern.controls || []}
-          controlValues={getCurrentControlValues()}
-          onControlChange={handleControlChange}
-          isExpanded={isAdvancedExpanded}
-          onToggleExpanded={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
-          hasEducationalContent={hasEducationalContent}
-          isEducationalVisible={isEducationalVisible}
-          onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
-          onResetToDefaults={handleResetToDefaults}
-        />
-      </div>
-
-      {/* Menu Overlay for mobile */}
-      <div 
-        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={handleMenuToggle}
-      >
-        <div className={`absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4 transform transition-transform duration-300 ease-in-out ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
+        {/* Menu Overlay for mobile */}
+        <div
+          className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+          onClick={handleMenuToggle}
+        >
+          <div className={`absolute top-0 right-0 w-64 h-full bg-background border-l border-border p-4 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-mono text-sm uppercase tracking-wider">Menu</h2>
-              <button 
+              <button
                 onClick={handleMenuToggle}
                 className="text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Close menu"
@@ -292,13 +286,13 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <ThemeToggle />
-              
+
               <div className="pt-4 border-t border-border">
                 <div className="text-xs font-mono text-muted-foreground">
-                  <div>VERSION: v1.0.0</div>
+                  <div>VERSION: v0.1</div>
                   <div>VIEWPORT: {viewport.width}×{viewport.height}</div>
                   <div>PATTERN: {selectedPattern.technology}</div>
                 </div>

@@ -112,9 +112,6 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       
       // User can see current pattern name
       expect(screen.getByText('Test Pattern 1')).toBeInTheDocument()
-      
-      // User can see their position in the pattern list
-      expect(screen.getByText('01/02')).toBeInTheDocument()
     })
 
     it('displays the active pattern visualization', () => {
@@ -147,26 +144,6 @@ describe('MobileLayoutWrapper - User Behavior', () => {
       })
     })
 
-    it('updates pattern counter when user changes patterns', async () => {
-      render(<MobileLayoutWrapper />, { wrapper: TestWrapper })
-      
-      // Initially shows first pattern
-      expect(screen.getByText('01/02')).toBeInTheDocument()
-      
-      // User changes pattern
-      const dropdown = screen.getByRole('combobox')
-      fireEvent.click(dropdown)
-      
-      // User selects Test Pattern 2 (all categories expanded by default)
-      await waitFor(() => {
-        fireEvent.click(screen.getByText('Test Pattern 2'))
-      })
-      
-      // Counter updates
-      await waitFor(() => {
-        expect(screen.getByText('02/02')).toBeInTheDocument()
-      })
-    })
 
     it('shows new pattern visualization when user changes patterns', async () => {
       render(<MobileLayoutWrapper />, { wrapper: TestWrapper })

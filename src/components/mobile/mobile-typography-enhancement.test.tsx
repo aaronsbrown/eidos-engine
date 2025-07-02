@@ -220,7 +220,6 @@ describe('Mobile Typography Enhancement', () => {
       render(
         <MobileHeader
           title="PATTERN GENERATOR SYSTEM"
-          patternCount={{ current: 4, total: 9 }}
           onMenuToggle={jest.fn()}
         />
       )
@@ -228,20 +227,15 @@ describe('Mobile Typography Enhancement', () => {
       const header = screen.getByTestId('mobile-header')
       const title = screen.getByText('PATTERN GENERATOR SYSTEM')
       const menuButton = screen.getByTestId('menu-toggle')
-      const patternCounter = screen.getByTestId('pattern-counter')
       
       // All elements should be visible and properly positioned
       expect(header).toBeVisible()
       expect(title).toBeVisible()
       expect(menuButton).toBeVisible()
-      expect(patternCounter).toBeVisible()
       
       // AIDEV-NOTE: Title kept at original size to maintain layout integrity
       expect(title).toHaveClass('text-sm')
       expect(title).not.toHaveClass('mobile-typography-header')
-      
-      // Pattern counter should use small typography
-      expect(patternCounter).toHaveClass('mobile-typography-small')
     })
 
     it('ensures enhanced typography does not cause control overflow', () => {
@@ -276,17 +270,18 @@ describe('Mobile Typography Enhancement', () => {
 
   describe('Cross-Component Typography Consistency', () => {
     it('ensures all mobile components use consistent typography classes', () => {
-      // Test mobile header pattern counter
+      // Test mobile header typography consistency
       render(
         <MobileHeader
           title="TEST"
-          patternCount={{ current: 1, total: 5 }}
           onMenuToggle={jest.fn()}
         />
       )
 
-      const patternCounter = screen.getByTestId('pattern-counter')
-      expect(patternCounter).toHaveClass('mobile-typography-small')
+      const title = screen.getByText('TEST')
+      const header = screen.getByTestId('mobile-header')
+      expect(title).toBeVisible()
+      expect(header).toHaveClass('font-mono')
     })
 
     it('verifies typography hierarchy across components', () => {
