@@ -14,7 +14,7 @@ export function DesktopLayoutHeader({
   startDesktopTour
 }: DesktopLayoutHeaderProps) {
   return (
-    <header className="relative border-b border-form p-6 bg-white/80 backdrop-blur-sm">
+    <header className="relative border-b border-form p-3 bg-white/80 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <h1 className="text-xl font-mono tracking-wider uppercase text-header-text">Eidos Engine</h1>
