@@ -3,6 +3,9 @@
 
 import type { PatternPreset } from './preset-types'
 
+// Epsilon for floating-point number comparison
+const FLOAT_COMPARISON_EPSILON = 1e-10
+
 /**
  * Compare current control values with a preset's parameters
  * Returns true if values have been modified from the preset
@@ -60,7 +63,7 @@ function valuesEqual(a: number | string | boolean, b: number | string | boolean)
 
   // For numbers, use small epsilon for floating point comparison
   if (typeof a === 'number' && typeof b === 'number') {
-    return Math.abs(a - b) < 1e-10
+    return Math.abs(a - b) < FLOAT_COMPARISON_EPSILON
   }
 
   // For strings and booleans, use strict equality
@@ -80,16 +83,6 @@ export function getPresetDisplayName(
   }
 
   const isModified = isPresetModified(currentValues, preset)
-  
-  // AIDEV-NOTE: Temporary debug logging
-  if (preset.name === 'Classic Lorenz') {
-    console.log('Debug preset comparison:', {
-      presetName: preset.name,
-      currentValues,
-      presetParams: preset.parameters,
-      isModified
-    })
-  }
   
   return isModified ? `${preset.name}*` : preset.name
 }

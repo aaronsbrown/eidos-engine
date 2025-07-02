@@ -3,6 +3,11 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { PresetManager } from '@/lib/preset-manager'
+import {
+  createMockUserPreset,
+  createMockFactoryPreset,
+  resetPresetMocks
+} from '@/test-utils/preset-test-helpers'
 
 // Mock the preset manager
 jest.mock('@/lib/preset-manager', () => ({
@@ -90,29 +95,12 @@ const PresetDefaultButtonComponent = ({
 }
 
 describe('Make/Remove Default Button - Behavioral Tests', () => {
-  const mockUserPreset = {
-    id: 'user-preset-1',
-    name: 'My Custom Preset',
-    generatorType: 'noise-field',
-    isFactory: false,
-    isUserDefault: false
-  }
-
-  const mockUserPresetAsDefault = {
-    ...mockUserPreset,
-    isUserDefault: true
-  }
-
-  const mockFactoryPreset = {
-    id: 'factory-preset-1',
-    name: 'Factory Preset',
-    generatorType: 'noise-field',
-    isFactory: true,
-    isDefault: true
-  }
+  const mockUserPreset = createMockUserPreset()
+  const mockUserPresetAsDefault = createMockUserPreset({ isUserDefault: true })
+  const mockFactoryPreset = createMockFactoryPreset()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    resetPresetMocks()
   })
 
   describe('Make Default Functionality', () => {
@@ -425,7 +413,7 @@ describe('Make/Remove Default Button - Behavioral Tests', () => {
       )
 
       // Factory preset should be read-only regarding default status
-      expect(screen.getByText('Factory Preset')).toBeInTheDocument()
+      expect(screen.getByText('Factory Classic')).toBeInTheDocument()
       expect(screen.queryByTestId('default-toggle-button')).not.toBeInTheDocument()
       
       // No way to interact with default functionality

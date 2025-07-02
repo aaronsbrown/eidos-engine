@@ -1,5 +1,6 @@
 // AIDEV-NOTE: Refactored preset management utilities - now focuses on core CRUD operations
 // Extracted modules: preset-types, preset-validation, factory-preset-operations, preset-import-export
+// Additional extractions: PresetLoader (data operations), UserDefaultManager (default logic)
 "use client"
 
 import type { 
@@ -10,8 +11,9 @@ import type {
 } from './preset-types'
 import { STORAGE_KEYS } from './preset-types'
 import { generateContentHash, validatePresetParameters } from './preset-validation'
-import { loadFactoryPresets } from './factory-preset-operations'
 import { exportPresets, importPresets } from './preset-import-export'
+import { PresetLoader } from './preset-loader'
+import { UserDefaultManager } from './user-default-manager'
 
 // Re-export types for backward compatibility
 export type { 
@@ -24,6 +26,10 @@ export type {
 // Re-export STORAGE_KEYS for external usage
 export { STORAGE_KEYS } from './preset-types'
 
+// Re-export extracted classes for direct usage
+export { PresetLoader } from './preset-loader'
+export { UserDefaultManager } from './user-default-manager'
+
 /**
  * Core preset management utilities
  * Handles localStorage operations, validation, and data transformation
@@ -33,62 +39,14 @@ export class PresetManager {
    * Load user presets from localStorage (excludes factory presets)
    */
   static loadUserPresets(): PatternPreset[] {
-    try {
-      if (typeof window === 'undefined') return []
-      
-      const stored = localStorage.getItem(STORAGE_KEYS.PRESETS)
-      if (!stored) return []
-      
-      const parsed = JSON.parse(stored) as PatternPreset[]
-      let shouldSave = false
-      
-      // AIDEV-NOTE: Filter out factory presets and update user presets
-      const userPresets = parsed
-        .filter(preset => !preset.isFactory) // Only keep user presets
-        .map((preset) => {
-          const updatedPreset = {
-            ...preset,
-            createdAt: new Date(preset.createdAt)
-          }
-          
-          // Add contentHash if missing (backward compatibility)
-          if (!updatedPreset.contentHash) {
-            updatedPreset.contentHash = generateContentHash(
-              updatedPreset.name, 
-              updatedPreset.generatorType, 
-              updatedPreset.parameters
-            )
-            shouldSave = true
-          }
-          
-          return updatedPreset
-        })
-      
-      // Save back to localStorage if we filtered out factory presets or added hashes
-      if (shouldSave || userPresets.length !== parsed.length) {
-        this.saveUserPresets(userPresets)
-      }
-      
-      return userPresets
-    } catch (error) {
-      console.warn('Failed to load user presets from localStorage:', error)
-      return []
-    }
+    return PresetLoader.loadUserPresets()
   }
 
   /**
    * Save user presets to localStorage (only user presets, not factory presets)
    */
   static saveUserPresets(userPresets: PatternPreset[]): boolean {
-    try {
-      if (typeof window === 'undefined') return false
-      
-      localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(userPresets))
-      return true
-    } catch (error) {
-      console.error('Failed to save user presets to localStorage:', error)
-      return false
-    }
+    return PresetLoader.saveUserPresets(userPresets)
   }
 
   /**
@@ -186,23 +144,7 @@ export class PresetManager {
    * Get presets for a specific generator type (combines factory + user presets)
    */
   static async getPresetsForGenerator(generatorType: string): Promise<PatternPreset[]> {
-    try {
-      // Load factory presets fresh from JSON
-      const factoryPresets = await this.loadFactoryPresets()
-      
-      // Load user presets from localStorage
-      const userPresets = this.loadUserPresets()
-      
-      // Combine and filter by generator type
-      const allPresets = [...factoryPresets, ...userPresets]
-      const filtered = allPresets.filter(p => p.generatorType === generatorType)
-      
-      return filtered
-    } catch (error) {
-      console.warn('Failed to load presets for generator:', error)
-      // Fallback to user presets only
-      return this.loadUserPresets().filter(p => p.generatorType === generatorType)
-    }
+    return await PresetLoader.getPresetsForGenerator(generatorType)
   }
 
   /**
@@ -313,7 +255,7 @@ export class PresetManager {
    * Load factory presets from the public directory
    */
   static async loadFactoryPresets(): Promise<PatternPreset[]> {
-    return await loadFactoryPresets()
+    return await PresetLoader.loadFactoryPresets()
   }
 
   /**
@@ -345,23 +287,8 @@ export class PresetManager {
    */
   static setUserDefault(presetId: string): boolean {
     const userPresets = this.loadUserPresets()
-    const targetPreset = userPresets.find(p => p.id === presetId)
-    
-    if (!targetPreset) {
-      throw new Error('Preset not found')
-    }
-
-    // Clear any existing user default for this pattern type
-    userPresets.forEach(preset => {
-      if (preset.generatorType === targetPreset.generatorType) {
-        preset.isUserDefault = false
-      }
-    })
-
-    // Set the target preset as user default
-    targetPreset.isUserDefault = true
-
-    return this.saveUserPresets(userPresets)
+    const updatedPresets = UserDefaultManager.setUserDefault(presetId, userPresets)
+    return this.saveUserPresets(updatedPresets)
   }
 
   /**
@@ -370,9 +297,7 @@ export class PresetManager {
    */
   static getUserDefault(generatorType: string): PatternPreset | null {
     const userPresets = this.loadUserPresets()
-    return userPresets.find(p => 
-      p.generatorType === generatorType && p.isUserDefault === true
-    ) || null
+    return UserDefaultManager.getUserDefault(generatorType, userPresets)
   }
 
   /**
@@ -380,16 +305,14 @@ export class PresetManager {
    */
   static clearUserDefault(generatorType: string): boolean {
     const userPresets = this.loadUserPresets()
-    let modified = false
-
-    userPresets.forEach(preset => {
-      if (preset.generatorType === generatorType && preset.isUserDefault) {
-        preset.isUserDefault = false
-        modified = true
-      }
-    })
-
-    return modified ? this.saveUserPresets(userPresets) : true
+    const updatedPresets = UserDefaultManager.clearUserDefault(generatorType, userPresets)
+    
+    // Only save if there were changes
+    const hasChanges = updatedPresets.some((preset, index) => 
+      preset.isUserDefault !== userPresets[index]?.isUserDefault
+    )
+    
+    return hasChanges ? this.saveUserPresets(updatedPresets) : true
   }
 
   /**
@@ -397,18 +320,7 @@ export class PresetManager {
    * Follows precedence: User Default -> Factory Default -> null
    */
   static async getEffectiveDefault(generatorType: string): Promise<PatternPreset | null> {
-    // First check for user default
-    const userDefault = this.getUserDefault(generatorType)
-    if (userDefault) {
-      return userDefault
-    }
-
-    // Fall back to factory default
-    const factoryPresets = await this.loadFactoryPresets()
-    const factoryDefault = factoryPresets.find(p => 
-      p.generatorType === generatorType && p.isDefault === true
-    )
-    
-    return factoryDefault || null
+    const userPresets = this.loadUserPresets()
+    return await UserDefaultManager.getEffectiveDefault(generatorType, userPresets)
   }
 }

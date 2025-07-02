@@ -1,9 +1,10 @@
 // AIDEV-NOTE: Behavioral tests for preset modification detection and UX phases
 import { getPresetDisplayName, isPresetModified } from '@/lib/preset-comparison'
+import { createMockFactoryPreset } from '@/test-utils/preset-test-helpers'
 
 // Test the core preset modification detection logic
 describe('Preset Modification Detection - Behavioral Tests', () => {
-  const mockPreset = {
+  const mockPreset = createMockFactoryPreset({
     id: 'test-preset',
     name: 'Test Preset',
     generatorType: 'aizawa-attractor',
@@ -13,12 +14,8 @@ describe('Preset Modification Detection - Behavioral Tests', () => {
       c: 0.6,
       particleCount: 2500,
       colorScheme: 1
-    },
-    createdAt: new Date(),
-    contentHash: 'test-hash',
-    isFactory: true,
-    isDefault: true
-  }
+    }
+  })
 
   describe('Phase 1: Preset Modification Detection Logic', () => {
     test('detects when control values exactly match preset', () => {

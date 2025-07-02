@@ -3,6 +3,12 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { PresetManager } from '@/lib/preset-manager'
+import {
+  createMockUserPreset,
+  createMockFactoryPreset,
+  resetPresetMocks,
+  type MockPresetDropdownProps
+} from '@/test-utils/preset-test-helpers'
 
 // Mock the preset manager and comparison utilities
 jest.mock('@/lib/preset-manager', () => ({
@@ -25,19 +31,7 @@ const PresetDropdownComponent = ({
   patternId,
   onPresetLoad,
   presets = []
-}: {
-  patternId: string
-  currentValues?: Record<string, unknown>
-  onPresetLoad: (presetId: string) => void
-  presets?: Array<{
-    id: string
-    name: string
-    generatorType: string
-    isFactory?: boolean
-    isDefault?: boolean
-    isUserDefault?: boolean
-  }>
-}) => {
+}: MockPresetDropdownProps) => {
   const [selectedPresetId, setSelectedPresetId] = React.useState<string>('')
   const [effectiveDefault, setEffectiveDefault] = React.useState<{
     id: string
@@ -144,31 +138,15 @@ const PresetDropdownComponent = ({
 }
 
 describe('Dropdown States - No Blank States Behavioral Tests', () => {
-  const mockUserPreset = {
-    id: 'user-preset-1',
-    name: 'My Custom Preset',
-    generatorType: 'noise-field',
-    isFactory: false,
-    isUserDefault: true
-  }
-
-  const mockFactoryPreset = {
-    id: 'factory-preset-1',
-    name: 'Factory Classic',
-    generatorType: 'noise-field',
-    isFactory: true,
-    isDefault: true
-  }
-
-  const mockOtherUserPreset = {
+  const mockUserPreset = createMockUserPreset({ isUserDefault: true })
+  const mockFactoryPreset = createMockFactoryPreset()
+  const mockOtherUserPreset = createMockUserPreset({
     id: 'user-preset-2',
-    name: 'Another Custom',
-    generatorType: 'noise-field',
-    isFactory: false
-  }
+    name: 'Another Custom'
+  })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    resetPresetMocks()
   })
 
   describe('Dropdown Always Has Meaningful Default Selection', () => {
