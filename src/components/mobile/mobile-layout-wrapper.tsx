@@ -15,6 +15,7 @@ import { useEducationalContent } from '@/lib/hooks/use-educational-content'
 import { getAllPatternIds } from '@/lib/educational-content-loader'
 import { getPlatformDefaultValue } from '@/lib/semantic-utils'
 import { useTour } from '@/lib/hooks/use-tour'
+import { PresetManager } from '@/lib/preset-manager'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -127,6 +128,48 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     }))
   }, [selectedPatternId])
 
+  // Handle reset to defaults with smart precedence
+  const handleResetToDefaults = useCallback(async () => {
+    try {
+      // Get the effective default preset using precedence rules
+      const effectiveDefault = await PresetManager.getEffectiveDefault(selectedPatternId)
+      
+      if (effectiveDefault) {
+        // Reset to the effective default preset values
+        const validParameters: Record<string, number | string | boolean> = {}
+        const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId)
+        const currentControlIds = new Set(selectedPattern?.controls?.map(c => c.id) || [])
+        
+        Object.entries(effectiveDefault.parameters).forEach(([key, value]) => {
+          if (currentControlIds.has(key)) {
+            validParameters[key] = value
+          }
+        })
+        
+        setControlValues(prev => ({
+          ...prev,
+          [selectedPatternId]: validParameters
+        }))
+      } else {
+        // Fall back to pattern control defaults
+        const defaults = initializeControlValues(selectedPatternId)
+        setControlValues(prev => ({
+          ...prev,
+          [selectedPatternId]: defaults
+        }))
+      }
+    } catch (error) {
+      console.warn('Failed to reset to defaults, falling back to pattern defaults:', error)
+      
+      // Emergency fallback: reset to pattern defaults
+      const defaults = initializeControlValues(selectedPatternId)
+      setControlValues(prev => ({
+        ...prev,
+        [selectedPatternId]: defaults
+      }))
+    }
+  }, [selectedPatternId, initializeControlValues])
+
   // Handle menu toggle
   const handleMenuToggle = useCallback(() => {
     setIsMenuOpen(!isMenuOpen)
@@ -225,6 +268,7 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           hasEducationalContent={hasEducationalContent}
           isEducationalVisible={isEducationalVisible}
           onEducationalToggle={() => setIsEducationalVisible(!isEducationalVisible)}
+          onResetToDefaults={handleResetToDefaults}
         />
       </div>
 

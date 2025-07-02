@@ -166,7 +166,8 @@ jest.mock('@/lib/hooks/use-preset-manager', () => ({
   usePresetManager: () => ({
     presets: [
       { id: 'preset-1', name: 'Preset 1' },
-      { id: 'preset-2', name: 'Preset 2' }
+      { id: 'preset-2', name: 'Preset 2' },
+      { id: 'preset-3', name: 'Preset 3' }
     ],
     activePresetId: null,
     loadPreset: mockLoadPreset,

@@ -3,6 +3,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { RotateCcw } from 'lucide-react'
 import CollapsibleControlGroup from './collapsible-control-group'
 import ViewportConstrainedPanel from './viewport-constrained-panel'
 import { renderControl, getControlGridClasses } from './base-control-renderer'
@@ -17,6 +18,7 @@ interface GroupedSimulationControlsPanelProps {
   controlValues: Record<string, number | string | boolean>
   onControlChange: (controlId: string, value: number | string | boolean) => void
   sidebarWidth: number
+  onResetToDefaults?: () => void
 }
 
 export default function GroupedSimulationControlsPanel({
@@ -24,7 +26,8 @@ export default function GroupedSimulationControlsPanel({
   controls,
   controlValues,
   onControlChange,
-  sidebarWidth
+  sidebarWidth,
+  onResetToDefaults
 }: GroupedSimulationControlsPanelProps) {
   // AIDEV-NOTE: Mobile detection for consistent single-column layout on mobile devices (Issue #23)
   const { isMobile } = useMobileDetection()
@@ -49,6 +52,20 @@ export default function GroupedSimulationControlsPanel({
           <div className={`grid gap-4 ${getControlGridClasses(sidebarWidth, isMobile)}`}>
             {controls.map(control => renderControl(control, controlValues, onControlChange))}
           </div>
+          
+          {/* Reset to Defaults Button - Ungrouped patterns */}
+          {onResetToDefaults && (
+            <div className="pt-2 border-t border-border">
+              <button
+                onClick={onResetToDefaults}
+                className="w-full flex items-center justify-center gap-2 border border-border bg-background hover:bg-muted px-3 py-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                title="Reset all controls to pattern defaults"
+              >
+                <RotateCcw className="w-3 h-3" />
+                {isMobile ? "RESET" : "RESET TO DEFAULTS"}
+              </button>
+            </div>
+          )}
         </div>
       </ViewportConstrainedPanel>
     )
@@ -110,6 +127,20 @@ export default function GroupedSimulationControlsPanel({
         {ungroupedControls.length > 0 && (
           <div className={`grid gap-4 ${getControlGridClasses(sidebarWidth, isMobile)}`}>
             {ungroupedControls.map(control => renderControl(control, controlValues, onControlChange))}
+          </div>
+        )}
+        
+        {/* Reset to Defaults Button */}
+        {onResetToDefaults && (
+          <div className="pt-2 border-t border-border">
+            <button
+              onClick={onResetToDefaults}
+              className="w-full flex items-center justify-center gap-2 border border-border bg-background hover:bg-muted px-3 py-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+              title="Reset all controls to pattern defaults"
+            >
+              <RotateCcw className="w-3 h-3" />
+              {isMobile ? "RESET" : "RESET TO DEFAULTS"}
+            </button>
           </div>
         )}
       </div>

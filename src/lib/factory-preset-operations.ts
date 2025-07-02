@@ -32,6 +32,7 @@ export async function loadFactoryPresets(): Promise<PatternPreset[]> {
       description: preset.description,
       contentHash: generateContentHash(preset.name, preset.generatorType, preset.parameters),
       isFactory: preset.isFactory || true,
+      isDefault: preset.isDefault || false, // CRITICAL: Preserve isDefault flag from factory presets
       category: preset.category,
       mathematicalSignificance: preset.mathematicalSignificance
     }))

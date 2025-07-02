@@ -9,7 +9,9 @@
       "Bash(npx:*)",
       "Bash(rg:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(jq:*)",
+      "Bash(timeout 30s npm run storybook -- --no-open)"
     ],
     "deny": [
       "Bash(rm:*)",
