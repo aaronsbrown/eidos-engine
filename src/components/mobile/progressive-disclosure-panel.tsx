@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useState, useMemo, memo } from 'react'
-import { ChevronDown, ChevronUp, GraduationCap, BookOpen } from 'lucide-react'
+import { ChevronDown, ChevronUp, GraduationCap, BookOpen, RotateCcw } from 'lucide-react'
 import GroupedSimulationControlsPanel from '@/components/ui/grouped-simulation-controls-panel'
 import type { PatternControl } from '@/components/pattern-generators/types'
 import { getMobileControlLayout } from '@/lib/mobile-utils'
@@ -21,6 +21,8 @@ export interface ProgressiveDisclosurePanelProps {
   hasEducationalContent?: boolean
   isEducationalVisible?: boolean
   onEducationalToggle?: () => void
+  // Reset functionality
+  onResetToDefaults?: () => void
 }
 
 const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
@@ -33,7 +35,8 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
   className = '',
   hasEducationalContent = false,
   isEducationalVisible = false,
-  onEducationalToggle
+  onEducationalToggle,
+  onResetToDefaults
 }: ProgressiveDisclosurePanelProps) {
   const [internalExpanded, setInternalExpanded] = useState(false)
   const { viewport } = useMobileDetection()
@@ -80,30 +83,44 @@ const ProgressiveDisclosurePanel = memo(function ProgressiveDisclosurePanel({
             </h3>
           </div>
           
-          {/* Educational Content Button - Mobile */}
-          {hasEducationalContent && onEducationalToggle && (
-            <button
-              data-tour="mobile-learn-button"
-              onClick={onEducationalToggle}
-              className={`border border-border px-3 py-2 font-mono text-xs transition-colors ${
-                isEducationalVisible 
-                  ? "bg-background text-foreground hover:bg-muted" 
-                  : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
-              }`}
-            >
-{isEducationalVisible ? (
-                <span className="flex items-center gap-1">
-                  <BookOpen className="w-3 h-3 text-foreground" />
-                  HIDE
-                </span>
-              ) : (
-                <span className="flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3 text-accent-primary-foreground" />
-                  LEARN
-                </span>
-              )}
-            </button>
-          )}
+          {/* Action Buttons - Mobile */}
+          <div className="flex items-center gap-2">
+            {/* Reset Button - Always visible on mobile */}
+            {onResetToDefaults && (
+              <button
+                onClick={onResetToDefaults}
+                className="border border-border bg-background hover:bg-muted px-2 py-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                title="Reset to defaults"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+            )}
+            
+            {/* Educational Content Button - Mobile */}
+            {hasEducationalContent && onEducationalToggle && (
+              <button
+                data-tour="mobile-learn-button"
+                onClick={onEducationalToggle}
+                className={`border border-border px-3 py-2 font-mono text-xs transition-colors ${
+                  isEducationalVisible 
+                    ? "bg-background text-foreground hover:bg-muted" 
+                    : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
+                }`}
+              >
+                {isEducationalVisible ? (
+                  <span className="flex items-center gap-1">
+                    <BookOpen className="w-3 h-3 text-foreground" />
+                    HIDE
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1">
+                    <GraduationCap className="w-3 h-3 text-accent-primary-foreground" />
+                    LEARN
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
         </div>
         
         {mobileLayout.essentialControls.length > 0 ? (
