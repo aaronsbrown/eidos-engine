@@ -67,12 +67,12 @@ export function DesktopLayoutMain({
     if (!activePresetId) {
       return ''
     }
-    
+
     const activePreset = presets.find(p => p.id === activePresetId)
     if (!activePreset) {
       return ''
     }
-    
+
     const currentValues = getCurrentControlValues()
     return getPresetDisplayName(activePreset, currentValues)
   }, [activePresetId, presets, getCurrentControlValues])
@@ -82,7 +82,7 @@ export function DesktopLayoutMain({
     try {
       // Get the effective default preset using precedence rules
       const effectiveDefault = await PresetManager.getEffectiveDefault(selectedPattern.id)
-      
+
       if (effectiveDefault) {
         // Reset to the effective default preset
         loadPreset(effectiveDefault.id)
@@ -95,7 +95,7 @@ export function DesktopLayoutMain({
         Object.entries(defaultValues).forEach(([controlId, value]) => {
           handleControlChange(controlId, value)
         })
-        
+
         // Clear any active preset since we're now at pattern defaults (not a preset)
         if (activePresetId) {
           clearActivePreset()
@@ -103,7 +103,7 @@ export function DesktopLayoutMain({
       }
     } catch (error) {
       console.warn('Failed to reset to defaults, falling back to pattern defaults:', error)
-      
+
       // Emergency fallback: reset to pattern defaults
       const defaultValues: Record<string, number | string | boolean> = {}
       selectedPattern.controls?.forEach(control => {
@@ -112,7 +112,7 @@ export function DesktopLayoutMain({
       Object.entries(defaultValues).forEach(([controlId, value]) => {
         handleControlChange(controlId, value)
       })
-      
+
       if (activePresetId) {
         clearActivePreset()
       }
@@ -129,11 +129,10 @@ export function DesktopLayoutMain({
             <button
               data-tour="learn-button"
               onClick={() => setIsEducationalVisible(!isEducationalVisible)}
-              className={`border border-border px-2 py-1 font-mono transition-colors ${
-                isEducationalVisible 
-                  ? "bg-background text-foreground hover:bg-muted" 
+              className={`border border-border px-2 py-1 font-mono transition-colors ${isEducationalVisible
+                  ? "bg-background text-foreground hover:bg-muted"
                   : "bg-accent-primary text-accent-primary-foreground hover:bg-accent-primary-strong"
-              }`}
+                }`}
             >
               {isEducationalVisible ? (
                 <span className="flex items-center gap-2">
@@ -151,7 +150,7 @@ export function DesktopLayoutMain({
             <div className="border border-border bg-background px-2 py-1 text-muted-foreground">VIEWPORT_01</div>
           )}
         </div>
-        
+
         <div data-tour="preset-dropdown" className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
           <div className="flex items-center space-x-2">
             {/* Preset Selection Dropdown - Only show if presets exist */}
@@ -172,7 +171,7 @@ export function DesktopLayoutMain({
                 ))}
               </select>
             )}
-            
+
             {/* Quick Save Button */}
             <button
               onClick={onQuickSave}
@@ -182,7 +181,7 @@ export function DesktopLayoutMain({
             >
               <Bookmark className="w-3 h-3" />
             </button>
-            
+
             {/* Preset Manager Button */}
             <button
               onClick={() => setIsPresetPanelOpen(true)}
@@ -195,7 +194,7 @@ export function DesktopLayoutMain({
 
         {/* Bottom technical annotations - positioned exactly like top ones */}
         <div className="absolute bottom-4 left-4 text-xs font-mono text-muted-foreground">
-          <div className="border border-border bg-background px-2 py-1">EIDOS_ENGINE_v1.0</div>
+          <div className="border border-border bg-background px-2 py-1">EIDOS_ENGINE_v0.1</div>
         </div>
         <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground">
           <div className="border border-border bg-background px-2 py-1">

@@ -149,7 +149,7 @@ jest.mock('@/components/ui/floating-preset-panel', () => ({
 }))
 
 jest.mock('@/components/ui/save-preset-modal', () => ({
-  SavePresetModal: ({ isOpen, onClose, onSave }: { isOpen: boolean; onClose: () => void; onSave: (name: string) => void }) => 
+  SavePresetModal: ({ isOpen, onClose, onSave }: { isOpen: boolean; onClose: () => void; onSave: (name: string) => void }) =>
     isOpen ? (
       <div data-testid="save-modal">
         <input aria-label="Preset name" />
@@ -188,7 +188,7 @@ describe('DesktopLayout - User Behavior', () => {
     // Use real timers for setTimeout in scroll throttling
     jest.useRealTimers()
   })
-  
+
   afterAll(() => {
     // Restore fake timers for other tests
     jest.useFakeTimers()
@@ -203,24 +203,24 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User can see and navigate patterns', () => {
     it('displays the initial pattern and its information', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User sees the app title
       expect(screen.getByText('Eidos Engine')).toBeInTheDocument()
-      
+
       // User sees the first pattern is selected
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-      
+
       // User sees pattern information (check TYPE field in specifications)
       expect(screen.getAllByText(/trigonometric-circle/i)).toHaveLength(2) // Appears in sidebar and specs
       expect(screen.getAllByText(/geometric/i)).toHaveLength(2) // Appears in sidebar divider and specs
-      
+
       // User sees pattern counter
       expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
     })
 
     it('shows pattern names in the selection list', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User should see all patterns (tests show all 6 are visible)
       expect(screen.getByText('Trigonometric Circle')).toBeInTheDocument()
       expect(screen.getByText('Noise Field')).toBeInTheDocument()
@@ -232,19 +232,19 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('allows user to select different patterns by clicking', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User clicks on Noise Field pattern
       fireEvent.click(screen.getByText('Noise Field'))
-      
+
       // Pattern changes
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
         expect(screen.queryByTestId('pattern-trig')).not.toBeInTheDocument()
       })
-      
+
       // Counter updates
       expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
-      
+
       // Specifications update
       expect(screen.getAllByText(/noise-field/i)).toHaveLength(2) // Sidebar + specs
       // "Noise" appears in: divider, pattern name, specs, mock pattern content = multiple places
@@ -252,28 +252,28 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('allows user to navigate patterns with previous/next buttons', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Initially on first pattern
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-      
+
       // Find next button using semantic test ID
       const nextButton = screen.getByTestId('pattern-next-button')
-      
+
       // User clicks next
       fireEvent.click(nextButton!)
-      
+
       // Pattern changes to second pattern
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
         expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
-      
+
       // Find previous button using semantic test ID
       const prevButton = screen.getByTestId('pattern-prev-button')
-      
+
       // User clicks previous
       fireEvent.click(prevButton!)
-      
+
       // Pattern changes back to first
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
@@ -283,22 +283,22 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('shows category dividers in the pattern list', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // First visible category divider should be Geometric
       expect(screen.getAllByText(/geometric/i)).toHaveLength(2) // Divider and specs
     })
 
     it('navigates through all patterns with next button', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Navigate to the 6th pattern (Brownian Motion)
       const nextButton = screen.getByTestId('pattern-next-button')
-      
+
       // Click next 5 times to get to the 6th pattern
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
       }
-      
+
       // Should be on the last pattern
       expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
@@ -306,30 +306,30 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('allows user to scroll through patterns with mouse wheel for browsing', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Initially on first pattern and it should stay selected
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
       expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
-      
+
       // Find pattern list container - it should have overflow-hidden class
       const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
       expect(patternList).toBeInTheDocument()
-      
+
       // User scrolls down (deltaY > 0) to browse patterns
       fireEvent.wheel(patternList!, { deltaY: 100 })
-      
+
       // Wait a bit for the throttle timeout to complete
       await new Promise(resolve => setTimeout(resolve, 150))
-      
+
       // Selected pattern should remain the same (Trig), but list should scroll
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument() // Still selected
         expect(screen.queryByText('[01/06]')).not.toBeInTheDocument() // Counter unchanged
       }, { timeout: 2000 })
-      
+
       // User must click to actually select a different pattern
       fireEvent.click(screen.getByText('Noise Field'))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
         expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
@@ -338,53 +338,53 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('allows direct pattern selection that auto-adjusts visible window', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Initially all patterns should be clickable even if outside visible window
       expect(screen.getByText('Trigonometric Circle')).toBeInTheDocument()
       expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
-      
+
       // User clicks on last pattern (Brownian Motion)
       fireEvent.click(screen.getByText('Brownian Motion'))
-      
+
       // Pattern should change and counter should update
       await waitFor(() => {
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       })
-      
+
       // Specifications should update
       expect(screen.getAllByText(/brownian-motion/i)).toHaveLength(2) // Sidebar + specs
     })
 
     it('prevents wheel scrolling past pattern boundaries', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Find pattern list container
       const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
       expect(patternList).toBeInTheDocument()
-      
+
       // Try to scroll up from first pattern - should stay on first
       fireEvent.wheel(patternList!, { deltaY: -100 })
-      
+
       await new Promise(resolve => setTimeout(resolve, 150))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
         expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       })
-      
+
       // Navigate to last pattern with button
       const nextButton = screen.getByTestId('pattern-next-button')
-      
+
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
       }
-      
+
       // Try to scroll down from last pattern - should stay on last
       fireEvent.wheel(patternList!, { deltaY: 100 })
-      
+
       await new Promise(resolve => setTimeout(resolve, 150))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
         expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
@@ -395,10 +395,10 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User can control pattern parameters', () => {
     it('displays controls for the selected pattern', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User sees simulation parameters section
       expect(screen.getByText('Simulation Parameters')).toBeInTheDocument()
-      
+
       // User sees controls for first pattern (Trigonometric Circle)
       expect(screen.getByLabelText('Speed')).toBeInTheDocument()
       expect(screen.getByLabelText('Radius')).toBeInTheDocument()
@@ -406,13 +406,13 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('updates control values when user interacts with them', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       const speedSlider = screen.getByLabelText('Speed')
       expect(speedSlider).toHaveValue('5') // Default value
-      
+
       // User changes speed
       fireEvent.change(speedSlider, { target: { value: '8' } })
-      
+
       await waitFor(() => {
         expect(speedSlider).toHaveValue('8')
       })
@@ -420,46 +420,46 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('maintains control values when switching patterns and back', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Change speed value
       const speedSlider = screen.getByLabelText('Speed')
       fireEvent.change(speedSlider, { target: { value: '8' } })
-      
+
       // Switch to another pattern
       fireEvent.click(screen.getByText('Noise Field'))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
       })
-      
+
       // Switch back
       fireEvent.click(screen.getByText('Trigonometric Circle'))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
       })
-      
+
       // Value should be preserved
       expect(screen.getByLabelText('Speed')).toHaveValue('8')
     })
 
     it('handles different control types appropriately', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Switch to Noise Field which has a color control
       fireEvent.click(screen.getByText('Noise Field'))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
       })
-      
+
       // User sees color control
       const colorPicker = screen.getByLabelText('Color')
       expect(colorPicker).toHaveValue('#00ff00')
-      
+
       // User changes color
       fireEvent.change(colorPicker, { target: { value: '#ff0000' } })
-      
+
       await waitFor(() => {
         expect(colorPicker).toHaveValue('#ff0000')
       })
@@ -467,18 +467,18 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('handles button controls like reset', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Switch to Particle System which has a reset button
       fireEvent.click(screen.getByText('Particle System'))
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('pattern-particle')).toBeInTheDocument()
       })
-      
+
       // User clicks reset button
       const resetButton = screen.getByLabelText('Reset')
       fireEvent.click(resetButton)
-      
+
       // Button click should trigger control change
       expect(resetButton).toBeInTheDocument()
     })
@@ -487,7 +487,7 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User can control viewport dimensions', () => {
     it('displays viewport controls with current dimensions', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       expect(screen.getByText('Viewport')).toBeInTheDocument()
       expect(screen.getByText('700px')).toBeInTheDocument() // Default width
       expect(screen.getByText('394px')).toBeInTheDocument() // Default height
@@ -497,15 +497,15 @@ describe('DesktopLayout - User Behavior', () => {
       // AIDEV-NOTE: Test responsive dimensions for Issue #70 - iPad Mini horizontal (1024x768)
       Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 })
       Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 768 })
-      
+
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // For iPad Mini (1024px width), should use responsive sizing (45% of viewport = ~460px, but min 500px)
       await waitFor(() => {
         expect(screen.getByText('500px')).toBeInTheDocument() // Should be 500px (minimum width)
         expect(screen.getByText('281px')).toBeInTheDocument() // Should be 281px (500 * 394/700)
       })
-      
+
       // Specifications should show the responsive dimensions
       expect(screen.getByText('500 × 281')).toBeInTheDocument()
     })
@@ -514,29 +514,29 @@ describe('DesktopLayout - User Behavior', () => {
       // AIDEV-NOTE: Test that larger screens still get default dimensions
       Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1400 })
       Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 })
-      
+
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // For larger screens (>1200px), should use default dimensions
       await waitFor(() => {
         expect(screen.getByText('700px')).toBeInTheDocument() // Default width
         expect(screen.getByText('394px')).toBeInTheDocument() // Default height
       })
-      
+
       expect(screen.getByText('700 × 394')).toBeInTheDocument()
     })
 
     it('allows user to resize pattern viewport', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Find width slider by looking for the one with value 700
       const sliders = screen.getAllByRole('slider')
       const widthSlider = sliders.find(s => s.getAttribute('value') === '700')
       expect(widthSlider).toBeDefined()
-      
+
       // User changes width
       fireEvent.change(widthSlider!, { target: { value: '800' } })
-      
+
       await waitFor(() => {
         expect(screen.getByText('800px')).toBeInTheDocument()
       })
@@ -547,26 +547,26 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User can manage presets', () => {
     it('allows user to browse and select available presets', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User can find and interact with preset selection
       const presetDropdown = screen.getByRole('combobox')
       expect(presetDropdown).toBeInTheDocument()
-      
+
       // User can see preset options are available for selection
       const options = screen.getAllByRole('option')
       expect(options.length).toBeGreaterThan(2) // Default + at least 2 presets
-      
+
       // User can interact with the dropdown (it's not disabled)
       expect(presetDropdown).not.toBeDisabled()
     })
 
     it('loads preset settings when user selects one', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // User selects a preset from the dropdown
       const presetDropdown = screen.getByRole('combobox')
       fireEvent.change(presetDropdown, { target: { value: 'preset-1' } })
-      
+
       // System loads the preset settings
       await waitFor(() => {
         expect(mockLoadPreset).toHaveBeenCalledWith('preset-1')
@@ -575,11 +575,11 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('opens save modal when user clicks quick save', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Find the bookmark icon button
       const quickSaveButton = screen.getByTitle('Quick Save Current Settings')
       fireEvent.click(quickSaveButton)
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('save-modal')).toBeInTheDocument()
       })
@@ -587,17 +587,17 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('opens preset manager panel when user clicks preset manager', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       const presetManagerButton = screen.getByText('PRESET MANAGER')
       fireEvent.click(presetManagerButton)
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('preset-panel')).toBeInTheDocument()
       })
-      
+
       // User can close it
       fireEvent.click(screen.getByText('Close'))
-      
+
       await waitFor(() => {
         expect(screen.queryByTestId('preset-panel')).not.toBeInTheDocument()
       })
@@ -607,7 +607,7 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User can see pattern specifications', () => {
     it('displays complete pattern specifications', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Check all specification fields
       expect(screen.getByText('TYPE:')).toBeInTheDocument()
       expect(screen.getByText('CATEGORY:')).toBeInTheDocument()
@@ -615,7 +615,7 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getByText('TECHNOLOGY:')).toBeInTheDocument()
       expect(screen.getByText('FPS:')).toBeInTheDocument()
       expect(screen.getByText('STATUS:')).toBeInTheDocument()
-      
+
       // Check values (pattern ID and category appear in multiple places)
       expect(screen.getAllByText(/trigonometric-circle/i)).toHaveLength(2)
       expect(screen.getAllByText(/geometric/i)).toHaveLength(2)
@@ -627,10 +627,10 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('updates specifications when pattern changes', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Switch to WebGL pattern
       fireEvent.click(screen.getByText('Noise Field'))
-      
+
       await waitFor(() => {
         expect(screen.getAllByText(/noise-field/i)).toHaveLength(2)
         expect(screen.getByText(/webgl/i)).toBeInTheDocument()
@@ -643,7 +643,7 @@ describe('DesktopLayout - User Behavior', () => {
   describe('User interface interactions', () => {
     it('provides theme toggle functionality', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Theme toggle should be present in header (may not have aria-label, just check it exists)
       const themeToggleButtons = screen.getAllByRole('button')
       expect(themeToggleButtons.length).toBeGreaterThan(0)
@@ -651,13 +651,13 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('shows technical annotations', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Technical viewport annotation
       expect(screen.getByText('VIEWPORT_01')).toBeInTheDocument()
-      
+
       // System version annotation
-      expect(screen.getByText('EIDOS_ENGINE_v1.0')).toBeInTheDocument()
-      
+      expect(screen.getByText('EIDOS_ENGINE_v0.1')).toBeInTheDocument()
+
       // Date annotation (today's date)
       const today = new Date().toISOString().split('T')[0]
       expect(screen.getByText(today)).toBeInTheDocument()
@@ -665,50 +665,50 @@ describe('DesktopLayout - User Behavior', () => {
 
     it('disables previous button on first pattern', () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       const prevButton = screen.getByTestId('pattern-prev-button')
       expect(prevButton).toHaveClass('cursor-not-allowed')
     })
 
     it('disables next button on last pattern', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       // Navigate to last pattern
       const nextButton = screen.getByTestId('pattern-next-button')
-      
+
       // Click next 5 times to get to the last pattern
       for (let i = 0; i < 5; i++) {
         fireEvent.click(nextButton!)
       }
-      
+
       // Now next button should be disabled
       expect(nextButton).toHaveClass('cursor-not-allowed')
     })
 
     it('combines wheel scrolling with button navigation seamlessly', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
-      
+
       const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
       const nextButton = screen.getByTestId('pattern-next-button')
-      
+
       // Start with wheel scroll
       fireEvent.wheel(patternList!, { deltaY: 100 })
-      
+
       // Wait for throttle timeout
       await new Promise(resolve => setTimeout(resolve, 150))
-      
+
       // Pattern should still be first (wheel doesn't select)
       await waitFor(() => {
         expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       }, { timeout: 2000 })
-      
+
       // Continue with button navigation
       fireEvent.click(nextButton!)
-      
+
       await waitFor(() => {
         expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
-      
+
       // Verify that both methods work independently
       // Both wheel and button navigation should be functional
       expect(patternList).toBeInTheDocument()
