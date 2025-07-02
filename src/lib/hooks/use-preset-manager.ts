@@ -24,6 +24,7 @@ export interface UsePresetManagerReturn {
   loadPreset: (presetId: string) => Promise<boolean>
   deletePreset: (presetId: string) => Promise<boolean>
   renamePreset: (presetId: string, newName: string) => Promise<boolean>
+  clearActivePreset: () => void
   
   // Utility operations
   refreshPresets: () => void
@@ -67,13 +68,35 @@ export function usePresetManager({
       const lastActive = PresetManager.getLastActivePreset()
       if (lastActive && loadedPresets.some(p => p.id === lastActive)) {
         setActivePresetId(lastActive)
+      } else if (loadedPresets.length > 0) {
+        // If no valid last active preset, find and load the effective default
+        const effectiveDefault = await PresetManager.getEffectiveDefault(patternId)
+        
+        if (effectiveDefault) {
+          setActivePresetId(effectiveDefault.id)
+          PresetManager.setLastActivePreset(effectiveDefault.id)
+          
+          // Auto-load the effective default preset parameters
+          const validParameters: Record<string, number | string | boolean> = {}
+          const currentControlIds = new Set(patternControls.map(c => c.id))
+          
+          Object.entries(effectiveDefault.parameters).forEach(([key, value]) => {
+            if (currentControlIds.has(key)) {
+              validParameters[key] = value
+            }
+          })
+          
+          onControlValuesChange(validParameters)
+        } else {
+          setActivePresetId(null)
+        }
       } else {
         setActivePresetId(null)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load presets')
     }
-  }, [patternId])
+  }, [patternId, patternControls, onControlValuesChange])
 
   // AIDEV-NOTE: Use ref to avoid dependency cycle in all effects
   const refreshPresetsRef = useRef(refreshPresets)
@@ -375,6 +398,25 @@ export function usePresetManager({
     setError(null)
   }, [])
 
+  // AIDEV-NOTE: Clear active preset and reset to pattern defaults
+  const clearActivePreset = useCallback((): void => {
+    // Clear active preset state
+    setActivePresetId(null)
+    PresetManager.clearLastActivePreset()
+    
+    // Reset all controls to their default values
+    const defaultValues: Record<string, number | string | boolean> = {}
+    patternControls.forEach(control => {
+      defaultValues[control.id] = control.defaultValue
+    })
+    
+    // Update control values through existing state management
+    onControlValuesChange(defaultValues)
+    
+    // Notify other components about the preset change
+    window.dispatchEvent(new CustomEvent('preset-updated'))
+  }, [patternControls, onControlValuesChange])
+
   // AIDEV-NOTE: Restore factory presets functionality
   const restoreFactoryPresets = useCallback(async (): Promise<{ imported: number; skipped: number }> => {
     setIsLoading(true)
@@ -413,6 +455,7 @@ export function usePresetManager({
     loadPreset,
     deletePreset,
     renamePreset,
+    clearActivePreset,
     
     // Utilities
     refreshPresets,

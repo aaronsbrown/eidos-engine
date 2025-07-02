@@ -2,9 +2,10 @@
 "use client"
 
 import React, { useState } from 'react'
-import { Edit2 } from 'lucide-react'
+import { Edit2, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePresetManager } from '@/lib/hooks/use-preset-manager'
+import { PresetManager } from '@/lib/preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
 
 interface FloatingPresetPanelProps {
@@ -144,6 +145,33 @@ export function FloatingPresetPanel({
     input.click()
   }
 
+  const handleMakeDefault = async (presetId: string) => {
+    try {
+      await PresetManager.setUserDefault(presetId)
+      // Refresh presets to show updated default status
+      window.dispatchEvent(new CustomEvent('preset-updated'))
+    } catch (error) {
+      console.error('Failed to set user default:', error)
+    }
+  }
+
+  const handleRemoveDefault = async (presetId: string) => {
+    try {
+      // Find the preset to get its generatorType
+      const preset = presets.find(p => p.id === presetId)
+      if (!preset) {
+        console.error('Preset not found for ID:', presetId)
+        return
+      }
+      
+      await PresetManager.clearUserDefault(preset.generatorType)
+      // Refresh presets to show updated default status
+      window.dispatchEvent(new CustomEvent('preset-updated'))
+    } catch (error) {
+      console.error('Failed to remove user default:', error)
+    }
+  }
+
   return (
     <>
       {/* Floating Trigger Button - Only show if not controlled externally */}
@@ -233,9 +261,13 @@ export function FloatingPresetPanel({
                             </div>
                           ) : (
                             <>
-                              <div className="text-xs font-mono truncate">{preset.name}</div>
+                              <div className="text-xs font-mono truncate flex items-center gap-1">
+                                {preset.name}
+                                {preset.isUserDefault && <Star className="w-3 h-3 text-yellow-500" />}
+                              </div>
                               <div className="text-xs text-muted-foreground/60">
                                 {new Date(preset.createdAt).toLocaleDateString()}
+                                {preset.isUserDefault && <span className="ml-1 text-yellow-600">• Default</span>}
                               </div>
                             </>
                           )}
@@ -273,6 +305,23 @@ export function FloatingPresetPanel({
                               >
                                 <Edit2 className="w-3 h-3" />
                               </Button>
+                              {/* Make/Remove Default Button - Only for user presets */}
+                              {!preset.isFactory && (
+                                <Button
+                                  onClick={() => preset.isUserDefault ? handleRemoveDefault(preset.id) : handleMakeDefault(preset.id)}
+                                  variant="outline"
+                                  size="sm"
+                                  className={`text-xs font-mono border-border px-2 py-1 ${
+                                    preset.isUserDefault 
+                                      ? 'bg-yellow-500/20 border-yellow-500 text-yellow-700 dark:text-yellow-300' 
+                                      : 'hover:border-yellow-500'
+                                  }`}
+                                  disabled={isLoading}
+                                  title={preset.isUserDefault ? 'Remove as default (will use factory default)' : 'Make this your default preset'}
+                                >
+                                  <Star className={`w-3 h-3 ${preset.isUserDefault ? 'fill-current' : ''}`} />
+                                </Button>
+                              )}
                               <Button
                                 onClick={() => handleExportPreset(preset.id)}
                                 variant="outline"

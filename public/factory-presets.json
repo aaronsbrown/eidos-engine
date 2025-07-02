@@ -22,6 +22,7 @@
       },
       "description": "Edward Lorenz's original parameters (σ=10, ρ=28, β=8/3) - the classic butterfly attractor that launched chaos theory.",
       "isFactory": true,
+      "isDefault": true,
       "category": "Classic",
       "mathematicalSignificance": "Historical parameters that first demonstrated deterministic chaos"
     },
@@ -89,6 +90,7 @@
       },
       "description": "René Thomas's cyclically symmetric attractor at the standard chaotic parameter (b=0.208).",
       "isFactory": true,
+      "isDefault": true,
       "category": "Classic",
       "mathematicalSignificance": "Demonstrates cyclic symmetry in chaotic systems"
     },
@@ -157,6 +159,7 @@
       },
       "description": "Standard Aizawa parameters creating the characteristic spherical attractor with tube structure.",
       "isFactory": true,
+      "isDefault": true,
       "category": "Classic",
       "mathematicalSignificance": "Six-parameter system demonstrating high-dimensional chaos"
     },
@@ -256,6 +259,7 @@
       },
       "description": "Standard Halvorsen parameters (a=1.4) creating the characteristic cyclically symmetric attractor.",
       "isFactory": true,
+      "isDefault": true,
       "category": "Classic",
       "mathematicalSignificance": "Demonstrates cyclic symmetry with quadratic nonlinear terms"
     },
@@ -341,6 +345,7 @@
       },
       "description": "Standard Newton-Leipnik parameters (a=0.4, b=0.175) creating the characteristic butterfly-wing structure.",
       "isFactory": true,
+      "isDefault": true,
       "category": "Classic",
       "mathematicalSignificance": "Classic parameters demonstrating cross-coupling dynamics and butterfly structure formation"
     },

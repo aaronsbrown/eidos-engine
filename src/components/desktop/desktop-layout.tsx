@@ -45,6 +45,7 @@ export default function DesktopLayout() {
     presets,
     activePresetId,
     loadPreset,
+    clearActivePreset,
     savePreset,
     error: presetError,
     clearError: clearPresetError,
@@ -123,6 +124,7 @@ export default function DesktopLayout() {
           setDimensions={actions.setDimensions}
           setIsEducationalVisible={actions.setIsEducationalVisible}
           loadPreset={loadPreset}
+          clearActivePreset={clearActivePreset}
         />
       </div>
 

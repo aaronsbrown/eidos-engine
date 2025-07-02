@@ -300,6 +300,15 @@ export class PresetManager {
     }
   }
 
+  static clearLastActivePreset(): void {
+    try {
+      if (typeof window === 'undefined') return
+      localStorage.removeItem(STORAGE_KEYS.LAST_ACTIVE_PRESET)
+    } catch (error) {
+      console.warn('Failed to clear last active preset:', error)
+    }
+  }
+
   /**
    * Load factory presets from the public directory
    */
@@ -328,5 +337,78 @@ export class PresetManager {
    */
   static getUserPresets(): PatternPreset[] {
     return this.loadUserPresets()
+  }
+
+  /**
+   * Set a user preset as the default for its pattern type
+   * Ensures only one user default per pattern type
+   */
+  static setUserDefault(presetId: string): boolean {
+    const userPresets = this.loadUserPresets()
+    const targetPreset = userPresets.find(p => p.id === presetId)
+    
+    if (!targetPreset) {
+      throw new Error('Preset not found')
+    }
+
+    // Clear any existing user default for this pattern type
+    userPresets.forEach(preset => {
+      if (preset.generatorType === targetPreset.generatorType) {
+        preset.isUserDefault = false
+      }
+    })
+
+    // Set the target preset as user default
+    targetPreset.isUserDefault = true
+
+    return this.saveUserPresets(userPresets)
+  }
+
+  /**
+   * Get the user default preset for a pattern type
+   * Returns null if no user default is set
+   */
+  static getUserDefault(generatorType: string): PatternPreset | null {
+    const userPresets = this.loadUserPresets()
+    return userPresets.find(p => 
+      p.generatorType === generatorType && p.isUserDefault === true
+    ) || null
+  }
+
+  /**
+   * Clear user default for a pattern type
+   */
+  static clearUserDefault(generatorType: string): boolean {
+    const userPresets = this.loadUserPresets()
+    let modified = false
+
+    userPresets.forEach(preset => {
+      if (preset.generatorType === generatorType && preset.isUserDefault) {
+        preset.isUserDefault = false
+        modified = true
+      }
+    })
+
+    return modified ? this.saveUserPresets(userPresets) : true
+  }
+
+  /**
+   * Get the effective default preset for a pattern type
+   * Follows precedence: User Default -> Factory Default -> null
+   */
+  static async getEffectiveDefault(generatorType: string): Promise<PatternPreset | null> {
+    // First check for user default
+    const userDefault = this.getUserDefault(generatorType)
+    if (userDefault) {
+      return userDefault
+    }
+
+    // Fall back to factory default
+    const factoryPresets = await this.loadFactoryPresets()
+    const factoryDefault = factoryPresets.find(p => 
+      p.generatorType === generatorType && p.isDefault === true
+    )
+    
+    return factoryDefault || null
   }
 }

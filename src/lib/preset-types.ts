@@ -14,6 +14,8 @@ export interface PatternPreset {
   description?: string
   contentHash: string // AIDEV-NOTE: Hash of meaningful content for duplicate detection
   isFactory?: boolean // AIDEV-NOTE: Factory presets that ship with the app
+  isDefault?: boolean // AIDEV-NOTE: Default factory preset for initialization
+  isUserDefault?: boolean // AIDEV-NOTE: User-chosen default preset (only one per pattern type)
   category?: string // AIDEV-NOTE: Factory preset category (Classic, Bifurcation, Enhanced, etc.)
   mathematicalSignificance?: string // AIDEV-NOTE: Educational description of mathematical importance
 }
@@ -67,6 +69,7 @@ export interface RawFactoryPreset {
   parameters: Record<string, number | string | boolean>
   description?: string
   isFactory?: boolean
+  isDefault?: boolean
   category?: string
   mathematicalSignificance?: string
 }

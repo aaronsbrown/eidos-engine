@@ -1,13 +1,15 @@
 // AIDEV-NOTE: Extracted desktop layout main content area from main component for better maintainability
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import { GraduationCap, BookOpen, Bookmark } from "lucide-react"
 import { EducationalOverlay } from "@/components/ui/educational-overlay"
 import GroupedSimulationControlsPanel from "@/components/ui/grouped-simulation-controls-panel"
 import type { DesktopLayoutState } from "@/lib/hooks/use-desktop-layout-state"
 import type { DesktopLayoutHandlers } from "@/lib/desktop-layout-handlers"
 import type { EducationalContent } from "@/components/ui/educational-overlay"
+import { getPresetDisplayName } from "@/lib/preset-comparison"
+import { PresetManager } from "@/lib/preset-manager"
 
 import type { PatternPreset } from "@/lib/preset-manager"
 
@@ -26,6 +28,7 @@ interface DesktopLayoutMainProps {
   setDimensions: (dimensions: { width: number; height: number }) => void
   setIsEducationalVisible: (visible: boolean) => void
   loadPreset: (presetId: string) => void
+  clearActivePreset: () => void
 }
 
 export function DesktopLayoutMain({
@@ -43,6 +46,7 @@ export function DesktopLayoutMain({
   setDimensions,
   setIsEducationalVisible,
   loadPreset,
+  clearActivePreset,
 }: DesktopLayoutMainProps) {
   const {
     selectedPattern,
@@ -57,6 +61,63 @@ export function DesktopLayoutMain({
   } = handlers
 
   const { PatternComponent } = state
+
+  // AIDEV-NOTE: Memoize active preset display name to detect modifications
+  const activePresetDisplayName = useMemo(() => {
+    if (!activePresetId) {
+      return ''
+    }
+    
+    const activePreset = presets.find(p => p.id === activePresetId)
+    if (!activePreset) {
+      return ''
+    }
+    
+    const currentValues = getCurrentControlValues()
+    return getPresetDisplayName(activePreset, currentValues)
+  }, [activePresetId, presets, getCurrentControlValues])
+
+  // AIDEV-NOTE: Smart reset function with precedence: User Default → Factory Default → Pattern Defaults
+  const handleResetToDefaults = async () => {
+    try {
+      // Get the effective default preset using precedence rules
+      const effectiveDefault = await PresetManager.getEffectiveDefault(selectedPattern.id)
+      
+      if (effectiveDefault) {
+        // Reset to the effective default preset
+        loadPreset(effectiveDefault.id)
+      } else {
+        // Fall back to pattern control defaults
+        const defaultValues: Record<string, number | string | boolean> = {}
+        selectedPattern.controls?.forEach(control => {
+          defaultValues[control.id] = control.defaultValue
+        })
+        Object.entries(defaultValues).forEach(([controlId, value]) => {
+          handleControlChange(controlId, value)
+        })
+        
+        // Clear any active preset since we're now at pattern defaults (not a preset)
+        if (activePresetId) {
+          clearActivePreset()
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to reset to defaults, falling back to pattern defaults:', error)
+      
+      // Emergency fallback: reset to pattern defaults
+      const defaultValues: Record<string, number | string | boolean> = {}
+      selectedPattern.controls?.forEach(control => {
+        defaultValues[control.id] = control.defaultValue
+      })
+      Object.entries(defaultValues).forEach(([controlId, value]) => {
+        handleControlChange(controlId, value)
+      })
+      
+      if (activePresetId) {
+        clearActivePreset()
+      }
+    }
+  }
 
   return (
     <>
@@ -93,28 +154,24 @@ export function DesktopLayoutMain({
         
         <div data-tour="preset-dropdown" className="absolute top-4 right-4 text-xs font-mono text-muted-foreground space-y-1">
           <div className="flex items-center space-x-2">
-            {/* Preset Selection Dropdown */}
-            <select
-              className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-              value={activePresetId || ""}
-              onChange={(e) => {
-                if (e.target.value === "") {
-                  // Reset to defaults - handled by clearing active preset
-                  // The parent component will handle resetting control values
-                } else {
+            {/* Preset Selection Dropdown - Only show if presets exist */}
+            {presets.length > 0 && (
+              <select
+                className="border border-border bg-background text-foreground px-2 py-1 font-mono text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                value={activePresetId || (presets.length > 0 ? presets[0].id : "")}
+                onChange={(e) => {
                   // Load the selected preset
                   loadPreset(e.target.value)
-                }
-              }}
-              disabled={isPresetLoading}
-            >
-              <option value="">DEFAULT PATTERN</option>
-              {presets.map((preset) => (
-                <option key={preset.id} value={preset.id}>
-                  {preset.name}
-                </option>
-              ))}
-            </select>
+                }}
+                disabled={isPresetLoading}
+              >
+                {presets.map((preset) => (
+                  <option key={preset.id} value={preset.id}>
+                    {preset.id === activePresetId ? activePresetDisplayName : preset.name}
+                  </option>
+                ))}
+              </select>
+            )}
             
             {/* Quick Save Button */}
             <button
@@ -248,6 +305,7 @@ export function DesktopLayoutMain({
             controlValues={getCurrentControlValues()}
             onControlChange={handleControlChange}
             sidebarWidth={sidebarWidth}
+            onResetToDefaults={handleResetToDefaults}
           />
         </div>
       </aside>

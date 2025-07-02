@@ -149,8 +149,19 @@ describe('Floating Preset Panel - Library Management', () => {
 
       // Users should see edit functionality for each preset
       const allButtons = screen.getAllByRole('button')
-      const editButtons = allButtons.filter(btn => btn.querySelector('svg') && !btn.textContent?.trim())
+      // Look specifically for Edit2 icons (edit buttons) vs Star icons (make default buttons)
+      const editButtons = allButtons.filter(btn => {
+        const svg = btn.querySelector('svg')
+        return svg && svg.querySelector('path[d*="21.174 6.812"]') // Edit2 icon path
+      })
       expect(editButtons).toHaveLength(2)
+
+      // Should also have Make Default buttons (Star icons) for user presets
+      const makeDefaultButtons = allButtons.filter(btn => {
+        const svg = btn.querySelector('svg')
+        return svg && svg.querySelector('path[d*="11.525 2.295"]') // Star icon path
+      })
+      expect(makeDefaultButtons).toHaveLength(2) // Both presets are user presets
 
       // Should have 2 export buttons
       const exportButtons = screen.getAllByText('Export')
