@@ -1,0 +1,54 @@
+# AIDEV-NOTE: Dependabot configuration for automated security updates
+version: 2
+updates:
+  # Monitor npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "aaronsbrown"
+    assignees:
+      - "aaronsbrown"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "security"
+    # Group non-security updates to reduce PR noise
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "@types/*"
+          - "@storybook/*"
+          - "eslint*"
+          - "jest*"
+          - "typescript"
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@react*"
+          - "next"
+      webgl-dependencies:
+        patterns:
+          - "three*"
+          - "@react-three/*"
+    # Always create individual PRs for security updates
+    security-updates:
+      dependency-type: "direct"
+      
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+      - "github-actions"
