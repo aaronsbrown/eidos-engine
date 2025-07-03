@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { validatePresetName } from '@/lib/preset-name-validation'
 
 interface SavePresetModalProps {
   isOpen: boolean
@@ -22,9 +23,10 @@ export function SavePresetModal({
   const [presetName, setPresetName] = useState('')
 
   const handleSave = async () => {
-    if (!presetName.trim()) return
+    const cleanedName = validatePresetName(presetName)
+    if (!cleanedName) return
     
-    const success = await onSave(presetName.trim())
+    const success = await onSave(cleanedName)
     if (success) {
       setPresetName('')
       onClose()

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { usePresetManager } from '@/lib/hooks/use-preset-manager'
 import { PresetManager } from '@/lib/preset-manager'
 import { PatternControl } from '@/components/pattern-generators/types'
+import { validatePresetName } from '@/lib/preset-name-validation'
 
 interface FloatingPresetPanelProps {
   patternId: string
@@ -92,9 +93,12 @@ export function FloatingPresetPanel({
   }
 
   const handleConfirmRename = async () => {
-    if (!renamingPresetId || !renameValue.trim()) return
+    if (!renamingPresetId) return
     
-    const success = await renamePreset(renamingPresetId, renameValue.trim())
+    const cleanedName = validatePresetName(renameValue)
+    if (!cleanedName) return
+    
+    const success = await renamePreset(renamingPresetId, cleanedName)
     if (success) {
       setRenamingPresetId(null)
       setRenameValue('')

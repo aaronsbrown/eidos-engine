@@ -11,6 +11,7 @@ import { calculateThomasPoint } from '@/lib/math/thomas'
 import ThreeJSCanvas from "@/components/three-js/ThreeJSCanvas"
 import AxesHelper3D from "@/components/three-js/AxesHelper3D"
 import { createThreeJSShaderMaterial } from "@/lib/threejs-shader-utils"
+import { applySafeParticleCount, WEBGL_LIMITS } from "@/lib/webgl-limits"
 
 interface ThomasControls {
   b: number
@@ -177,7 +178,7 @@ const ThomasAttractorGenerator: React.FC<PatternGeneratorProps> = ({
   // Use passed control values or defaults
   const controls: ThomasControls = useMemo(() => ({
       b: (controlValues?.b as number) ?? 0.208,
-      particleCount: (controlValues?.particleCount as number) ?? 2500,
+      particleCount: applySafeParticleCount((controlValues?.particleCount as number) ?? 2500, WEBGL_LIMITS.MAX_ATTRACTOR_PARTICLES),
       particleSize: (controlValues?.particleSize as number) ?? 0.04,
       autoRotate: (controlValues?.autoRotate as boolean) ?? false,
       autoRotateSpeed: (controlValues?.autoRotateSpeed as number) ?? 1.0,
