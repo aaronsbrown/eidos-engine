@@ -22,7 +22,12 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Organic", "Flowing", "Jittery", "Luminous"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["random walk", "stochastic", "molecular motion", "chaos"]
+      keywords: ["random walk", "stochastic", "molecular motion", "chaos"],
+      educationalContent: {
+        contentId: "brownian-motion",
+        relatedConcepts: ["random-walk", "stochastic-processes", "molecular-kinetics"],
+        crossReferences: ["noise", "pixelated-noise", "particle-system"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -149,7 +154,12 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Organic", "Complex", "Luminous", "Pulsating"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["particles", "curl noise", "physics", "fluid dynamics", "generative"]
+      keywords: ["particles", "curl noise", "physics", "fluid dynamics", "generative"],
+      educationalContent: {
+        contentId: "particle-system",
+        relatedConcepts: ["particle-physics", "fluid-dynamics", "vector-fields"],
+        crossReferences: ["brownian-motion", "noise"]
+      }
     },
     performance: {
       computationalComplexity: "High",
@@ -406,7 +416,12 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Discrete", "Ordered", "Geometric", "Complex", "Static"],
       dimensionality: "1D",
       interactionStyle: "ParameterTuning",
-      keywords: ["wolfram", "rule 30", "rule 110", "emergence", "complexity"]
+      keywords: ["wolfram", "rule 30", "rule 110", "emergence", "complexity"],
+      educationalContent: {
+        contentId: "cellular-automaton",
+        relatedConcepts: ["discrete-mathematics", "emergence", "computational-theory"],
+        crossReferences: ["pixelated-noise"]
+      }
     },
     performance: {
       computationalComplexity: "Low",

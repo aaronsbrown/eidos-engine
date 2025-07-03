@@ -20,7 +20,12 @@ export const noisePatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Organic", "Continuous", "Smooth"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["perlin", "noise", "flow field", "organic patterns"]
+      keywords: ["perlin", "noise", "flow field", "organic patterns"],
+      educationalContent: {
+        contentId: "noise",
+        relatedConcepts: ["perlin-noise", "stochastic-processes"],
+        crossReferences: ["pixelated-noise", "brownian-motion"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -136,7 +141,12 @@ export const noisePatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Pixelated", "Discrete", "Geometric", "Flowing"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["pixel art", "retro", "discrete noise", "blocky"]
+      keywords: ["pixel art", "retro", "discrete noise", "blocky"],
+      educationalContent: {
+        contentId: "pixelated-noise",
+        relatedConcepts: ["discrete-mathematics", "digital-noise"],
+        crossReferences: ["noise", "brownian-motion"]
+      }
     },
     performance: {
       computationalComplexity: "Low",

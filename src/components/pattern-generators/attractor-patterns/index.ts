@@ -23,7 +23,12 @@ export const attractorPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Chaotic", "Organic", "Complex", "Luminous", "Smooth", "Continuous"],
       dimensionality: "True3D_WebGL",
       interactionStyle: "DirectManipulation",
-      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl", "camera", "depth", "interactive", "spatial"]
+      keywords: ["lorenz", "butterfly effect", "dynamical system", "chaos", "3d", "webgl", "camera", "depth", "interactive", "spatial"],
+      educationalContent: {
+        contentId: "lorenz-attractor",
+        relatedConcepts: ["chaos-theory", "butterfly-effect", "dynamical-systems"],
+        crossReferences: ["thomas-attractor", "aizawa-attractor", "halvorsen-attractor", "newton-leipnik-attractor"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -229,7 +234,12 @@ export const attractorPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Chaotic", "Continuous", "Symmetrical", "Luminous", "Smooth"],
       dimensionality: "True3D_WebGL",
       interactionStyle: "DirectManipulation",
-      keywords: ["thomas", "cyclic symmetry", "sinusoidal", "strange attractor", "3d", "webgl", "interactive", "spatial"]
+      keywords: ["thomas", "cyclic symmetry", "sinusoidal", "strange attractor", "3d", "webgl", "interactive", "spatial"],
+      educationalContent: {
+        contentId: "thomas-attractor",
+        relatedConcepts: ["chaos-theory", "cyclic-symmetry", "sinusoidal-dynamics"],
+        crossReferences: ["lorenz-attractor", "aizawa-attractor", "halvorsen-attractor"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -409,7 +419,12 @@ export const attractorPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Chaotic", "Complex", "Organic", "Luminous", "Smooth", "Continuous"],
       dimensionality: "True3D_WebGL",
       interactionStyle: "DirectManipulation",
-      keywords: ["aizawa", "strange attractor", "dynamical system", "chaos", "3d", "webgl", "parametric", "nonlinear"]
+      keywords: ["aizawa", "strange attractor", "dynamical system", "chaos", "3d", "webgl", "parametric", "nonlinear"],
+      educationalContent: {
+        contentId: "aizawa-attractor",
+        relatedConcepts: ["chaos-theory", "parameter-space", "nonlinear-dynamics"],
+        crossReferences: ["lorenz-attractor", "thomas-attractor", "halvorsen-attractor", "newton-leipnik-attractor"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -648,7 +663,12 @@ export const attractorPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Chaotic", "Continuous", "Symmetrical", "Luminous", "Smooth"],
       dimensionality: "True3D_WebGL",
       interactionStyle: "DirectManipulation",
-      keywords: ["halvorsen", "cyclic symmetry", "quadratic", "strange attractor", "3d", "webgl", "interactive", "spatial"]
+      keywords: ["halvorsen", "cyclic symmetry", "quadratic", "strange attractor", "3d", "webgl", "interactive", "spatial"],
+      educationalContent: {
+        contentId: "halvorsen-attractor",
+        relatedConcepts: ["chaos-theory", "cyclic-symmetry", "quadratic-nonlinearity"],
+        crossReferences: ["lorenz-attractor", "thomas-attractor", "aizawa-attractor", "newton-leipnik-attractor"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",
@@ -829,7 +849,12 @@ export const attractorPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Flowing", "Chaotic", "Continuous", "Complex", "Organic", "Luminous", "Smooth"],
       dimensionality: "True3D_WebGL",
       interactionStyle: "DirectManipulation",
-      keywords: ["newton-leipnik", "butterfly structure", "folding dynamics", "cross-coupling", "strange attractor", "3d", "webgl", "interactive", "spatial"]
+      keywords: ["newton-leipnik", "butterfly structure", "folding dynamics", "cross-coupling", "strange attractor", "3d", "webgl", "interactive", "spatial"],
+      educationalContent: {
+        contentId: "newton-leipnik-attractor",
+        relatedConcepts: ["chaos-theory", "butterfly-structure", "folding-dynamics"],
+        crossReferences: ["lorenz-attractor", "thomas-attractor", "aizawa-attractor", "halvorsen-attractor"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",

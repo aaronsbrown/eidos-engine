@@ -1,6 +1,7 @@
 import type { EducationalContent } from '@/components/ui/educational-overlay'
 import { parseEducationalContent } from './educational-content-parser'
 import { patternGenerators } from '@/components/pattern-generators'
+import { hasSemanticMetadata } from './semantic-types'
 
 // AIDEV-NOTE: Educational content loader with fallbacks for Storybook compatibility
 export class EducationalContentLoader {
@@ -17,9 +18,17 @@ export class EducationalContentLoader {
       return this.cache.get(patternId)!
     }
 
+    // AIDEV-NOTE: Check for explicit educational content link in pattern metadata first
+    const pattern = patternGenerators.find(p => p.id === patternId)
+    let contentId = patternId // Default to pattern ID for backward compatibility
+    
+    if (pattern && hasSemanticMetadata(pattern) && pattern.semantics.educationalContent) {
+      contentId = pattern.semantics.educationalContent.contentId
+    }
+
     try {
       // Try to load from public directory (works in production and dev)
-      const response = await fetch(`/educational-content/${patternId}.md`)
+      const response = await fetch(`/educational-content/${contentId}.md`)
       
       if (response.ok) {
         const markdownContent = await response.text()
@@ -30,7 +39,7 @@ export class EducationalContentLoader {
         return parsedContent
       }
     } catch (error) {
-      console.warn(`Failed to load educational content for ${patternId}:`, error)
+      console.warn(`Failed to load educational content for ${patternId} (contentId: ${contentId}):`, error)
     }
 
     // Fallback to hard-coded content for Storybook and error cases
@@ -132,11 +141,69 @@ export class EducationalContentLoader {
    */
   static async hasEducationalContent(patternId: string): Promise<boolean> {
     try {
-      const response = await fetch(`/educational-content/${patternId}.md`)
+      // AIDEV-NOTE: Check explicit content ID from metadata if available
+      const pattern = patternGenerators.find(p => p.id === patternId)
+      let contentId = patternId
+      
+      if (pattern && hasSemanticMetadata(pattern) && pattern.semantics.educationalContent) {
+        contentId = pattern.semantics.educationalContent.contentId
+      }
+      
+      const response = await fetch(`/educational-content/${contentId}.md`)
       return response.ok
     } catch {
       return false
     }
+  }
+
+  /**
+   * Get related educational content for a pattern based on cross-references
+   * @param patternId - Pattern identifier
+   * @returns Array of related pattern IDs with educational content
+   */
+  static getRelatedEducationalContent(patternId: string): string[] {
+    const pattern = patternGenerators.find(p => p.id === patternId)
+    
+    if (!pattern || !hasSemanticMetadata(pattern) || !pattern.semantics.educationalContent) {
+      return []
+    }
+    
+    return pattern.semantics.educationalContent.crossReferences || []
+  }
+
+  /**
+   * Get patterns that reference this pattern's educational content
+   * @param patternId - Pattern identifier
+   * @returns Array of pattern IDs that cross-reference this pattern
+   */
+  static getEducationalContentReferences(patternId: string): string[] {
+    const referencingPatterns: string[] = []
+    
+    for (const pattern of patternGenerators) {
+      if (hasSemanticMetadata(pattern) && pattern.semantics.educationalContent) {
+        const crossRefs = pattern.semantics.educationalContent.crossReferences || []
+        if (crossRefs.includes(patternId)) {
+          referencingPatterns.push(pattern.id)
+        }
+      }
+    }
+    
+    return referencingPatterns
+  }
+
+  /**
+   * Get related concepts for a pattern
+   * @param patternId - Pattern identifier
+   * @returns Array of related concept IDs
+   */
+  static getRelatedConcepts(patternId: string): string[] {
+    const pattern = patternGenerators.find(p => p.id === patternId)
+    
+    if (!pattern || !hasSemanticMetadata(pattern) || !pattern.semantics.educationalContent) {
+      return []
+    }
+    
+    return pattern.semantics.educationalContent.relatedConcepts || []
   }
 }
 
@@ -161,4 +228,17 @@ export function getAllPatternIds(): string[] {
 
 export async function hasEducationalContent(patternId: string): Promise<boolean> {
   return EducationalContentLoader.hasEducationalContent(patternId)
+}
+
+// AIDEV-NOTE: New convenience functions for cross-reference and related concepts
+export function getRelatedEducationalContent(patternId: string): string[] {
+  return EducationalContentLoader.getRelatedEducationalContent(patternId)
+}
+
+export function getEducationalContentReferences(patternId: string): string[] {
+  return EducationalContentLoader.getEducationalContentReferences(patternId)
+}
+
+export function getRelatedConcepts(patternId: string): string[] {
+  return EducationalContentLoader.getRelatedConcepts(patternId)
 }

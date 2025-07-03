@@ -20,7 +20,12 @@ export const geometricPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Geometric", "Minimalist", "Ordered", "Flowing"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["unit circle", "sine", "cosine", "trigonometry", "educational"]
+      keywords: ["unit circle", "sine", "cosine", "trigonometry", "educational"],
+      educationalContent: {
+        contentId: "trigonometric-circle",
+        relatedConcepts: ["trigonometry", "unit-circle", "periodic-functions"],
+        crossReferences: ["four-pole-gradient"]
+      }
     },
     performance: {
       computationalComplexity: "VeryLow",
@@ -74,7 +79,12 @@ export const geometricPatterns: RichPatternGeneratorDefinition[] = [
       visualCharacteristics: ["Smooth", "Continuous", "Geometric", "Flowing", "Luminous"],
       dimensionality: "2D",
       interactionStyle: "ParameterTuning",
-      keywords: ["gradient", "interpolation", "bilinear", "color field"]
+      keywords: ["gradient", "interpolation", "bilinear", "color field"],
+      educationalContent: {
+        contentId: "four-pole-gradient",
+        relatedConcepts: ["linear-interpolation", "bilinear-interpolation", "color-theory"],
+        crossReferences: ["trigonometric-circle", "noise"]
+      }
     },
     performance: {
       computationalComplexity: "Medium",

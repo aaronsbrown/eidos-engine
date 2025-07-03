@@ -175,3 +175,98 @@ export function getRelatedPatterns(
   return Array.from(new Set(combined.map(p => p.id)))
     .map(id => combined.find(p => p.id === id)!)
 }
+
+// AIDEV-NOTE: Educational content utility functions for querying patterns by educational metadata
+/**
+ * Get all patterns that have educational content
+ */
+export function getPatternsWithEducationalContent(
+  patterns: RichPatternGeneratorDefinition[]
+): RichPatternGeneratorDefinition[] {
+  return patterns.filter(pattern =>
+    hasSemanticMetadata(pattern) && 
+    pattern.semantics.educationalContent !== undefined
+  )
+}
+
+/**
+ * Find patterns by educational content ID
+ */
+export function findPatternsByEducationalContentId(
+  patterns: RichPatternGeneratorDefinition[],
+  contentId: string
+): RichPatternGeneratorDefinition[] {
+  return patterns.filter(pattern =>
+    hasSemanticMetadata(pattern) &&
+    pattern.semantics.educationalContent?.contentId === contentId
+  )
+}
+
+/**
+ * Get patterns that cross-reference a specific pattern's educational content
+ */
+export function getEducationalCrossReferences(
+  patterns: RichPatternGeneratorDefinition[],
+  targetPatternId: string
+): RichPatternGeneratorDefinition[] {
+  return patterns.filter(pattern =>
+    hasSemanticMetadata(pattern) &&
+    pattern.semantics.educationalContent?.crossReferences?.includes(targetPatternId)
+  )
+}
+
+/**
+ * Find patterns by related concept
+ */
+export function findPatternsByRelatedConcept(
+  patterns: RichPatternGeneratorDefinition[],
+  concept: string
+): RichPatternGeneratorDefinition[] {
+  return patterns.filter(pattern =>
+    hasSemanticMetadata(pattern) &&
+    pattern.semantics.educationalContent?.relatedConcepts?.includes(concept)
+  )
+}
+
+/**
+ * Get all unique educational content IDs from patterns
+ */
+export function getAllEducationalContentIds(
+  patterns: RichPatternGeneratorDefinition[]
+): string[] {
+  const contentIds = patterns
+    .filter(pattern => hasSemanticMetadata(pattern) && pattern.semantics.educationalContent)
+    .map(pattern => pattern.semantics.educationalContent!.contentId)
+  
+  return Array.from(new Set(contentIds))
+}
+
+/**
+ * Get all unique related concepts from patterns
+ */
+export function getAllRelatedConcepts(
+  patterns: RichPatternGeneratorDefinition[]
+): string[] {
+  const concepts = patterns
+    .filter(pattern => hasSemanticMetadata(pattern) && pattern.semantics.educationalContent)
+    .flatMap(pattern => pattern.semantics.educationalContent!.relatedConcepts || [])
+  
+  return Array.from(new Set(concepts))
+}
+
+/**
+ * Build educational content network - returns a map of pattern IDs to their cross-references
+ */
+export function buildEducationalContentNetwork(
+  patterns: RichPatternGeneratorDefinition[]
+): Record<string, string[]> {
+  const network: Record<string, string[]> = {}
+  
+  patterns.forEach(pattern => {
+    if (hasSemanticMetadata(pattern) && pattern.semantics.educationalContent) {
+      network[pattern.id] = pattern.semantics.educationalContent.crossReferences || []
+    }
+  })
+  
+  return network
+}

@@ -249,5 +249,194 @@ Convenience content.`
       const allIds = getAllPatternIds()
       expect(Array.isArray(allIds)).toBe(true)
     })
+
+    it('exports new convenience functions for metadata features', async () => {
+      // Test new convenience imports
+      const { 
+        getRelatedEducationalContent, 
+        getEducationalContentReferences, 
+        getRelatedConcepts 
+      } = await import('../educational-content-loader')
+
+      expect(typeof getRelatedEducationalContent).toBe('function')
+      expect(typeof getEducationalContentReferences).toBe('function')
+      expect(typeof getRelatedConcepts).toBe('function')
+    })
+  })
+
+  // AIDEV-NOTE: Tests for new educational content metadata functionality
+  describe('Educational Content Metadata', () => {
+    // Mock pattern generators with educational content metadata
+    const mockPatternGenerators = [
+      {
+        id: 'pattern-with-metadata',
+        name: 'Pattern With Metadata',
+        schemaVersion: '1.0',
+        semantics: {
+          primaryAlgorithmFamily: 'NoiseFunction',
+          keyMathematicalConcepts: ['Calculus'],
+          visualCharacteristics: ['Organic'],
+          dimensionality: '2D',
+          interactionStyle: 'ParameterTuning',
+          keywords: ['test'],
+          educationalContent: {
+            contentId: 'custom-content-id',
+            relatedConcepts: ['concept1', 'concept2'],
+            crossReferences: ['related-pattern-1', 'related-pattern-2']
+          }
+        },
+        performance: {
+          computationalComplexity: 'Medium',
+          typicalFrameRateTarget: '60fps'
+        }
+      },
+      {
+        id: 'pattern-without-metadata',
+        name: 'Pattern Without Metadata',
+        component: {},
+        technology: 'CANVAS_2D',
+        category: 'Noise'
+      },
+      {
+        id: 'related-pattern-1',
+        name: 'Related Pattern 1',
+        schemaVersion: '1.0',
+        semantics: {
+          primaryAlgorithmFamily: 'NoiseFunction',
+          keyMathematicalConcepts: ['Calculus'],
+          visualCharacteristics: ['Organic'],
+          dimensionality: '2D',
+          interactionStyle: 'ParameterTuning',
+          keywords: ['test'],
+          educationalContent: {
+            contentId: 'related-content-1',
+            crossReferences: ['pattern-with-metadata']
+          }
+        },
+        performance: {
+          computationalComplexity: 'Low',
+          typicalFrameRateTarget: '60fps'
+        }
+      }
+    ]
+
+    beforeEach(() => {
+      // Mock the pattern generators import
+      jest.doMock('@/components/pattern-generators', () => ({
+        patternGenerators: mockPatternGenerators
+      }))
+    })
+
+    it('loads content using explicit contentId from metadata', async () => {
+      const mockContent = `# Custom Content
+
+## Layer 1: "What is this?" (Intuitive/Experiential)
+
+Custom content.
+
+## Layer 2: "How does this work?" (Conceptual/Mechanical)
+
+Custom content.
+
+## Layer 3: "Show me the code" (Technical/Formal)
+
+Custom content.`
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockContent)
+      })
+
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const result = await EducationalContentLoader.loadContent('pattern-with-metadata')
+
+      // Should fetch using the custom contentId, not the pattern ID
+      expect(global.fetch).toHaveBeenCalledWith('/educational-content/custom-content-id.md')
+      expect(result.title).toBe('Custom Content')
+    })
+
+    it('falls back to pattern ID when no explicit contentId is provided', async () => {
+      const mockContent = `# Fallback Content
+
+## Layer 1: "What is this?" (Intuitive/Experiential)
+
+Fallback content.
+
+## Layer 2: "How does this work?" (Conceptual/Mechanical)
+
+Fallback content.
+
+## Layer 3: "Show me the code" (Technical/Formal)
+
+Fallback content.`
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(mockContent)
+      })
+
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const result = await EducationalContentLoader.loadContent('pattern-without-metadata')
+
+      // Should fetch using the pattern ID as fallback
+      expect(global.fetch).toHaveBeenCalledWith('/educational-content/pattern-without-metadata.md')
+      expect(result.title).toBe('Fallback Content')
+    })
+
+    it('gets related educational content from cross-references', async () => {
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const relatedContent = EducationalContentLoader.getRelatedEducationalContent('pattern-with-metadata')
+      expect(relatedContent).toEqual(['related-pattern-1', 'related-pattern-2'])
+    })
+
+    it('gets empty array for patterns without cross-references', async () => {
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const relatedContent = EducationalContentLoader.getRelatedEducationalContent('pattern-without-metadata')
+      expect(relatedContent).toEqual([])
+    })
+
+    it('finds patterns that reference a given pattern', async () => {
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const references = EducationalContentLoader.getEducationalContentReferences('pattern-with-metadata')
+      expect(references).toEqual(['related-pattern-1'])
+    })
+
+    it('gets related concepts from metadata', async () => {
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const concepts = EducationalContentLoader.getRelatedConcepts('pattern-with-metadata')
+      expect(concepts).toEqual(['concept1', 'concept2'])
+    })
+
+    it('uses explicit contentId in hasEducationalContent check', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
+
+      // Re-import to get the mocked pattern generators
+      jest.resetModules()
+      const { EducationalContentLoader } = await import('../educational-content-loader')
+
+      const hasContent = await EducationalContentLoader.hasEducationalContent('pattern-with-metadata')
+      
+      // Should check the custom contentId, not the pattern ID
+      expect(global.fetch).toHaveBeenCalledWith('/educational-content/custom-content-id.md')
+      expect(hasContent).toBe(true)
+    })
   })
 })
