@@ -6,6 +6,7 @@
 import { useEffect, useRef, useMemo } from "react"
 import type { PatternGeneratorProps } from "./types"
 import { loadShader, createShaderProgram } from "@/lib/shader-loader"
+import { applySafeParticleCount } from "@/lib/webgl-limits"
 
 interface BrownianControls {
   particleCount: number
@@ -29,7 +30,7 @@ export default function BrownianMotionGenerator({
   
   // Use passed control values or defaults
   const controls: BrownianControls = useMemo(() => ({
-    particleCount: (controlValues?.particleCount as number) ?? 12,
+    particleCount: applySafeParticleCount((controlValues?.particleCount as number) ?? 12, 20),
     speed: (controlValues?.speed as number) ?? 1.0,
     brightness: (controlValues?.brightness as number) ?? 2.0,
     trailLength: (controlValues?.trailLength as number) ?? 8,

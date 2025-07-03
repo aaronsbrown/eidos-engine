@@ -11,6 +11,7 @@ import { calculateLorenzPoint } from '@/lib/math/lorenz'
 import ThreeJSCanvas from "@/components/three-js/ThreeJSCanvas"
 import AxesHelper3D from "@/components/three-js/AxesHelper3D"
 import { createThreeJSShaderMaterial } from "@/lib/threejs-shader-utils"
+import { applySafeParticleCount, WEBGL_LIMITS } from "@/lib/webgl-limits"
 
 interface LorenzControls {
   sigma: number
@@ -181,7 +182,7 @@ const LorenzAttractorGenerator: React.FC<PatternGeneratorProps> = ({
       sigma: (controlValues?.sigma as number) ?? 10,
       rho: (controlValues?.rho as number) ?? 28,
       beta: (controlValues?.beta as number) ?? 8/3,
-      particleCount: (controlValues?.particleCount as number) ?? 2500,
+      particleCount: applySafeParticleCount((controlValues?.particleCount as number) ?? 2500, WEBGL_LIMITS.MAX_ATTRACTOR_PARTICLES),
       particleSize: (controlValues?.particleSize as number) ?? 0.03,
       autoRotate: (controlValues?.autoRotate as boolean) ?? false,
       autoRotateSpeed: (controlValues?.autoRotateSpeed as number) ?? 1.0,

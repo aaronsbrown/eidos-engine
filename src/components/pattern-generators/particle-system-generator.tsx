@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useMemo } from "react"
 import type { PatternGeneratorProps } from "./types"
+import { applySafeParticleCount } from "@/lib/webgl-limits"
 
 interface ParticleSystemControls {
   particleCount: number
@@ -38,7 +39,7 @@ export default function ParticleSystemGenerator({
   
   // Use passed control values or defaults
   const controls: ParticleSystemControls = useMemo(() => ({
-    particleCount: (controlValues?.particleCount as number) ?? 50,
+    particleCount: applySafeParticleCount((controlValues?.particleCount as number) ?? 50, 100),
     lifeExpectancy: (controlValues?.lifeExpectancy as number) ?? 5.0,
     lifeVariation: (controlValues?.lifeVariation as number) ?? 50,
     particleSize: (controlValues?.particleSize as number) ?? 8,

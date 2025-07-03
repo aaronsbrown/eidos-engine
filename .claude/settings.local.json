@@ -11,7 +11,8 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(jq:*)",
-      "Bash(timeout 30s npm run storybook -- --no-open)"
+      "Bash(timeout 30s npm run storybook -- --no-open)",
+      "Bash(sed:*)"
     ],
     "deny": [
       "Bash(rm:*)",

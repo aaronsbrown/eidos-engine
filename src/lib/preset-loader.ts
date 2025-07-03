@@ -68,11 +68,44 @@ export class PresetLoader {
     try {
       if (typeof window === 'undefined') return false
       
-      localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(userPresets))
+      // Check storage size before saving
+      const dataString = JSON.stringify(userPresets)
+      if (!this.checkStorageSize(dataString)) {
+        console.warn('Cannot save presets: localStorage size limit exceeded (5MB)')
+        return false
+      }
+      
+      localStorage.setItem(STORAGE_KEYS.PRESETS, dataString)
       return true
     } catch (error) {
       console.error('Failed to save user presets to localStorage:', error)
       return false
+    }
+  }
+
+  /**
+   * Check if data can be stored without exceeding reasonable localStorage limits
+   * @param newData - The data string to be stored
+   * @returns true if storage is within limits
+   */
+  private static checkStorageSize(newData: string): boolean {
+    try {
+      // Calculate approximate current localStorage usage
+      let currentSize = 0
+      for (const key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          currentSize += localStorage.getItem(key)?.length || 0
+        }
+      }
+      
+      // Add size of new data
+      const totalSize = currentSize + newData.length
+      const maxSize = 5 * 1024 * 1024 // 5MB limit
+      
+      return totalSize < maxSize
+    } catch (error) {
+      console.warn('Could not check storage size:', error)
+      return true // Allow storage if we can't check
     }
   }
 
