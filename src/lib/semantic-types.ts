@@ -111,6 +111,13 @@ export interface EducationalLink {
   type: "Tutorial" | "Reference" | "Paper" | "Video" | "InteractiveDemo" | "ProjectWriteup"
 }
 
+// AIDEV-NOTE: Educational content reference for explicit linking vs implicit filename matching
+export interface EducationalContentReference {
+  contentId: string                    // Explicit link to educational content file (e.g., "noise" for noise.md)
+  relatedConcepts?: string[]          // IDs of related educational concepts for cross-referencing
+  crossReferences?: string[]          // Other pattern IDs with related educational content
+}
+
 export interface SemanticTags {
   primaryAlgorithmFamily: AlgorithmFamily
   secondaryAlgorithmFamilies?: AlgorithmFamily[]
@@ -119,6 +126,7 @@ export interface SemanticTags {
   dimensionality: Dimensionality
   interactionStyle: InteractionStyle
   keywords: string[] // Freeform keywords for searchability, e.g., ["Lorenz", "butterfly effect", "dynamical system"]
+  educationalContent?: EducationalContentReference // AIDEV-NOTE: Explicit educational content linking
 }
 
 export interface PerformanceProfile {

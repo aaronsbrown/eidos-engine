@@ -240,11 +240,27 @@ Factory presets are curated parameter combinations that ship with the applicatio
 
 ### 📚 Educational Content Convention
 
+**Explicit Content Linking System:**
+
+Educational content is now linked through explicit metadata in pattern definitions rather than implicit filename matching:
+
+```typescript
+semantics: {
+  // ... other semantic data
+  educationalContent: {
+    contentId: "noise",                               // Explicit link to content file
+    relatedConcepts: ["perlin-noise", "stochastic"], // Related educational concepts
+    crossReferences: ["pixelated-noise", "brownian-motion"] // Related patterns
+  }
+}
+```
+
 **Naming Convention:**
 
-- Educational content files must use the exact pattern ID as the filename
-- Pattern with `id: "noise"` → `public/educational-content/noise.md`
-- Files are created directly in the public directory for immediate availability
+- **Content files**: Use descriptive names in `public/educational-content/{contentId}.md`
+- **Default**: `contentId` typically matches pattern ID (e.g., `"noise"` → `noise.md`)
+- **Custom**: Can use different content ID (e.g., multiple patterns sharing content)
+- **Fallback**: System falls back to pattern ID if no explicit `contentId` specified
 
 **Content Structure:**
 Follow the three-layer educational approach:
@@ -263,11 +279,26 @@ All educational content MUST follow the established format:
 - **Consistent Structure**: All files must use identical section headers and organization
 - **Mathematical Notation**: Use standard mathematical notation and LaTeX-style formatting for equations
 
+**Cross-Reference Discovery:**
+
+The new system enables educational content discovery through:
+
+- **Cross-references**: Patterns can reference related patterns for exploration
+- **Related concepts**: Conceptual relationships for deeper learning
+- **Content network**: Programmatic discovery of educational relationships
+
+**Implementation Workflow:**
+
+1. **Create content file**: `public/educational-content/{contentId}.md`
+2. **Add metadata**: Include `educationalContent` in pattern's `semantics`
+3. **Define relationships**: Add `crossReferences` and `relatedConcepts`
+4. **Test discovery**: Use utility functions to verify relationships
+
 **File Location:**
 
-- **Single source of truth**: `public/educational-content/{patternId}.md`
-- Educational content is created directly in the public directory for immediate availability
-- No build step required - content is available at runtime
+- **Content files**: `public/educational-content/{contentId}.md`
+- **Pattern metadata**: `src/components/pattern-generators/{category}-patterns.ts`
+- **Utility functions**: `src/lib/semantic-utils.ts` (discovery) and `src/lib/educational-content-loader.ts` (loading)
 
 ### 🏷️ Pattern Categorization System
 
