@@ -352,7 +352,7 @@ export default function ConwaysGameOfLifeGenerator({
         />
 
         {/* Generation Counter */}
-        <div className="absolute top-2 left-2 text-accent-primary text-xs font-mono bg-background/80 border border-border px-2 py-1 rounded">
+        <div className="absolute top-2 left-2 text-foreground text-xs font-mono bg-background border border-border px-2 py-1 rounded">
           GEN {generation}
         </div>
 
@@ -365,7 +365,7 @@ export default function ConwaysGameOfLifeGenerator({
             className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
             title="Drawing tips"
           >
-            <HelpCircle className="w-4 h-4 text-background" />
+            <HelpCircle className="w-4 h-4 text-black" />
           </button>
 
           {/* Mode Toggle Button */}
@@ -375,9 +375,9 @@ export default function ConwaysGameOfLifeGenerator({
             title={isDrawingMode ? "Start simulation" : "Enter drawing mode"}
           >
             {isDrawingMode ? (
-              <Play className="w-4 h-4 text-background" />
+              <Play className="w-4 h-4 text-black" />
             ) : (
-              <Edit3 className="w-4 h-4 text-background" />
+              <Edit3 className="w-4 h-4 text-black" />
             )}
           </button>
 
@@ -387,14 +387,14 @@ export default function ConwaysGameOfLifeGenerator({
             className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
             title="Clear grid"
           >
-            <X className="w-4 h-4 text-background" />
+            <X className="w-4 h-4 text-black" />
           </button>
         </div>
 
         {/* Help Tooltip */}
         {showHint && (
           <div className="absolute top-12 right-24 bg-background border border-border p-3 rounded text-xs font-mono max-w-xs">
-            <p className="text-accent-primary mb-1">Drawing Tips:</p>
+            <p className="text-foreground font-semibold mb-1">Drawing Tips:</p>
             <p>• Draw clusters of touching cells</p>
             <p>• Try an &apos;L&apos; or &apos;T&apos; shape</p>
             <p>• Make a small 2x2 square</p>
@@ -404,7 +404,7 @@ export default function ConwaysGameOfLifeGenerator({
         )}
 
         {/* Mode Instructions */}
-        <div className="absolute bottom-2 left-2 text-accent-primary text-xs font-mono bg-background border border-border px-2 py-1 rounded max-w-lg">
+        <div className="absolute bottom-2 left-2 text-foreground text-xs font-mono bg-background border border-border px-2 py-1 rounded max-w-lg">
           {isDrawingMode ? 
             "Click/drag to toggle cells, then press play to start simulation" : 
             "Simulation running - press edit button to modify pattern"}
