@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useMemo, useState, useCallback } from "react"
-import { Play, Edit3, HelpCircle, X } from "lucide-react"
+import { Play, Edit3, HelpCircle, RotateCcw } from "lucide-react"
 import type { PatternGeneratorProps } from "./types"
 
 interface GameOfLifeControls {
@@ -387,7 +387,7 @@ export default function ConwaysGameOfLifeGenerator({
             className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
             title="Clear grid"
           >
-            <X className="w-4 h-4 text-black" />
+            <RotateCcw className="w-4 h-4 text-black" />
           </button>
         </div>
 
