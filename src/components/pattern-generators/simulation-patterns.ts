@@ -619,7 +619,7 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
       },
       {
         id: "resetTrigger",
-        label: "Reset Grid",
+        label: "Randomize Grid",
         type: "button",
         defaultValue: false,
         description: "Generates a new random pattern based on current density setting.",

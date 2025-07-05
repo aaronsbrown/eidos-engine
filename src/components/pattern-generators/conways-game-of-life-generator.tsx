@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useMemo, useState, useCallback } from "react"
-import { Play, Edit3, RotateCcw, HelpCircle } from "lucide-react"
+import { Play, Edit3, HelpCircle, X } from "lucide-react"
 import type { PatternGeneratorProps } from "./types"
 
 interface GameOfLifeControls {
@@ -135,8 +135,8 @@ export default function ConwaysGameOfLifeGenerator({
     setIsPlaying(!isPlaying)
   }, [isDrawingMode, isPlaying])
 
-  // Reset grid
-  const resetGrid = useCallback(() => {
+  // Randomize grid with current density
+  const randomizeGrid = useCallback(() => {
     gridRef.current = initializeGrid(controls.density)
     nextGridRef.current = Array(gridHeightRef.current).fill(null).map(() => 
       Array(gridWidthRef.current).fill(0)
@@ -144,6 +144,18 @@ export default function ConwaysGameOfLifeGenerator({
     generationRef.current = 0
     timeRef.current = 0
   }, [controls.density, initializeGrid])
+
+  // Clear grid (all cells dead)
+  const clearGrid = useCallback(() => {
+    gridRef.current = Array(gridHeightRef.current).fill(null).map(() => 
+      Array(gridWidthRef.current).fill(0)
+    )
+    nextGridRef.current = Array(gridHeightRef.current).fill(null).map(() => 
+      Array(gridWidthRef.current).fill(0)
+    )
+    generationRef.current = 0
+    timeRef.current = 0
+  }, [])
 
   // AIDEV-NOTE: Dynamic grid sizing based on viewport with platform-specific cell sizes
   useEffect(() => {
@@ -156,16 +168,16 @@ export default function ConwaysGameOfLifeGenerator({
     gridHeightRef.current = Math.floor(height / cellSizeRef.current)
     
     // Initialize grids
-    resetGrid()
-  }, [width, height, resetGrid])
+    randomizeGrid()
+  }, [width, height, randomizeGrid])
 
   // Handle reset trigger from controls
   useEffect(() => {
     if (controls.resetTrigger > 0) {
-      resetGrid()
+      randomizeGrid()
       onControlChange?.('resetTrigger', 0) // Reset trigger
     }
-  }, [controls.resetTrigger, resetGrid, onControlChange])
+  }, [controls.resetTrigger, randomizeGrid, onControlChange])
 
   // Main animation loop
   useEffect(() => {
@@ -271,45 +283,50 @@ export default function ConwaysGameOfLifeGenerator({
           GEN {generationRef.current}
         </div>
 
-        {/* Mode Toggle Button */}
-        <button
-          onClick={toggleMode}
-          className="absolute top-2 right-12 bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
-          title={isDrawingMode ? "Start simulation" : "Enter drawing mode"}
-        >
-          {isDrawingMode ? (
-            <Play className="w-4 h-4 text-background" />
-          ) : (
-            <Edit3 className="w-4 h-4 text-background" />
-          )}
-        </button>
+        {/* Button Group */}
+        <div className="absolute top-2 right-2 flex gap-2">
+          {/* Help Button */}
+          <button
+            onMouseEnter={() => setShowHint(true)}
+            onMouseLeave={() => setShowHint(false)}
+            className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
+            title="Drawing tips"
+          >
+            <HelpCircle className="w-4 h-4 text-background" />
+          </button>
 
-        {/* Reset Button */}
-        <button
-          onClick={resetGrid}
-          className="absolute top-2 right-2 bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
-          title="Reset grid"
-        >
-          <RotateCcw className="w-4 h-4 text-background" />
-        </button>
+          {/* Mode Toggle Button */}
+          <button
+            onClick={toggleMode}
+            className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
+            title={isDrawingMode ? "Start simulation" : "Enter drawing mode"}
+          >
+            {isDrawingMode ? (
+              <Play className="w-4 h-4 text-background" />
+            ) : (
+              <Edit3 className="w-4 h-4 text-background" />
+            )}
+          </button>
 
-        {/* Help Button */}
-        <button
-          onMouseEnter={() => setShowHint(true)}
-          onMouseLeave={() => setShowHint(false)}
-          className="absolute bottom-2 left-2 bg-background/80 border border-border p-2 rounded transition-colors"
-        >
-          <HelpCircle className="w-4 h-4 text-accent-primary" />
-        </button>
+          {/* Clear Button */}
+          <button
+            onClick={clearGrid}
+            className="bg-accent-primary hover:bg-accent-primary/80 border border-accent-primary p-2 rounded transition-colors"
+            title="Clear grid"
+          >
+            <X className="w-4 h-4 text-background" />
+          </button>
+        </div>
 
         {/* Help Tooltip */}
         {showHint && (
-          <div className="absolute bottom-12 left-2 bg-background border border-border p-3 rounded text-xs font-mono max-w-xs">
+          <div className="absolute top-12 right-24 bg-background border border-border p-3 rounded text-xs font-mono max-w-xs">
             <p className="text-accent-primary mb-1">Drawing Tips:</p>
-            <p>• Try drawing simple patterns like gliders</p>
-            <p>• Create oscillators (blinkers, toads)</p>
-            <p>• Draw dense clusters for interesting evolution</p>
-            <p>• Use reset for new random patterns</p>
+            <p>• Draw clusters of touching cells</p>
+            <p>• Try an &apos;L&apos; or &apos;T&apos; shape</p>
+            <p>• Make a small 2x2 square</p>
+            <p>• Draw a straight line of 3-5 cells</p>
+            <p>• Use clear to start fresh or controls to randomize</p>
           </div>
         )}
 
