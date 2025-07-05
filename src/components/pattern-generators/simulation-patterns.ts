@@ -1,6 +1,7 @@
 import BrownianMotionGenerator from "./brownian-motion-generator"
 import ParticleSystemGenerator from "./particle-system-generator"
 import CellularAutomatonGenerator from "./cellular-automaton-generator"
+import ConwaysGameOfLifeGenerator from "./conways-game-of-life-generator"
 import type { RichPatternGeneratorDefinition } from "@/lib/semantic-types"
 
 // AIDEV-NOTE: Extracted from main index.ts for better maintainability and context window usage
@@ -529,6 +530,103 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
         role: "UserAction",
         impactsPerformance: "Negligible"
       },
+    ],
+  },
+  {
+    id: "conways-game-of-life",
+    name: "Conway's Game of Life",
+    component: ConwaysGameOfLifeGenerator,
+    technology: 'CANVAS_2D',
+    category: 'Simulation',
+    schemaVersion: "1.0",
+    description: "Interactive 2D cellular automaton showcasing emergence and complexity from simple rules.",
+    longDescription: "The most famous cellular automaton, invented by John Conway in 1970. Demonstrates how complex behaviors emerge from simple rules: cells live, die, or reproduce based on their neighbors. Interactive seeding allows exploration of patterns like gliders, oscillators, and still lifes.",
+    semantics: {
+      primaryAlgorithmFamily: "CellularAutomata",
+      keyMathematicalConcepts: ["DiscreteMathematics", "ComputationalGeometry", "SetTheory"],
+      visualCharacteristics: ["Discrete", "Ordered", "Complex", "Flowing"],
+      dimensionality: "2D",
+      interactionStyle: "Seeding",
+      keywords: ["game of life", "cellular automaton", "emergence", "glider", "oscillator", "Conway"],
+      educationalContent: {
+        contentId: "conways-game-of-life",
+        relatedConcepts: ["emergence", "turing-completeness", "cellular-automata", "discrete-mathematics"],
+        crossReferences: ["cellular-automaton", "pixelated-noise"]
+      }
+    },
+    performance: {
+      computationalComplexity: "Medium",
+      typicalFrameRateTarget: "60fps",
+      notes: "Performance scales with grid size - automatically adapts to viewport dimensions"
+    },
+    educationalLinks: [
+      {
+        title: "Conway's Game of Life",
+        url: "https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life",
+        type: "Reference"
+      },
+      {
+        title: "Game of Life Pattern Collections",
+        url: "https://www.conwaylife.com/wiki/Main_Page",
+        type: "Reference"
+      }
+    ],
+    version: "1.0.0",
+    author: "Aaron Brown & Claude",
+    dateAdded: "2024-07-05",
+    lastModified: "2024-07-05",
+    relatedPatterns: ["cellular-automaton"],
+    isInteractive: true,
+    isAnimatedByDefault: false,
+    status: "Production",
+    controls: [
+      {
+        id: "speed",
+        label: "Evolution Speed",
+        type: "range",
+        min: 0.5,
+        max: 10.0,
+        step: 0.5,
+        defaultValue: 3.0,
+        description: "Speed of evolution - controls how quickly generations advance during simulation.",
+        role: "AnimationBehavior",
+        unit: "generations/second",
+        impactsPerformance: "Minor",
+        typicalRangeForInterestingResults: [1.0, 6.0],
+        group: "Simulation"
+      },
+      {
+        id: "density",
+        label: "Initial Density",
+        type: "range",
+        min: 0.05,
+        max: 0.50,
+        step: 0.05,
+        defaultValue: 0.15,
+        description: "Probability of cells being alive when generating random patterns - affects initial complexity.",
+        role: "PrimaryAlgorithmParameter",
+        unit: "probability",
+        impactsPerformance: "Negligible",
+        typicalRangeForInterestingResults: [0.10, 0.25],
+        group: "Initial State",
+        defaultRecommendations: {
+          platformSpecific: {
+            mobile: 0.12,
+            desktop: 0.15,
+            rationale: "Lower density reduces visual complexity on smaller mobile screens"
+          }
+        }
+      },
+      {
+        id: "resetTrigger",
+        label: "Reset Grid",
+        type: "button",
+        defaultValue: false,
+        description: "Generates a new random pattern based on current density setting.",
+        role: "UserAction",
+        impactsPerformance: "Negligible",
+        group: "Controls"
+      }
     ],
   },
 ]
