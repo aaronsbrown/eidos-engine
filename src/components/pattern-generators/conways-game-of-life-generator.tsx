@@ -120,6 +120,62 @@ export default function ConwaysGameOfLifeGenerator({
     }
   }, [isDrawingMode])
 
+  // Add touch event listeners directly to canvas for preventDefault support
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const handleTouchStart = (event: TouchEvent) => {
+      event.preventDefault() // This will work with direct event listeners
+      if (isDrawingMode) {
+        isDrawingRef.current = true
+        // Also handle the initial touch as a click
+        const touch = event.touches[0]
+        if (!touch) return
+        
+        const rect = canvas.getBoundingClientRect()
+        const x = Math.floor((touch.clientX - rect.left) / cellSizeRef.current)
+        const y = Math.floor((touch.clientY - rect.top) / cellSizeRef.current)
+        
+        if (x >= 0 && x < gridWidthRef.current && y >= 0 && y < gridHeightRef.current) {
+          gridRef.current[y][x] = gridRef.current[y][x] === 1 ? 0 : 1
+        }
+      }
+    }
+
+    const handleTouchMove = (event: TouchEvent) => {
+      event.preventDefault() // This will work with direct event listeners
+      if (!isDrawingMode || !isDrawingRef.current) return
+      
+      const touch = event.touches[0]
+      if (!touch) return
+      
+      const rect = canvas.getBoundingClientRect()
+      const x = Math.floor((touch.clientX - rect.left) / cellSizeRef.current)
+      const y = Math.floor((touch.clientY - rect.top) / cellSizeRef.current)
+      
+      if (x >= 0 && x < gridWidthRef.current && y >= 0 && y < gridHeightRef.current) {
+        gridRef.current[y][x] = 1 // Paint cells when dragging
+      }
+    }
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      event.preventDefault()
+      isDrawingRef.current = false
+    }
+
+    // Add event listeners with { passive: false } to allow preventDefault
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false })
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleTouchStart)
+      canvas.removeEventListener('touchmove', handleTouchMove)
+      canvas.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDrawingMode])
+
   const handleMouseDown = useCallback(() => {
     if (isDrawingMode) {
       isDrawingRef.current = true
