@@ -33,7 +33,7 @@ export default function ConwaysGameOfLifeGenerator({
 
   // Use passed control values or defaults
   const controls: GameOfLifeControls = useMemo(() => ({
-    speed: (controlValues?.speed as number) ?? 3.0,
+    speed: (controlValues?.speed as number) ?? 7.0,
     density: (controlValues?.density as number) ?? 0.15,
     resetTrigger: (controlValues?.resetTrigger as number) ?? 0
   }), [controlValues])
@@ -331,10 +331,10 @@ export default function ConwaysGameOfLifeGenerator({
         )}
 
         {/* Mode Instructions */}
-        <div className="absolute bottom-2 right-2 text-accent-primary text-xs font-mono bg-background border border-border px-2 py-1 rounded max-w-xs">
+        <div className="absolute bottom-2 left-2 text-accent-primary text-xs font-mono bg-background border border-border px-2 py-1 rounded max-w-lg">
           {isDrawingMode ? 
-            "Click/drag to toggle cells, then press play to start" : 
-            "Simulation running - press edit to modify pattern"}
+            "Click/drag to toggle cells, then press play to start simulation" : 
+            "Simulation running - press edit button to modify pattern"}
         </div>
       </div>
     </div>

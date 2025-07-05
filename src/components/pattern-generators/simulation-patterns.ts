@@ -582,17 +582,17 @@ export const simulationPatterns: RichPatternGeneratorDefinition[] = [
     controls: [
       {
         id: "speed",
-        label: "Evolution Speed",
+        label: "Animation Speed",
         type: "range",
         min: 0.5,
         max: 10.0,
         step: 0.5,
-        defaultValue: 3.0,
-        description: "Speed of evolution - controls how quickly generations advance during simulation.",
+        defaultValue: 7.0,
+        description: "Speed of animation - controls how quickly generations advance during simulation.",
         role: "AnimationBehavior",
         unit: "generations/second",
         impactsPerformance: "Minor",
-        typicalRangeForInterestingResults: [1.0, 6.0],
+        typicalRangeForInterestingResults: [4.0, 8.0],
         group: "Simulation"
       },
       {
