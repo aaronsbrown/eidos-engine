@@ -35,17 +35,9 @@ export interface DesktopLayoutState {
   // UI state
   sidebarWidth: number
   isResizing: boolean
-  visiblePatternStart: number
   isPresetPanelOpen: boolean
   isSaveModalOpen: boolean
   isEducationalVisible: boolean
-  
-  // Pattern pagination
-  patternsPerPage: number
-  totalPatterns: number
-  currentIndex: number
-  canGoToPrevious: boolean
-  canGoToNext: boolean
   
   // Current pattern info
   selectedPattern: typeof patternGenerators[0]
@@ -53,14 +45,11 @@ export interface DesktopLayoutState {
   
   // Refs for event handling
   initializedPatternsRef: React.MutableRefObject<Set<string>>
-  patternListRef: React.RefObject<HTMLDivElement | null>
-  scrollTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>
 }
 
 export interface DesktopLayoutActions {
   // Pattern selection
   setSelectedPatternId: (id: string) => void
-  setVisiblePatternStart: (start: number) => void
   
   // Control management
   handleControlChange: (controlId: string, value: number | string | boolean) => void
@@ -95,22 +84,12 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(DESKTOP_LAYOUT_CONSTANTS.DEFAULT_RIGHT_SIDEBAR_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
-  const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
   const [isPresetPanelOpen, setIsPresetPanelOpen] = useState(false) // Track preset panel visibility
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false) // Track save preset modal visibility
   const [isEducationalVisible, setIsEducationalVisible] = useState(false) // Track educational overlay visibility
 
   // Refs for event handling
   const initializedPatternsRef = useRef<Set<string>>(new Set()) // Track which patterns have been initialized
-  const patternListRef = useRef<HTMLDivElement>(null)
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Computed values
-  const patternsPerPage = 5
-  const totalPatterns = patternGenerators.length
-  const currentIndex = patternGenerators.findIndex(p => p.id === selectedPatternId)
-  const canGoToPrevious = currentIndex > 0
-  const canGoToNext = currentIndex < totalPatterns - 1
 
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
@@ -184,25 +163,16 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
     controlValues,
     sidebarWidth,
     isResizing,
-    visiblePatternStart,
     isPresetPanelOpen,
     isSaveModalOpen,
     isEducationalVisible,
-    patternsPerPage,
-    totalPatterns,
-    currentIndex,
-    canGoToPrevious,
-    canGoToNext,
     selectedPattern,
     PatternComponent,
     initializedPatternsRef,
-    patternListRef,
-    scrollTimeoutRef,
   }
 
   const actions: DesktopLayoutActions = {
     setSelectedPatternId: setSharedSelectedPatternId,
-    setVisiblePatternStart,
     handleControlChange,
     getCurrentControlValues,
     initializeControlValues,

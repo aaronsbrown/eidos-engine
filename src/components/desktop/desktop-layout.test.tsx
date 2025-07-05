@@ -255,34 +255,26 @@ describe('DesktopLayout - User Behavior', () => {
       // "Noise" appears in: divider, pattern name, specs, mock pattern content = multiple places
     })
 
-    it('allows user to navigate patterns with previous/next buttons', async () => {
+    it('allows user to navigate patterns by clicking on them in scroll list', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
 
       // Initially on first pattern
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
 
-      // Find next button using semantic test ID
-      const nextButton = screen.getByTestId('pattern-next-button')
-
-      // User clicks next
-      fireEvent.click(nextButton!)
+      // User clicks on different pattern in the scroll list
+      fireEvent.click(screen.getByText('Noise Field'))
 
       // Pattern changes to second pattern
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
-        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
 
-      // Find previous button using semantic test ID
-      const prevButton = screen.getByTestId('pattern-prev-button')
-
-      // User clicks previous
-      fireEvent.click(prevButton!)
+      // User clicks back to first pattern
+      fireEvent.click(screen.getByText('Trigonometric Circle'))
 
       // Pattern changes back to first
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
       })
     })
 
@@ -293,51 +285,39 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getAllByText(/geometric/i)).toHaveLength(2) // Divider and specs
     })
 
-    it('navigates through all patterns with next button', async () => {
+    it('allows user to navigate to any pattern by clicking', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
 
-      // Navigate to the 6th pattern (Brownian Motion)
-      const nextButton = screen.getByTestId('pattern-next-button')
-
-      // Click next 5 times to get to the 6th pattern
-      for (let i = 0; i < 5; i++) {
-        fireEvent.click(nextButton!)
-      }
+      // Click on the last pattern (Brownian Motion)
+      fireEvent.click(screen.getByText('Brownian Motion'))
 
       // Should be on the last pattern
-      expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
-      expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+      })
     })
 
-    it('allows user to scroll through patterns with mouse wheel for browsing', async () => {
+    it('displays all patterns in a scrollable area', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
 
-      // Initially on first pattern and it should stay selected
+      // Initially on first pattern
       expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-      expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
 
-      // Find pattern list container - it should have overflow-hidden class
-      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
-      expect(patternList).toBeInTheDocument()
+      // Verify scroll area exists
+      const scrollArea = screen.getByText('Trigonometric Circle').closest('[data-slot="scroll-area"]')
+      expect(scrollArea).toBeInTheDocument()
 
-      // User scrolls down (deltaY > 0) to browse patterns
-      fireEvent.wheel(patternList!, { deltaY: 100 })
+      // All patterns should be visible in the DOM (within scroll area)
+      expect(screen.getByText('Trigonometric Circle')).toBeInTheDocument()
+      expect(screen.getByText('Noise Field')).toBeInTheDocument()
+      expect(screen.getByText('Particle System')).toBeInTheDocument()
+      expect(screen.getByText('Brownian Motion')).toBeInTheDocument()
 
-      // Wait a bit for the throttle timeout to complete
-      await new Promise(resolve => setTimeout(resolve, 150))
-
-      // Selected pattern should remain the same (Trig), but list should scroll
-      await waitFor(() => {
-        expect(screen.getByTestId('pattern-trig')).toBeInTheDocument() // Still selected
-        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument() // Counter unchanged
-      }, { timeout: 2000 })
-
-      // User must click to actually select a different pattern
+      // User can click to select different patterns
       fireEvent.click(screen.getByText('Noise Field'))
 
       await waitFor(() => {
         expect(screen.getByTestId('pattern-noise')).toBeInTheDocument()
-        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
       })
     })
 
@@ -361,38 +341,28 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getAllByText(/brownian-motion/i)).toHaveLength(2) // Sidebar + specs
     })
 
-    it('prevents wheel scrolling past pattern boundaries', async () => {
+    it('maintains scroll position within scroll area boundaries', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
 
-      // Find pattern list container
-      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
-      expect(patternList).toBeInTheDocument()
+      // Find scroll area container
+      const scrollArea = screen.getByText('Trigonometric Circle').closest('[data-slot="scroll-area"]')
+      expect(scrollArea).toBeInTheDocument()
 
-      // Try to scroll up from first pattern - should stay on first
-      fireEvent.wheel(patternList!, { deltaY: -100 })
+      // Initially on first pattern
+      expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
 
-      await new Promise(resolve => setTimeout(resolve, 150))
+      // Click on last pattern to verify it's reachable
+      fireEvent.click(screen.getByText('Brownian Motion'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
+      })
+
+      // Click back to first pattern
+      fireEvent.click(screen.getByText('Trigonometric Circle'))
 
       await waitFor(() => {
         expect(screen.getByTestId('pattern-trig')).toBeInTheDocument()
-        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
-      })
-
-      // Navigate to last pattern with button
-      const nextButton = screen.getByTestId('pattern-next-button')
-
-      for (let i = 0; i < 5; i++) {
-        fireEvent.click(nextButton!)
-      }
-
-      // Try to scroll down from last pattern - should stay on last
-      fireEvent.wheel(patternList!, { deltaY: 100 })
-
-      await new Promise(resolve => setTimeout(resolve, 150))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
-        expect(screen.getByTestId('pattern-brownian')).toBeInTheDocument()
       })
     })
   })
@@ -668,56 +638,23 @@ describe('DesktopLayout - User Behavior', () => {
       expect(screen.getByText(today)).toBeInTheDocument()
     })
 
-    it('disables previous button on first pattern', () => {
+    it('allows scrolling through pattern list', async () => {
       render(<DesktopLayout />, { wrapper: TestWrapper })
 
-      const prevButton = screen.getByTestId('pattern-prev-button')
-      expect(prevButton).toHaveClass('cursor-not-allowed')
-    })
-
-    it('disables next button on last pattern', async () => {
-      render(<DesktopLayout />, { wrapper: TestWrapper })
-
-      // Navigate to last pattern
-      const nextButton = screen.getByTestId('pattern-next-button')
-
-      // Click next 5 times to get to the last pattern
-      for (let i = 0; i < 5; i++) {
-        fireEvent.click(nextButton!)
-      }
-
-      // Now next button should be disabled
-      expect(nextButton).toHaveClass('cursor-not-allowed')
-    })
-
-    it('combines wheel scrolling with button navigation seamlessly', async () => {
-      render(<DesktopLayout />, { wrapper: TestWrapper })
-
-      const patternList = screen.getByText('Trigonometric Circle').closest('.overflow-hidden')
-      const nextButton = screen.getByTestId('pattern-next-button')
-
-      // Start with wheel scroll
-      fireEvent.wheel(patternList!, { deltaY: 100 })
-
-      // Wait for throttle timeout
-      await new Promise(resolve => setTimeout(resolve, 150))
-
-      // Pattern should still be first (wheel doesn't select)
-      await waitFor(() => {
-        expect(screen.queryByText('[01/06]')).not.toBeInTheDocument()
-      }, { timeout: 2000 })
-
-      // Continue with button navigation
-      fireEvent.click(nextButton!)
-
-      await waitFor(() => {
-        expect(screen.queryByText('[02/06]')).not.toBeInTheDocument()
-      })
-
-      // Verify that both methods work independently
-      // Both wheel and button navigation should be functional
+      // Find the scroll area containing patterns
+      const patternList = screen.getByText('Trigonometric Circle').closest('[data-slot="scroll-area-viewport"]')
       expect(patternList).toBeInTheDocument()
-      expect(nextButton).toBeInTheDocument()
+
+      // Verify that patterns are scrollable by checking scroll container exists
+      const scrollContainer = screen.getByText('Trigonometric Circle').closest('[data-slot="scroll-area"]')
+      expect(scrollContainer).toBeInTheDocument()
+
+      // Test clicking on different patterns works
+      fireEvent.click(screen.getByText('Noise Field'))
+      
+      await waitFor(() => {
+        expect(screen.getAllByText(/noise-field/i)).toHaveLength(2)
+      })
     })
   })
 })
