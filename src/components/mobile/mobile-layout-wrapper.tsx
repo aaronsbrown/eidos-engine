@@ -13,9 +13,9 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { EducationalOverlay } from '@/components/ui/educational-overlay'
 import { useEducationalContent } from '@/lib/hooks/use-educational-content'
 import { getAllPatternIds } from '@/lib/educational-content-loader'
-import { getPlatformDefaultValue } from '@/lib/semantic-utils'
 import { useTour } from '@/lib/hooks/use-tour'
 import { PresetManager } from '@/lib/preset-manager'
+import { usePatternState } from '@/lib/contexts/pattern-state-context'
 
 export interface MobileLayoutWrapperProps {
   initialPatternId?: string
@@ -30,13 +30,22 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
 }: MobileLayoutWrapperProps) {
   const { isMobile, isDesktop, viewport } = useMobileDetection()
 
-  // Pattern state
-  const [selectedPatternId, setSelectedPatternId] = useState(
-    initialPatternId || patternGenerators[0]?.id || ''
-  )
+  // AIDEV-NOTE: Use shared pattern state context for mobile/desktop synchronization (Issue #80)
+  const {
+    selectedPatternId,
+    controlValues,
+    setSelectedPatternId: setSharedSelectedPatternId,
+    updateControlValue,
+    initializePattern,
+    resetToDefaults
+  } = usePatternState()
 
-  // Control values state
-  const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
+  // AIDEV-NOTE: Handle initial pattern ID if provided as prop
+  useEffect(() => {
+    if (initialPatternId && initialPatternId !== selectedPatternId) {
+      setSharedSelectedPatternId(initialPatternId)
+    }
+  }, [initialPatternId, selectedPatternId, setSharedSelectedPatternId])
 
   // Mobile UI state
   const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false)
@@ -83,52 +92,34 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
     }
   }, [isDesktop, viewport])
 
-  // Initialize control values for pattern
-  // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile experience
-  const initializeControlValues = useCallback((patternId: string) => {
-    const pattern = patternGenerators.find(p => p.id === patternId)
-    if (!pattern?.controls) return {}
-
-    const defaults: Record<string, number | string | boolean> = {}
-    pattern.controls.forEach(control => {
-      // Use platform-aware defaults for mobile
-      defaults[control.id] = getPlatformDefaultValue(control, 'mobile')
-    })
-    return defaults
-  }, [])
-
-  // Get current control values
+  // AIDEV-NOTE: Get current control values from shared context (Issue #80)
   const getCurrentControlValues = useCallback(() => {
-    if (!controlValues[selectedPatternId]) {
-      const defaults = initializeControlValues(selectedPatternId)
-      setControlValues(prev => ({ ...prev, [selectedPatternId]: defaults }))
-      return defaults
-    }
     return controlValues[selectedPatternId] || {}
-  }, [selectedPatternId, controlValues, initializeControlValues])
+  }, [selectedPatternId, controlValues])
 
-  // Handle pattern selection
+  // AIDEV-NOTE: Initialize pattern when it's not in controlValues (Issue #80)
+  useEffect(() => {
+    if (!controlValues[selectedPatternId]) {
+      initializePattern(selectedPatternId, 'mobile')
+    }
+  }, [selectedPatternId, controlValues, initializePattern])
+
+  // AIDEV-NOTE: Handle pattern selection with shared context (Issue #80)
   const handlePatternSelect = useCallback((patternId: string) => {
-    setSelectedPatternId(patternId)
+    setSharedSelectedPatternId(patternId)
     setIsAdvancedExpanded(false) // Collapse advanced controls when switching patterns
 
     if (onPatternChange) {
       onPatternChange(patternId)
     }
-  }, [onPatternChange])
+  }, [setSharedSelectedPatternId, onPatternChange])
 
-  // Handle control changes
+  // AIDEV-NOTE: Handle control changes with shared context (Issue #80)
   const handleControlChange = useCallback((controlId: string, value: number | string | boolean) => {
-    setControlValues(prev => ({
-      ...prev,
-      [selectedPatternId]: {
-        ...prev[selectedPatternId],
-        [controlId]: value
-      }
-    }))
-  }, [selectedPatternId])
+    updateControlValue(selectedPatternId, controlId, value)
+  }, [selectedPatternId, updateControlValue])
 
-  // Handle reset to defaults with smart precedence
+  // AIDEV-NOTE: Handle reset to defaults with shared context (Issue #80)
   const handleResetToDefaults = useCallback(async () => {
     try {
       // Get the effective default preset using precedence rules
@@ -146,29 +137,21 @@ const MobileLayoutWrapper = memo(function MobileLayoutWrapper({
           }
         })
 
-        setControlValues(prev => ({
-          ...prev,
-          [selectedPatternId]: validParameters
-        }))
+        // Update each control value through the shared context
+        Object.entries(validParameters).forEach(([controlId, value]) => {
+          updateControlValue(selectedPatternId, controlId, value)
+        })
       } else {
-        // Fall back to pattern control defaults
-        const defaults = initializeControlValues(selectedPatternId)
-        setControlValues(prev => ({
-          ...prev,
-          [selectedPatternId]: defaults
-        }))
+        // Fall back to pattern control defaults using shared context
+        resetToDefaults(selectedPatternId, 'mobile')
       }
     } catch (error) {
       console.warn('Failed to reset to defaults, falling back to pattern defaults:', error)
 
       // Emergency fallback: reset to pattern defaults
-      const defaults = initializeControlValues(selectedPatternId)
-      setControlValues(prev => ({
-        ...prev,
-        [selectedPatternId]: defaults
-      }))
+      resetToDefaults(selectedPatternId, 'mobile')
     }
-  }, [selectedPatternId, initializeControlValues])
+  }, [selectedPatternId, updateControlValue, resetToDefaults])
 
   // Handle menu toggle
   const handleMenuToggle = useCallback(() => {

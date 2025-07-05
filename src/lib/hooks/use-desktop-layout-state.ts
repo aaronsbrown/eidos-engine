@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import { patternGenerators } from "@/components/pattern-generators"
 import type { PatternGeneratorProps } from "@/components/pattern-generators"
 import { getPlatformDefaultValue } from "@/lib/semantic-utils"
+import { usePatternState } from "@/lib/contexts/pattern-state-context"
 
 // AIDEV-NOTE: Desktop layout responsive breakpoints and sizing constants
 export const DESKTOP_LAYOUT_CONSTANTS = {
@@ -78,13 +79,20 @@ export interface DesktopLayoutActions {
 }
 
 export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActions] {
-  // Core state
-  const [selectedPatternId, setSelectedPatternId] = useState<string>(patternGenerators[0].id)
+  // AIDEV-NOTE: Use shared pattern state context for mobile/desktop synchronization (Issue #80)
+  const {
+    selectedPatternId,
+    controlValues,
+    setSelectedPatternId: setSharedSelectedPatternId,
+    updateControlValue,
+    initializePattern
+  } = usePatternState()
+
+  // Desktop-specific state
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ 
     width: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_WIDTH, 
     height: DESKTOP_LAYOUT_CONSTANTS.DEFAULT_HEIGHT 
   })
-  const [controlValues, setControlValues] = useState<Record<string, Record<string, number | string | boolean>>>({})
   const [sidebarWidth, setSidebarWidth] = useState<number>(DESKTOP_LAYOUT_CONSTANTS.DEFAULT_RIGHT_SIDEBAR_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
   const [visiblePatternStart, setVisiblePatternStart] = useState(0) // Which pattern to start showing from
@@ -107,15 +115,14 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
   const selectedPattern = patternGenerators.find(p => p.id === selectedPatternId) || patternGenerators[0]
   const PatternComponent = selectedPattern.component
 
-  // Initialize default control values for patterns that have controls
-  // AIDEV-NOTE: Uses platform-aware defaults from semantic metadata for optimal mobile/desktop experience
+  // AIDEV-NOTE: Control value functions updated for shared context (Issue #80)
   const initializeControlValues = (patternId: string) => {
     const pattern = patternGenerators.find(p => p.id === patternId)
     if (!pattern?.controls) return {}
 
     const defaults: Record<string, number | string | boolean> = {}
     pattern.controls.forEach(control => {
-      // Use platform-aware defaults for desktop (assumes desktop since this is desktop layout)
+      // Use platform-aware defaults for desktop
       defaults[control.id] = getPlatformDefaultValue(control, 'desktop')
     })
     return defaults
@@ -126,15 +133,9 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
     return controlValues[selectedPatternId] || {}
   }
 
-  // Handle control changes
+  // Handle control changes through shared context
   const handleControlChange = (controlId: string, value: number | string | boolean) => {
-    setControlValues(prev => ({
-      ...prev,
-      [selectedPatternId]: {
-        ...prev[selectedPatternId],
-        [controlId]: value
-      }
-    }))
+    updateControlValue(selectedPatternId, controlId, value)
   }
 
   // AIDEV-NOTE: Responsive dimensions for smaller desktop screens (like iPad Mini horizontal)
@@ -170,14 +171,12 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
     return () => window.removeEventListener('resize', updateDimensions)
   }, [sidebarWidth])
 
-  // Initialize control values when pattern changes
+  // AIDEV-NOTE: Initialize control values when pattern changes (Issue #80)
   useEffect(() => {
-    if (!controlValues[selectedPatternId] && !initializedPatternsRef.current.has(selectedPatternId)) {
-      const defaults = initializeControlValues(selectedPatternId)
-      setControlValues(prev => ({ ...prev, [selectedPatternId]: defaults }))
-      initializedPatternsRef.current.add(selectedPatternId)
+    if (!controlValues[selectedPatternId]) {
+      initializePattern(selectedPatternId, 'desktop')
     }
-  }, [selectedPatternId, controlValues])
+  }, [selectedPatternId, controlValues, initializePattern])
 
   const state: DesktopLayoutState = {
     selectedPatternId,
@@ -202,7 +201,7 @@ export function useDesktopLayoutState(): [DesktopLayoutState, DesktopLayoutActio
   }
 
   const actions: DesktopLayoutActions = {
-    setSelectedPatternId,
+    setSelectedPatternId: setSharedSelectedPatternId,
     setVisiblePatternStart,
     handleControlChange,
     getCurrentControlValues,

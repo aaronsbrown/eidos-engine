@@ -25,6 +25,19 @@ jest.mock('@/components/desktop', () => ({
   DesktopLayout: () => <div data-testid="desktop-layout">Desktop Layout</div>
 }))
 
+// Mock the pattern state context
+jest.mock('@/lib/contexts/pattern-state-context', () => ({
+  PatternStateProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="pattern-state-provider">{children}</div>,
+  usePatternState: () => ({
+    selectedPatternId: 'lorenz-attractor',
+    controlValues: {},
+    setSelectedPatternId: jest.fn(),
+    updateControlValue: jest.fn(),
+    initializePattern: jest.fn(),
+    resetToDefaults: jest.fn()
+  })
+}))
+
 describe('PatternGeneratorShowcase - Integration Tests', () => {
   beforeEach(() => {
     // Default to desktop
@@ -37,6 +50,28 @@ describe('PatternGeneratorShowcase - Integration Tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+  })
+
+  describe('Pattern State Provider Integration', () => {
+    it('wraps layouts with PatternStateProvider for state synchronization', () => {
+      render(<PatternGeneratorShowcase />, { wrapper: TestWrapper })
+      
+      expect(screen.getByTestId('pattern-state-provider')).toBeInTheDocument()
+      expect(screen.getByTestId('desktop-layout')).toBeInTheDocument()
+    })
+
+    it('provides state context to mobile layout', () => {
+      mockUseMobileDetection.mockReturnValue({
+        isMobile: true,
+        isDesktop: false,
+        viewport: { width: 375, height: 667 }
+      })
+
+      render(<PatternGeneratorShowcase />, { wrapper: TestWrapper })
+      
+      expect(screen.getByTestId('pattern-state-provider')).toBeInTheDocument()
+      expect(screen.getByTestId('mobile-layout')).toBeInTheDocument()
+    })
   })
 
   describe('Layout Selection Based on Device', () => {
