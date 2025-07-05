@@ -1,13 +1,16 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { ThemeProvider } from '@/lib/theme-context'
+import { PatternStateProvider } from '@/lib/contexts/pattern-state-context'
 
-// AIDEV-NOTE: Test utility to provide necessary context providers for educational overlay tests
+// AIDEV-NOTE: Test utility to provide necessary context providers including pattern state (Issue #80)
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider>
-      {children}
+      <PatternStateProvider>
+        {children}
+      </PatternStateProvider>
     </ThemeProvider>
   )
 }
