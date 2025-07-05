@@ -2,12 +2,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { ThemeProvider } from '@/lib/theme-context'
+import { PatternStateProvider } from '@/lib/contexts/pattern-state-context'
 import MobileLayoutWrapper from './mobile-layout-wrapper'
 
 // Test wrapper with required providers
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>
-    {children}
+    <PatternStateProvider>
+      {children}
+    </PatternStateProvider>
   </ThemeProvider>
 )
 
@@ -48,6 +51,9 @@ jest.mock('../hooks/useMobileDetection', () => ({
 
 describe('MobileLayoutWrapper - User Behavior', () => {
   beforeEach(() => {
+    // Clear localStorage to ensure clean test state
+    localStorage.clear()
+    
     // Default to mobile viewport
     mockUseMobileDetection.mockReturnValue({
       isMobile: true,

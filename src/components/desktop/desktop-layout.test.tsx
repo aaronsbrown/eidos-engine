@@ -3,11 +3,14 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DesktopLayout from './desktop-layout'
 import { ThemeProvider } from '@/lib/theme-context'
+import { PatternStateProvider } from '@/lib/contexts/pattern-state-context'
 
 // Test wrapper with required providers
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>
-    {children}
+    <PatternStateProvider>
+      {children}
+    </PatternStateProvider>
   </ThemeProvider>
 )
 
@@ -195,6 +198,8 @@ describe('DesktopLayout - User Behavior', () => {
   })
   beforeEach(() => {
     jest.clearAllMocks()
+    // Clear localStorage to ensure clean test state
+    localStorage.clear()
     // Mock window dimensions - use large desktop size by default to get default 700x394 dimensions
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1400 })
     Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 })
