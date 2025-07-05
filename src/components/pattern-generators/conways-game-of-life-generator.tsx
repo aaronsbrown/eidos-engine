@@ -30,6 +30,7 @@ export default function ConwaysGameOfLifeGenerator({
   const [isPlaying, setIsPlaying] = useState(false)
   const [isDrawingMode, setIsDrawingMode] = useState(true)
   const [showHint, setShowHint] = useState(false)
+  const [generation, setGeneration] = useState(0)
 
   // Use passed control values or defaults
   const controls: GameOfLifeControls = useMemo(() => ({
@@ -131,8 +132,18 @@ export default function ConwaysGameOfLifeGenerator({
 
   // Toggle between play and drawing modes
   const toggleMode = useCallback(() => {
-    setIsDrawingMode(!isDrawingMode)
-    setIsPlaying(!isPlaying)
+    const newDrawingMode = !isDrawingMode
+    const newPlayingMode = !isPlaying
+    
+    setIsDrawingMode(newDrawingMode)
+    setIsPlaying(newPlayingMode)
+    
+    // Reset generation counter when entering drawing mode
+    if (newDrawingMode) {
+      generationRef.current = 0
+      timeRef.current = 0
+      setGeneration(0)
+    }
   }, [isDrawingMode, isPlaying])
 
   // Randomize grid with current density
@@ -143,6 +154,7 @@ export default function ConwaysGameOfLifeGenerator({
     )
     generationRef.current = 0
     timeRef.current = 0
+    setGeneration(0)
   }, [controls.density, initializeGrid])
 
   // Clear grid (all cells dead)
@@ -155,6 +167,10 @@ export default function ConwaysGameOfLifeGenerator({
     )
     generationRef.current = 0
     timeRef.current = 0
+    setGeneration(0)
+    // Switch to drawing mode when clearing
+    setIsDrawingMode(true)
+    setIsPlaying(false)
   }, [])
 
   // AIDEV-NOTE: Dynamic grid sizing based on viewport with platform-specific cell sizes
@@ -201,6 +217,7 @@ export default function ConwaysGameOfLifeGenerator({
         if (timeRef.current >= frameInterval) {
           timeRef.current = 0
           generationRef.current++
+          setGeneration(generationRef.current)
           
           // Apply Game of Life rules
           applyGameOfLifeRules(gridRef.current, nextGridRef.current)
@@ -280,7 +297,7 @@ export default function ConwaysGameOfLifeGenerator({
 
         {/* Generation Counter */}
         <div className="absolute top-2 left-2 text-accent-primary text-xs font-mono bg-background/80 border border-border px-2 py-1 rounded">
-          GEN {generationRef.current}
+          GEN {generation}
         </div>
 
         {/* Button Group */}
