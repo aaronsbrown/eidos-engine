@@ -14,7 +14,8 @@
       "Bash(timeout 30s npm run storybook -- --no-open)",
       "Bash(sed:*)",
       "Bash(curl:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [
       "Bash(rm:*)",
