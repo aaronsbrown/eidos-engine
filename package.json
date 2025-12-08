@@ -19,6 +19,10 @@
     "build-storybook": "storybook build",
     "chromatic": "npx chromatic --project-token=chpt_4d2a84729e40365"
   },
+  "engines": {
+    "node": ">=20.9.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",
     "@radix-ui/react-scroll-area": "^1.2.9",
@@ -56,7 +60,7 @@
     "@types/react-dom": "^19",
     "chromatic": "^13.0.1",
     "eslint": "^9",
-    "eslint-config-next": "15.2.4",
+    "eslint-config-next": "^16.0.7",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-storybook": "^10.1.4",
     "jest": "^30.0.1",
