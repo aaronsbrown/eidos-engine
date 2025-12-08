@@ -21,13 +21,13 @@ export function DesktopLayoutSidebar({
   state,
   handlers,
   // TODO: Use these props once full implementation is complete
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   onQuickSave: _onQuickSave,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   hasEducationalContent: _hasEducationalContent,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   setIsEducationalVisible: _setIsEducationalVisible,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   setIsPresetPanelOpen: _setIsPresetPanelOpen
 }: DesktopLayoutSidebarProps) {
   const {

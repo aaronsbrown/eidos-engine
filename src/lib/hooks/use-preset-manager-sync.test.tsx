@@ -74,7 +74,7 @@ function TestComponent({ patternId, onPresetsChange }: {
 }
 
 describe('usePresetManager Cross-Component Synchronization', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const mockPresetManager = require('../preset-manager').PresetManager
 
   beforeEach(() => {

@@ -104,7 +104,6 @@ function HalvorsenPoints({ controls }: { controls: HalvorsenControls }) {
     }
     // ESLint is disabled for this effect because we intentionally only want to recreate
     // the shader when useCustomShader changes. Control values are updated via uniforms in useFrame.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [controls.useCustomShader]) // Only recreate when shader mode changes
 
   // Performance optimization: batch updates and efficient computation

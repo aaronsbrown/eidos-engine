@@ -111,7 +111,6 @@ export default function CellularAutomatonGenerator({
   // AIDEV-NOTE: Initialize rule state in parent on mount only once to avoid infinite loops
   useEffect(() => {
     onControlChange?.('rule', rule)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])  // Run only once on mount - intentionally excluding dependencies to prevent infinite loop
 
   useEffect(() => {

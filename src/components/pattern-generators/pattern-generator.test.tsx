@@ -1,5 +1,5 @@
 // AIDEV-NOTE: Basic pattern generator component tests - Issue #12
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { act } from 'react'

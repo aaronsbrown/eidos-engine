@@ -30,7 +30,7 @@ export function DesktopLayoutPanels({
   state,
   actions,
   // Educational content handled in main component for desktop
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   educationalContent: _educationalContent,
   presetData
 }: DesktopLayoutPanelsProps) {

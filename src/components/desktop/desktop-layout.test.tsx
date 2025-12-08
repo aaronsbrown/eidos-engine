@@ -1,5 +1,5 @@
 // AIDEV-NOTE: BEHAVIORAL_TEST - Desktop layout user workflows and interactions - Issue #12
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DesktopLayout from './desktop-layout'
 import { ThemeProvider } from '@/lib/theme-context'
