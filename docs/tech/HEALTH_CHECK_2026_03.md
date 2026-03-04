@@ -174,7 +174,7 @@ Note: Automated HTTP fetching tools return a 404-like response because the app r
    - `three` 0.177 → 0.183 (test shaders carefully)
    - `lucide-react` 0.516 → 0.576 (audit icon usage)
    - `eslint` 9 → 10 + `eslint-plugin-security` 3 → 4
-6. **Update CLAUDE.md** — repo reference says `gen_pattern_showcase.git` but GitHub repo is `eidos-engine`
+6. ~~**Update CLAUDE.md**~~ — RESOLVED: Fixed repo reference to `eidos-engine`
 7. **Address the elliptic vulnerability** — monitor Storybook for a fix to `node-polyfill-webpack-plugin` dependency
 
 ### Priority 3: Low
