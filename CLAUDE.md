@@ -637,7 +637,7 @@ export const Variants: Story = {
 
 ### Repository Information
 
-- **GitHub**: <https://github.com/aaronsbrown/gen_pattern_showcase.git>
+- **GitHub**: <https://github.com/aaronsbrown/eidos-engine.git>
 - **Branch**: `main`
 - **Development**: Active, collaborative with AI assistance
 
