@@ -11,12 +11,12 @@
 | Area | Status |
 |------|--------|
 | **Dependencies** | GREEN — all safe updates applied, 6 low-severity remain (Storybook transitive) |
-| **Security** | YELLOW — Chromatic token exposed in package.json; no other secrets found |
+| **Security** | GREEN — Chromatic token removed; no secrets found |
 | **CI/CD** | GREEN — last main workflow succeeded; workflows are current |
 | **Preflight** | GREEN — all 5 commands pass |
 | **Deployment** | GREEN — live site (www.eidos-engine.app) is accessible and functional |
 
-**Overall: YELLOW** — Codebase is healthy and builds clean. Minor security hygiene item (Chromatic token).
+**Overall: GREEN** — Codebase is healthy, builds clean, all preflight passes, deployment is live.
 
 ---
 
@@ -84,13 +84,7 @@ Key vulnerabilities resolved by `npm audit fix`:
 "chromatic": "npx chromatic --project-token=chpt_4d2a84729e40365"
 ```
 
-**Risk:** Low — Chromatic tokens are scoped to visual regression testing and cannot modify code or access sensitive data. However, best practice is to use environment variables.
-
-**Recommendation:** Move to `CHROMATIC_PROJECT_TOKEN` environment variable and update the script to:
-```json
-"chromatic": "npx chromatic"
-```
-(Chromatic CLI auto-reads `CHROMATIC_PROJECT_TOKEN` from env.)
+**Resolution:** Removed Chromatic entirely — dependency, script, and plaintext token all deleted from `package.json`. The tool was unused.
 
 ### 3c. Security Headers
 
@@ -171,9 +165,9 @@ Note: Automated HTTP fetching tools return a 404-like response because the app r
 ## 6. Recommended Actions (Prioritized)
 
 ### Priority 1: High
-1. **Move Chromatic token to env var** — Remove plaintext token from `package.json`, use `CHROMATIC_PROJECT_TOKEN` env var instead
-3. **Update CI Node.js matrix** — Consider adding Node 24.x to the test matrix (current LTS)
-4. **Update `codecov/codecov-action`** from v3 to v4
+1. ~~**Move Chromatic token to env var**~~ — RESOLVED: Removed Chromatic entirely
+2. **Update CI Node.js matrix** — Consider adding Node 24.x to the test matrix (current LTS)
+3. **Update `codecov/codecov-action`** from v3 to v4
 
 ### Priority 2: Medium
 4. **Evaluate major dependency updates:**
@@ -194,7 +188,8 @@ Note: Automated HTTP fetching tools return a 404-like response because the app r
 
 1. **Applied `npm audit fix`** — resolved 11 vulnerabilities (7 low→moderate, 4 high)
 2. **Ran `npm update`** — updated all packages within semver range to latest compatible versions
-3. **Verified full preflight** — all 5 commands pass
-4. **Created this report**
+3. **Removed Chromatic** — unused visual regression tool; also removes plaintext token from package.json
+4. **Verified full preflight** — all 5 commands pass
+5. **Created this report**
 
 All changes are on branch `feature/health-check-2026-03`.
