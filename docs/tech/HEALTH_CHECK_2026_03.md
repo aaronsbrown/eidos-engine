@@ -166,14 +166,13 @@ Note: Automated HTTP fetching tools return a 404-like response because the app r
 
 ### Priority 1: High
 1. ~~**Move Chromatic token to env var**~~ — RESOLVED: Removed Chromatic entirely
-2. **Update CI Node.js matrix** — Consider adding Node 24.x to the test matrix (current LTS)
-3. **Update `codecov/codecov-action`** from v3 to v4
+2. ~~**Update CI Node.js matrix**~~ — RESOLVED: Added Node 24.x to test matrix
+3. ~~**Update `codecov/codecov-action`**~~ — RESOLVED: Updated from v3 to v4
 
 ### Priority 2: Medium
 4. **Evaluate major dependency updates:**
    - `three` 0.177 → 0.183 (test shaders carefully)
    - `lucide-react` 0.516 → 0.576 (audit icon usage)
-   - `chromatic` 13 → 15
    - `eslint` 9 → 10 + `eslint-plugin-security` 3 → 4
 6. **Update CLAUDE.md** — repo reference says `gen_pattern_showcase.git` but GitHub repo is `eidos-engine`
 7. **Address the elliptic vulnerability** — monitor Storybook for a fix to `node-polyfill-webpack-plugin` dependency
